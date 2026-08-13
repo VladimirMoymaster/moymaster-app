@@ -1,420 +1,257 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>МойМастер</title>
-  <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f0f2f5;
-    }
-    .header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 30px 20px;
-      text-align: center;
-    }
-    .header h1 { margin: 0; font-size: 28px; margin-bottom: 10px; }
-    .header p { margin: 0; opacity: 0.9; }
-    
-    .container { padding: 20px; }
-    
-    .section {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    .section h2 {
-      margin: 0 0 15px 0;
-      font-size: 20px;
-      color: #333;
-    }
-    
-    .category-btn {
-      display: block;
-      width: 100%;
-      padding: 15px;
-      margin: 8px 0;
-      background: #f5f5f5;
-      border: 2px solid #e0e0e0;
-      border-radius: 10px;
-      font-size: 16px;
-      text-align: left;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    .category-btn:hover, .category-btn:active {
-      background: #667eea;
-      color: white;
-      border-color: #667eea;
-    }
-    
-    .order-card {
-      background: #fafafa;
-      border: 1px solid #e0e0e0;
-      border-radius: 10px;
-      padding: 15px;
-      margin: 10px 0;
-    }
-    .order-card h3 { margin: 0 0 10px 0; color: #333; }
-    .order-card p { margin: 5px 0; color: #666; }
-    .order-card .budget { 
-      font-weight: bold; 
-      color: #667eea;
-      font-size: 18px;
-    }
-    
-    .btn {
-      display: block;
-      width: 100%;
-      padding: 15px;
-      background: #667eea;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      margin: 10px 0;
-    }
-    .btn:active { opacity: 0.9; }
-    
-    .loading {
-      text-align: center;
-      padding: 20px;
-      color: #999;
-    }
-    
-    .form-group { margin: 15px 0; }
-    .form-group label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: 600;
-      color: #333;
-    }
-    .form-group input,
-    .form-group textarea,
-    .form-group select {
-      width: 100%;
-      padding: 12px;
-      border: 2px solid #e0e0e0;
-      border-radius: 8px;
-      font-size: 16px;
-    }
-    .form-group input:focus,
-    .form-group textarea:focus,
-    .form-group select:focus {
-      outline: none;
-      border-color: #667eea;
-    }
-    
-    .user-info {
-      background: #f5f5f5;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 15px;
-    }
-    .user-info p { margin: 5px 0; }
-    
-    .tab {
-      display: inline-block;
-      padding: 10px 20px;
-      margin: 5px;
-      background: #f0f0f0;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    .tab.active {
-      background: #667eea;
-      color: white;
-    }
-    
-    .hidden { display: none; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Мой Мастер</title>
+    <!-- VK Bridge -->
+    <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif; margin: 0; padding: 0; background: #f5f5f5; color: #333; padding-bottom: 70px; }
+        .header { background: #0077FF; color: white; padding: 15px; text-align: center; font-weight: bold; font-size: 18px; position: sticky; top: 0; z-index: 10; }
+        .container { padding: 15px; }
+        .card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .card h3 { margin: 0 0 10px 0; font-size: 16px; }
+        .btn { background: #0077FF; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; font-size: 16px; font-weight: 500; cursor: pointer; margin-top: 10px; }
+        .btn:active { background: #005ce6; }
+        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; box-sizing: border-box; }
+        .nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; border-top: 1px solid #eee; padding-bottom: env(safe-area-inset-bottom); }
+        .nav-item { flex: 1; text-align: center; padding: 12px 0; font-size: 12px; color: #888; cursor: pointer; }
+        .nav-item.active { color: #0077FF; font-weight: bold; }
+        .nav-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+        .tab { display: none; }
+        .tab.active { display: block; }
+        .loading { text-align: center; color: #888; padding: 20px; }
+        .order-item { border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px; }
+        .order-item:last-child { border-bottom: none; margin-bottom: 0; }
+        .badge { display: inline-block; background: #e3f2fd; color: #0077FF; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-bottom: 5px; }
+    </style>
 </head>
 <body>
 
-  <div class="header">
-    <h1>🛠 МойМастер</h1>
-    <p>Поиск проверенных мастеров</p>
-  </div>
+    <div class="header">🛠 Мой Мастер</div>
 
-  <div class="container">
-    
     <!-- Вкладка: Главная -->
-    <div id="tab-home" class="tab-section">
-      <div class="section">
-        <h2>📋 Категории услуг</h2>
-        <div id="categories-list" class="loading">Загрузка...</div>
-      </div>
-      
-      <div class="section">
-        <h2>🔥 Последние заявки</h2>
-        <div id="orders-list" class="loading">Загрузка...</div>
-      </div>
+    <div id="tab-home" class="tab active">
+        <div class="container">
+            <div class="card">
+                <h3>📋 Категории услуг</h3>
+                <div id="categories-list" class="loading">Загрузка...</div>
+            </div>
+            <div class="card">
+                <h3>🔥 Последние заявки</h3>
+                <div id="orders-list" class="loading">Загрузка...</div>
+            </div>
+        </div>
     </div>
 
-    <!-- Вкладка: Создать заявку -->
-    <div id="tab-create" class="tab-section hidden">
-      <div class="section">
-        <h2>📝 Новая заявка</h2>
-        <div class="form-group">
-          <label>Категория:</label>
-          <select id="create-category">
-            <option value="">Выберите категорию</option>
-          </select>
+    <!-- Вкладка: Новая заявка -->
+    <div id="tab-order" class="tab">
+        <div class="container">
+            <div class="card">
+                <h3>📝 Новая заявка</h3>
+                <select id="order-category">
+                    <option value="">Выберите категорию</option>
+                </select>
+                <input type="text" id="order-title" placeholder="Заголовок (например: Починить розетку)">
+                <textarea id="order-description" rows="4" placeholder="Описание проблемы..."></textarea>
+                <input type="number" id="order-budget" placeholder="Бюджет (руб)">
+                <button class="btn" onclick="createOrder()">📤 Создать заявку</button>
+            </div>
         </div>
-        <div class="form-group">
-          <label>Заголовок:</label>
-          <input type="text" id="create-title" placeholder="Например: Установить смеситель">
-        </div>
-        <div class="form-group">
-          <label>Описание:</label>
-          <textarea id="create-desc" rows="4" placeholder="Опишите задачу подробно..."></textarea>
-        </div>
-        <div class="form-group">
-          <label>Бюджет (руб):</label>
-          <input type="number" id="create-budget" placeholder="5000">
-        </div>
-        <button class="btn" onclick="createOrder()">📤 Создать заявку</button>
-      </div>
     </div>
 
     <!-- Вкладка: Профиль -->
-    <div id="tab-profile" class="tab-section hidden">
-      <div class="section">
-        <h2> Мой профиль</h2>
-        <div id="user-info" class="user-info">
-          <div class="loading">Загрузка...</div>
+    <div id="tab-profile" class="tab">
+        <div class="container">
+            <div class="card">
+                <h3>👤 Профиль</h3>
+                <div id="profile-info" class="loading">Загрузка...</div>
+            </div>
         </div>
-        <button class="btn" onclick="becomeMaster()">🔧 Стать мастером</button>
-      </div>
     </div>
 
-  </div>
-
-  <!-- Навигация -->
-  <div style="position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 10px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1);">
-    <div style="display: flex; justify-content: space-around;">
-      <div class="tab active" onclick="showTab('home')" style="flex: 1; text-align: center; margin: 0 5px;"> Главная</div>
-      <div class="tab" onclick="showTab('create')" style="flex: 1; text-align: center; margin: 0 5px;">➕ Заявка</div>
-      <div class="tab" onclick="showTab('profile')" style="flex: 1; text-align: center; margin: 0 5px;">👤 Профиль</div>
-    </div>
-  </div>
-
-  <script>
-    // API URL
-    const API_URL = 'https://moymaster.gamer.free/api.php';
-    
-    // Текущий пользователь
-    let currentUser = null;
-    let categories = [];
-
-    // Инициализация
-    async function init() {
-      try {
-        // Инициализация VK Bridge
-        await vkBridge.send('VKWebAppInit');
-        
-        // Получаем данные пользователя VK
-        const userInfo = await vkBridge.send('VKWebAppGetUserInfo');
-        currentUser = {
-          vk_id: userInfo.id,
-          name: userInfo.first_name + ' ' + userInfo.last_name,
-          avatar: userInfo.photo_200
-        };
-        
-        // Авторизуем на сервере
-        await authUser();
-        
-        // Загружаем категории
-        await loadCategories();
-        
-        // Загружаем заявки
-        await loadOrders();
-        
-        // Показываем профиль
-        showProfile();
-        
-      } catch (error) {
-        console.error('Init error:', error);
-        alert('Ошибка инициализации: ' + error.message);
-      }
-    }
-
-    // Авторизация пользователя
-    async function authUser() {
-      const formData = new FormData();
-      formData.append('action', 'vk_auth');
-      formData.append('vk_id', currentUser.vk_id);
-      formData.append('name', currentUser.name);
-      
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        body: formData
-      });
-      
-      const data = await response.json();
-      if (data.success) {
-        currentUser.id = data.user.id;
-        currentUser.role = data.user.role;
-      }
-    }
-
-    // Загрузка категорий
-    async function loadCategories() {
-      try {
-        const response = await fetch(API_URL + '?action=get_categories');
-        const data = await response.json();
-        
-        if (data.success) {
-          categories = data.categories;
-          displayCategories();
-          fillCategorySelect();
-        }
-      } catch (error) {
-        console.error('Load categories error:', error);
-      }
-    }
-
-    // Отображение категорий
-    function displayCategories() {
-      const container = document.getElementById('categories-list');
-      container.innerHTML = categories.map(cat => `
-        <button class="category-btn" onclick="selectCategory(${cat.id})">
-          ${cat.icon || '📦'} ${cat.name}
-        </button>
-      `).join('');
-    }
-
-    // Заполнение select
-    function fillCategorySelect() {
-      const select = document.getElementById('create-category');
-      select.innerHTML = '<option value="">Выберите категорию</option>' +
-        categories.map(cat => `<option value="${cat.id}">${cat.icon || '📦'} ${cat.name}</option>`).join('');
-    }
-
-    // Выбор категории
-    function selectCategory(categoryId) {
-      showTab('create');
-      document.getElementById('create-category').value = categoryId;
-    }
-
-    // Загрузка заявок
-    async function loadOrders() {
-      try {
-        const response = await fetch(API_URL + '?action=get_orders');
-        const data = await response.json();
-        
-        if (data.success) {
-          displayOrders(data.orders);
-        }
-      } catch (error) {
-        console.error('Load orders error:', error);
-      }
-    }
-
-    // Отображение заявок
-    function displayOrders(orders) {
-      const container = document.getElementById('orders-list');
-      
-      if (orders.length === 0) {
-        container.innerHTML = '<p style="text-align: center; color: #999;">Пока нет заявок</p>';
-        return;
-      }
-      
-      container.innerHTML = orders.map(order => `
-        <div class="order-card">
-          <h3>${order.title}</h3>
-          <p><strong>Категория:</strong> ${order.category_name || 'Не указана'}</p>
-          <p>${order.description || ''}</p>
-          ${order.budget ? `<p class="budget">${order.budget} ₽</p>` : ''}
-          <p style="font-size: 12px; color: #999;">${new Date(order.created_at).toLocaleString('ru-RU')}</p>
+    <!-- Нижняя навигация -->
+    <div class="nav">
+        <div class="nav-item active" onclick="switchTab('home')">
+            <span class="nav-icon">🏠</span>Главная
         </div>
-      `).join('');
-    }
+        <div class="nav-item" onclick="switchTab('order')">
+            <span class="nav-icon">➕</span>Заявка
+        </div>
+        <div class="nav-item" onclick="switchTab('profile')">
+            <span class="nav-icon">👤</span>Профиль
+        </div>
+    </div>
 
-    // Создание заявки
-    async function createOrder() {
-      const categoryId = document.getElementById('create-category').value;
-      const title = document.getElementById('create-title').value.trim();
-      const description = document.getElementById('create-desc').value.trim();
-      const budget = document.getElementById('create-budget').value;
-      
-      if (!categoryId) {
-        alert('Выберите категорию');
-        return;
-      }
-      if (!title) {
-        alert('Введите заголовок');
-        return;
-      }
-      
-      const formData = new FormData();
-      formData.append('action', 'create_order');
-      formData.append('user_id', currentUser.id);
-      formData.append('category_id', categoryId);
-      formData.append('title', title);
-      formData.append('description', description);
-      formData.append('budget', budget || 0);
-      
-      try {
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          body: formData
+    <script>
+        // 1. ИНИЦИАЛИЗАЦИЯ SUPABASE (ЗАМЕНИ НА СВОИ ДАННЫЕ!)
+        const SUPABASE_URL = 'https://supabase.com/dashboard/project/kmjuddmhvlccrbyyfcce'; // например: 'https://xyz123.supabase.co'
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttanVkZG1odmxjY3JieXlmY2NlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2Mjc5ODcsImV4cCI6MjEwMjIwMzk4N30.PhJxMFSRlF9tmUuvOLH-JC9Tn-9kAgQ11XEg69eJZ6c'; // начинается на eyJ...
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let currentUser = null;
+
+        // 2. ИНИЦИАЛИЗАЦИЯ VK BRIDGE
+        vkBridge.send('VKWebAppInit').then(() => {
+            console.log('VK Bridge инициализирован');
+            loadUserData();
+        }).catch(err => {
+            console.error('Ошибка VK Bridge:', err);
+            // Для тестирования в обычном браузере создаем фейкового пользователя
+            currentUser = { id: 1, vk_id: 999999, name: 'Тестовый Пользователь', role: 'customer' };
+            updateProfileUI();
+            loadCategories();
+            loadOrders();
         });
-        
-        const data = await response.json();
-        if (data.success) {
-          alert('✅ Заявка создана!');
-          document.getElementById('create-title').value = '';
-          document.getElementById('create-desc').value = '';
-          document.getElementById('create-budget').value = '';
-          showTab('home');
-          loadOrders();
-        } else {
-          alert('Ошибка при создании заявки');
+
+        // 3. ПОЛУЧЕНИЕ ДАННЫХ ПОЛЬЗОВАТЕЛЯ ИЗ VK
+        async function loadUserData() {
+            try {
+                const userData = await vkBridge.send('VKWebAppGetUserInfo');
+                const vkId = userData.id;
+                const name = `${userData.first_name} ${userData.last_name}`.trim();
+
+                // Проверяем или создаем пользователя в Supabase (аналог vk_auth)
+                let { data: users, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('vk_id', vkId)
+                    .single();
+
+                if (!users) {
+                    const { data: newUser, error: insertError } = await supabase
+                        .from('users')
+                        .insert([{ vk_id: vkId, name: name, role: 'customer' }])
+                        .select()
+                        .single();
+                    currentUser = newUser;
+                } else {
+                    currentUser = users;
+                }
+                
+                updateProfileUI();
+                loadCategories();
+                loadOrders();
+            } catch (e) {
+                console.error('Ошибка получения данных VK:', e);
+            }
         }
-      } catch (error) {
-        console.error('Create order error:', error);
-        alert('Ошибка при создании заявки');
-      }
-    }
 
-    // Показ профиля
-    function showProfile() {
-      const container = document.getElementById('user-info');
-      container.innerHTML = `
-        <p><strong>Имя:</strong> ${currentUser.name}</p>
-        <p><strong>Роль:</strong> ${currentUser.role === 'master' ? '🔧 Мастер' : '👤 Заказчик'}</p>
-        <p><strong>ID VK:</strong> ${currentUser.vk_id}</p>
-      `;
-    }
+        // 4. ЗАГРУЗКА КАТЕГОРИЙ
+        async function loadCategories() {
+            const { data, error } = await supabase
+                .from('categories')
+                .select('*')
+                .order('sort_order', { ascending: true });
 
-    // Стать мастером
-    function becomeMaster() {
-      alert('Функция "Стать мастером" будет доступна скоро!');
-    }
+            const container = document.getElementById('categories-list');
+            const select = document.getElementById('order-category');
+            
+            if (error || !data) {
+                container.innerHTML = 'Ошибка загрузки';
+                return;
+            }
 
-    // Переключение вкладок
-    function showTab(tabName) {
-      document.querySelectorAll('.tab-section').forEach(el => el.classList.add('hidden'));
-      document.getElementById('tab-' + tabName).classList.remove('hidden');
-      
-      document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
-      event.target.classList.add('active');
-    }
+            // Отображаем на главной
+            container.innerHTML = data.map(c => `<span class="badge">${c.name}</span>`).join(' ');
+            
+            // Заполняем селект в форме
+            select.innerHTML = '<option value="">Выберите категорию</option>' + 
+                data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        }
 
-    // Запускаем приложение
-    init();
-  </script>
+        // 5. ЗАГРУЗКА ЗАЯВОК
+        async function loadOrders() {
+            // В реальном проекте тут можно сделать JOIN с users и categories
+            const { data, error } = await supabase
+                .from('orders')
+                .select('*, categories(name)')
+                .eq('status', 'open')
+                .order('created_at', { ascending: false })
+                .limit(5);
 
+            const container = document.getElementById('orders-list');
+            if (error || !data || data.length === 0) {
+                container.innerHTML = '<div style="color:#888">Пока нет активных заявок</div>';
+                return;
+            }
+
+            container.innerHTML = data.map(order => `
+                <div class="order-item">
+                    <div style="font-weight:bold; margin-bottom:5px;">${order.title}</div>
+                    <div style="font-size:14px; color:#666; margin-bottom:5px;">${order.description}</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span class="badge">${order.categories?.name || 'Без категории'}</span>
+                        <span style="font-weight:bold; color:#0077FF;">${order.budget ? order.budget + ' ₽' : 'Договорная'}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 6. СОЗДАНИЕ ЗАЯВКИ
+        async function createOrder() {
+            if (!currentUser) return alert('Сначала дождитесь загрузки профиля');
+            
+            const categoryId = document.getElementById('order-category').value;
+            const title = document.getElementById('order-title').value.trim();
+            const description = document.getElementById('order-description').value.trim();
+            const budget = document.getElementById('order-budget').value;
+
+            if (!categoryId || !title) {
+                return alert('Пожалуйста, заполните категорию и заголовок');
+            }
+
+            const btn = document.querySelector('#tab-order .btn');
+            btn.textContent = 'Создание...';
+            btn.disabled = true;
+
+            const { data, error } = await supabase
+                .from('orders')
+                .insert([{ 
+                    user_id: currentUser.id, 
+                    category_id: categoryId, 
+                    title, 
+                    description, 
+                    budget: budget || null,
+                    status: 'open'
+                }])
+                .select();
+
+            if (error) {
+                alert('Ошибка при создании: ' + error.message);
+            } else {
+                alert('✅ Заявка успешно создана!');
+                document.getElementById('order-title').value = '';
+                document.getElementById('order-description').value = '';
+                document.getElementById('order-budget').value = '';
+                switchTab('home');
+                loadOrders(); // Обновляем список
+            }
+            
+            btn.textContent = '📤 Создать заявку';
+            btn.disabled = false;
+        }
+
+        // 7. ОБНОВЛЕНИЕ ПРОФИЛЯ
+        function updateProfileUI() {
+            document.getElementById('profile-info').innerHTML = `
+                <div style="font-size:18px; font-weight:bold; margin-bottom:10px;">${currentUser.name}</div>
+                <div style="color:#666; margin-bottom:5px;">Роль: ${currentUser.role === 'customer' ? '👤 Заказчик' : '👷 Мастер'}</div>
+                <div style="color:#666;">VK ID: ${currentUser.vk_id}</div>
+            `;
+        }
+
+        // 8. ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+    </script>
 </body>
 </html>
