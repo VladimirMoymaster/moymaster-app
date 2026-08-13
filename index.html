@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,87 +6,415 @@
   <title>МойМастер</title>
   <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
   <style>
+    * { box-sizing: border-box; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       margin: 0;
-      padding: 20px;
-      background: #f5f5f5;
+      padding: 0;
+      background: #f0f2f5;
     }
     .header {
-      background: #6366f1;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
-      padding: 20px;
-      border-radius: 12px;
+      padding: 30px 20px;
       text-align: center;
+    }
+    .header h1 { margin: 0; font-size: 28px; margin-bottom: 10px; }
+    .header p { margin: 0; opacity: 0.9; }
+    
+    .container { padding: 20px; }
+    
+    .section {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
       margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-    .header h1 {
-      margin: 0;
-      font-size: 24px;
+    .section h2 {
+      margin: 0 0 15px 0;
+      font-size: 20px;
+      color: #333;
     }
-    .button {
+    
+    .category-btn {
       display: block;
       width: 100%;
       padding: 15px;
+      margin: 8px 0;
+      background: #f5f5f5;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 16px;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .category-btn:hover, .category-btn:active {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+    
+    .order-card {
+      background: #fafafa;
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 15px;
       margin: 10px 0;
-      background: white;
-      border: 2px solid #6366f1;
+    }
+    .order-card h3 { margin: 0 0 10px 0; color: #333; }
+    .order-card p { margin: 5px 0; color: #666; }
+    .order-card .budget { 
+      font-weight: bold; 
+      color: #667eea;
+      font-size: 18px;
+    }
+    
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      background: #667eea;
+      color: white;
+      border: none;
       border-radius: 10px;
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
+      margin: 10px 0;
     }
-    .button:active {
-      background: #6366f1;
+    .btn:active { opacity: 0.9; }
+    
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #999;
+    }
+    
+    .form-group { margin: 15px 0; }
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: #333;
+    }
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    
+    .user-info {
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+    .user-info p { margin: 5px 0; }
+    
+    .tab {
+      display: inline-block;
+      padding: 10px 20px;
+      margin: 5px;
+      background: #f0f0f0;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .tab.active {
+      background: #667eea;
       color: white;
     }
-    .info {
-      background: white;
-      padding: 15px;
-      border-radius: 10px;
-      margin-top: 20px;
-    }
+    
+    .hidden { display: none; }
   </style>
 </head>
 <body>
+
   <div class="header">
-    <h1> Мой Мастер</h1>
+    <h1>🛠 МойМастер</h1>
     <p>Поиск проверенных мастеров</p>
   </div>
-  
-  <button class="button" onclick="findMaster()">
-    🛠 Найти мастера
-  </button>
-  
-  <button class="button" onclick="createOrder()">
-     Создать заявку
-  </button>
-  
-  <button class="button" onclick="showProfile()">
-    👤 Мой профиль
-  </button>
-  
-  <div class="info">
-    <h3>Добро пожаловать!</h3>
-    <p>Это тестовая версия приложения Мой Мастер.</p>
-    <p>Здесь вы сможете найти мастеров для любой работы.</p>
+
+  <div class="container">
+    
+    <!-- Вкладка: Главная -->
+    <div id="tab-home" class="tab-section">
+      <div class="section">
+        <h2>📋 Категории услуг</h2>
+        <div id="categories-list" class="loading">Загрузка...</div>
+      </div>
+      
+      <div class="section">
+        <h2>🔥 Последние заявки</h2>
+        <div id="orders-list" class="loading">Загрузка...</div>
+      </div>
+    </div>
+
+    <!-- Вкладка: Создать заявку -->
+    <div id="tab-create" class="tab-section hidden">
+      <div class="section">
+        <h2>📝 Новая заявка</h2>
+        <div class="form-group">
+          <label>Категория:</label>
+          <select id="create-category">
+            <option value="">Выберите категорию</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Заголовок:</label>
+          <input type="text" id="create-title" placeholder="Например: Установить смеситель">
+        </div>
+        <div class="form-group">
+          <label>Описание:</label>
+          <textarea id="create-desc" rows="4" placeholder="Опишите задачу подробно..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Бюджет (руб):</label>
+          <input type="number" id="create-budget" placeholder="5000">
+        </div>
+        <button class="btn" onclick="createOrder()">📤 Создать заявку</button>
+      </div>
+    </div>
+
+    <!-- Вкладка: Профиль -->
+    <div id="tab-profile" class="tab-section hidden">
+      <div class="section">
+        <h2> Мой профиль</h2>
+        <div id="user-info" class="user-info">
+          <div class="loading">Загрузка...</div>
+        </div>
+        <button class="btn" onclick="becomeMaster()">🔧 Стать мастером</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Навигация -->
+  <div style="position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 10px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1);">
+    <div style="display: flex; justify-content: space-around;">
+      <div class="tab active" onclick="showTab('home')" style="flex: 1; text-align: center; margin: 0 5px;"> Главная</div>
+      <div class="tab" onclick="showTab('create')" style="flex: 1; text-align: center; margin: 0 5px;">➕ Заявка</div>
+      <div class="tab" onclick="showTab('profile')" style="flex: 1; text-align: center; margin: 0 5px;">👤 Профиль</div>
+    </div>
   </div>
 
   <script>
-    // Инициализация VK Bridge
-    vkBridge.send('VKWebAppInit');
+    // API URL
+    const API_URL = 'https://moymaster.gamer.free/api.php';
     
-    function findMaster() {
-      alert('Поиск мастера — скоро будет доступно!');
+    // Текущий пользователь
+    let currentUser = null;
+    let categories = [];
+
+    // Инициализация
+    async function init() {
+      try {
+        // Инициализация VK Bridge
+        await vkBridge.send('VKWebAppInit');
+        
+        // Получаем данные пользователя VK
+        const userInfo = await vkBridge.send('VKWebAppGetUserInfo');
+        currentUser = {
+          vk_id: userInfo.id,
+          name: userInfo.first_name + ' ' + userInfo.last_name,
+          avatar: userInfo.photo_200
+        };
+        
+        // Авторизуем на сервере
+        await authUser();
+        
+        // Загружаем категории
+        await loadCategories();
+        
+        // Загружаем заявки
+        await loadOrders();
+        
+        // Показываем профиль
+        showProfile();
+        
+      } catch (error) {
+        console.error('Init error:', error);
+        alert('Ошибка инициализации: ' + error.message);
+      }
     }
-    
-    function createOrder() {
-      alert('Создание заявки — скоро будет доступно!');
+
+    // Авторизация пользователя
+    async function authUser() {
+      const formData = new FormData();
+      formData.append('action', 'vk_auth');
+      formData.append('vk_id', currentUser.vk_id);
+      formData.append('name', currentUser.name);
+      
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        body: formData
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        currentUser.id = data.user.id;
+        currentUser.role = data.user.role;
+      }
     }
-    
+
+    // Загрузка категорий
+    async function loadCategories() {
+      try {
+        const response = await fetch(API_URL + '?action=get_categories');
+        const data = await response.json();
+        
+        if (data.success) {
+          categories = data.categories;
+          displayCategories();
+          fillCategorySelect();
+        }
+      } catch (error) {
+        console.error('Load categories error:', error);
+      }
+    }
+
+    // Отображение категорий
+    function displayCategories() {
+      const container = document.getElementById('categories-list');
+      container.innerHTML = categories.map(cat => `
+        <button class="category-btn" onclick="selectCategory(${cat.id})">
+          ${cat.icon || '📦'} ${cat.name}
+        </button>
+      `).join('');
+    }
+
+    // Заполнение select
+    function fillCategorySelect() {
+      const select = document.getElementById('create-category');
+      select.innerHTML = '<option value="">Выберите категорию</option>' +
+        categories.map(cat => `<option value="${cat.id}">${cat.icon || '📦'} ${cat.name}</option>`).join('');
+    }
+
+    // Выбор категории
+    function selectCategory(categoryId) {
+      showTab('create');
+      document.getElementById('create-category').value = categoryId;
+    }
+
+    // Загрузка заявок
+    async function loadOrders() {
+      try {
+        const response = await fetch(API_URL + '?action=get_orders');
+        const data = await response.json();
+        
+        if (data.success) {
+          displayOrders(data.orders);
+        }
+      } catch (error) {
+        console.error('Load orders error:', error);
+      }
+    }
+
+    // Отображение заявок
+    function displayOrders(orders) {
+      const container = document.getElementById('orders-list');
+      
+      if (orders.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #999;">Пока нет заявок</p>';
+        return;
+      }
+      
+      container.innerHTML = orders.map(order => `
+        <div class="order-card">
+          <h3>${order.title}</h3>
+          <p><strong>Категория:</strong> ${order.category_name || 'Не указана'}</p>
+          <p>${order.description || ''}</p>
+          ${order.budget ? `<p class="budget">${order.budget} ₽</p>` : ''}
+          <p style="font-size: 12px; color: #999;">${new Date(order.created_at).toLocaleString('ru-RU')}</p>
+        </div>
+      `).join('');
+    }
+
+    // Создание заявки
+    async function createOrder() {
+      const categoryId = document.getElementById('create-category').value;
+      const title = document.getElementById('create-title').value.trim();
+      const description = document.getElementById('create-desc').value.trim();
+      const budget = document.getElementById('create-budget').value;
+      
+      if (!categoryId) {
+        alert('Выберите категорию');
+        return;
+      }
+      if (!title) {
+        alert('Введите заголовок');
+        return;
+      }
+      
+      const formData = new FormData();
+      formData.append('action', 'create_order');
+      formData.append('user_id', currentUser.id);
+      formData.append('category_id', categoryId);
+      formData.append('title', title);
+      formData.append('description', description);
+      formData.append('budget', budget || 0);
+      
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          body: formData
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+          alert('✅ Заявка создана!');
+          document.getElementById('create-title').value = '';
+          document.getElementById('create-desc').value = '';
+          document.getElementById('create-budget').value = '';
+          showTab('home');
+          loadOrders();
+        } else {
+          alert('Ошибка при создании заявки');
+        }
+      } catch (error) {
+        console.error('Create order error:', error);
+        alert('Ошибка при создании заявки');
+      }
+    }
+
+    // Показ профиля
     function showProfile() {
-      alert('Профиль — скоро будет доступно!');
+      const container = document.getElementById('user-info');
+      container.innerHTML = `
+        <p><strong>Имя:</strong> ${currentUser.name}</p>
+        <p><strong>Роль:</strong> ${currentUser.role === 'master' ? '🔧 Мастер' : '👤 Заказчик'}</p>
+        <p><strong>ID VK:</strong> ${currentUser.vk_id}</p>
+      `;
     }
+
+    // Стать мастером
+    function becomeMaster() {
+      alert('Функция "Стать мастером" будет доступна скоро!');
+    }
+
+    // Переключение вкладок
+    function showTab(tabName) {
+      document.querySelectorAll('.tab-section').forEach(el => el.classList.add('hidden'));
+      document.getElementById('tab-' + tabName).classList.remove('hidden');
+      
+      document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+
+    // Запускаем приложение
+    init();
   </script>
+
 </body>
 </html>
