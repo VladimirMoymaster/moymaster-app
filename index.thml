@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>МойМастер</title>
+  <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .header {
+      background: #6366f1;
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .header h1 { margin: 0; font-size: 24px; }
+    .button {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      margin: 10px 0;
+      background: white;
+      border: 2px solid #6366f1;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .button:active { background: #6366f1; color: white; }
+    .info {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>МойМастер</h1>
+    <p>Поиск проверенных мастеров</p>
+  </div>
+  
+  <button class="button" onclick="findMaster()">🛠 Найти мастера</button>
+  <button class="button" onclick="createOrder()">📝 Создать заявку</button>
+  <button class="button" onclick="showProfile()">👤 Мой профиль</button>
+  
+  <div class="info">
+    <h3>Добро пожаловать!</h3>
+    <p>Это тестовая версия приложения МойМастер.</p>
+  </div>
+
+  <script>
+    vkBridge.send('VKWebAppInit');
+    function findMaster() { alert('Поиск мастера — скоро!'); }
+    function createOrder() { alert('Создание заявки — скоро!'); }
+    function showProfile() { alert('Профиль — скоро!'); }
+  </script>
+</body>
+</html>
