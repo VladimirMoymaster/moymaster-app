@@ -92,7 +92,11 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttanVkZG1odmxjY3JieXlmY2NlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2Mjc5ODcsImV4cCI6MjEwMjIwMzk4N30.PhJxMFSRlF9tmUuvOLH-JC9Tn-9kAgQ11XEg69eJZ6c'; // вставь свой полный ключ
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        
         let currentUser = null;
+        console.log(' SUPABASE_URL:', SUPABASE_URL);
+        console.log('🔑 SUPABASE_KEY:', SUPABASE_KEY.substring(0, 20) + '...');
+        console.log(' Supabase client:', supabase);
 
         // 2. ИНИЦИАЛИЗАЦИЯ VK BRIDGE
         vkBridge.send('VKWebAppInit').then(() => {
