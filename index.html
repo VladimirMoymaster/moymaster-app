@@ -369,121 +369,171 @@
             `;
         }
 
-        function cancelResponse(orderId) {
-            const formContainer = document.getElementById(`response-form-${orderId}`);
-            formContainer.innerHTML = '';
-        }
-
         async function submitResponse(orderId) {
-            const priceInput = document.getElementById(`response-price-${orderId}`);
-            const messageInput = document.getElementById(`response-message-${orderId}`);
-            
-            const price = priceInput.value.trim();
-            const message = messageInput.value.trim();
+    const priceInput = document.getElementById(`response-price-${orderId}`);
+    const messageInput = document.getElementById(`response-message-${orderId}`);
+    
+    const price = priceInput.value.trim();
+    const message = messageInput.value.trim();
 
-            if (!price) { alert('Укажите цену'); return; }
+    if (!price) { 
+        alert('Укажите цену'); 
+        return; 
+    }
 
-            const btn = event.target;
-            btn.textContent = ' Отправка...';
-            btn.disabled = true;
+    const btn = event.target;
+    btn.textContent = '⏳ Отправка...';
+    btn.disabled = true;
 
-            const { error } = await supabaseClient
-                .from('responses')
-                .insert([{
-                    order_id: orderId,
-                    user_id: currentUser.id,
-                    price: parseFloat(price),
-                    message: message || null,
-                    status: 'pending'
-                }]);
+    console.log('📤 Создание отклика:', {
+        order_id: orderId,
+        user_id: currentUser.id,
+        price: parseFloat(price),
+        message: message
+    });
 
-            if (error) {
-                alert('❌ Ошибка: ' + error.message);
-                btn.textContent = '✅ Отправить отклик';
-                btn.disabled = false;
-            } else {
-                alert('✅ Отклик отправлен!');
-                cancelResponse(orderId);
-                await loadResponses();
-            }
-        }
+    const { data, error } = await supabaseClient
+        .from('responses')
+        .insert([{
+            order_id: orderId,
+            user_id: currentUser.id,
+            price: parseFloat(price),
+            message: message || null,
+            status: 'pending'
+        }])
+        .select();
 
+    if (error) {
+        console.error('❌ Ошибка создания отклика:', error);
+        alert('❌ Ошибка: ' + error.message);
+        btn.textContent = '✅ Отправить отклик';
+        btn.disabled = false;
+    } else {
+        console.log('✅ Отклик создан:', data);
+        alert('✅ Отклик отправлен! Перейдите во вкладку "Отклики"');
+        cancelResponse(orderId);
+        
+        // Принудительно обновляем все данные
+        await loadOrders();
+        await loadResponses();
+        
+        // Автоматически переключаемся на вкладку откликов
+        switchTab('responses');
+    }
+}
         async function loadResponses() {
-            if (!currentUser) return;
-            
-            const container = document.getElementById('responses-list');
-            const title = document.getElementById('responses-title');
-            
-            if (currentUser.role === 'master') {
-                title.textContent = '💼 Мои отклики';
-                const { data, error } = await supabaseClient
-                    .from('responses')
-                    .select('*')
-                    .eq('user_id', currentUser.id)
-                    .order('created_at', { ascending: false });
-                
-                if (error || !data || data.length === 0) {
-                    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div>Вы пока не откликались на заявки</div>';
-                    return;
-                }
-                
-                container.innerHTML = data.map(r => {
-                    const statusText = r.status === 'pending' ? '⏳ Ожидает' : 
-                                      r.status === 'accepted' ? '✅ Принят' : '❌ Отклонен';
-                    return `
-                        <div class="response-item">
-                            <div style="font-weight:bold; margin-bottom:5px;">Заявка #${r.order_id}</div>
-                            <div style="font-size:14px; color:#666; margin-bottom:8px;">${r.message || 'Без сообщения'}</div>
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <span class="price-tag">${r.price ? r.price + ' ₽' : 'Цена не указана'}</span>
-                                <span style="font-size:13px; color:#888;">${statusText}</span>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            } else {
-                title.textContent = '📬 Отклики на мои заявки';
-                
-                const { data: myOrders } = await supabaseClient
-                    .from('orders')
-                    .select('id, title')
-                    .eq('user_id', currentUser.id);
-                
-                if (!myOrders || myOrders.length === 0) {
-                    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div>У вас пока нет заявок</div>';
-                    return;
-                }
-                
-                const orderIds = myOrders.map(o => o.id);
-                const { data: responses, error } = await supabaseClient
-                    .from('responses')
-                    .select('*')
-                    .in('order_id', orderIds)
-                    .order('created_at', { ascending: false });
-                
-                if (error || !responses || responses.length === 0) {
-                    container.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>Пока нет откликов на ваши заявки</div>';
-                    return;
-                }
-                
-                container.innerHTML = responses.map(r => {
-                    const order = myOrders.find(o => o.id === r.order_id);
-                    const acceptBtn = r.status === 'pending' ? 
-                        `<button class="btn btn-success" onclick="acceptResponse(${r.id}, ${r.order_id})">✅ Принять мастера</button>` : '';
-                    return `
-                        <div class="response-item">
-                            <div style="font-size:13px; color:#888; margin-bottom:5px;">На заявку: ${order?.title || '#' + r.order_id}</div>
-                            <div style="font-size:14px; color:#666; margin-bottom:8px;">${r.message || 'Без сообщения'}</div>
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                                <span class="price-tag">${r.price ? r.price + ' ₽' : 'Цена не указана'}</span>
-                                <span style="font-size:13px;">Пользователь #${r.user_id}</span>
-                            </div>
-                            ${acceptBtn}
-                        </div>
-                    `;
-                }).join('');
-            }
+    if (!currentUser) {
+        console.log('⚠️ Пользователь не загружен');
+        return;
+    }
+    
+    console.log('📥 Загрузка откликов для пользователя:', currentUser.id, 'роль:', currentUser.role);
+    
+    const container = document.getElementById('responses-list');
+    const title = document.getElementById('responses-title');
+    
+    if (currentUser.role === 'master') {
+        // Мастер видит свои отклики
+        title.textContent = '💼 Мои отклики';
+        
+        console.log('🔍 Ищем отклики мастера...');
+        const { data, error } = await supabaseClient
+            .from('responses')
+            .select('*')
+            .eq('user_id', currentUser.id)
+            .order('created_at', { ascending: false });
+        
+        console.log('Результат:', { data, error });
+        
+        if (error) {
+            console.error('❌ Ошибка загрузки откликов:', error);
+            container.innerHTML = `<div class="error">Ошибка: ${error.message}</div>`;
+            return;
         }
+        
+        if (!data || data.length === 0) {
+            container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div>Вы пока не откликались на заявки</div>';
+            return;
+        }
+        
+        container.innerHTML = data.map(r => {
+            const statusText = r.status === 'pending' ? '⏳ Ожидает' : 
+                              r.status === 'accepted' ? '✅ Принят' : '❌ Отклонен';
+            return `
+                <div class="response-item">
+                    <div style="font-weight:bold; margin-bottom:5px;">Заявка #${r.order_id}</div>
+                    <div style="font-size:14px; color:#666; margin-bottom:8px;">${r.message || 'Без сообщения'}</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span class="price-tag">${r.price ? r.price + ' ₽' : 'Цена не указана'}</span>
+                        <span style="font-size:13px; color:#888;">${statusText}</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+    } else {
+        // Заказчик видит отклики на свои заявки
+        title.textContent = ' Отклики на мои заявки';
+        
+        console.log('🔍 Ищем заявки заказчика...');
+        const { data: myOrders, error: ordersError } = await supabaseClient
+            .from('orders')
+            .select('id, title')
+            .eq('user_id', currentUser.id);
+        
+        console.log('Мои заявки:', { myOrders, ordersError });
+        
+        if (ordersError) {
+            console.error('❌ Ошибка загрузки заявок:', ordersError);
+            container.innerHTML = `<div class="error">Ошибка: ${ordersError.message}</div>`;
+            return;
+        }
+        
+        if (!myOrders || myOrders.length === 0) {
+            container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div>У вас пока нет заявок</div>';
+            return;
+        }
+        
+        const orderIds = myOrders.map(o => o.id);
+        console.log('ID заявок для поиска откликов:', orderIds);
+        
+        const { data: responses, error: responsesError } = await supabaseClient
+            .from('responses')
+            .select('*')
+            .in('order_id', orderIds)
+            .order('created_at', { ascending: false });
+        
+        console.log('Найденные отклики:', { responses, responsesError });
+        
+        if (responsesError) {
+            console.error('❌ Ошибка загрузки откликов:', responsesError);
+            container.innerHTML = `<div class="error">Ошибка: ${responsesError.message}</div>`;
+            return;
+        }
+        
+        if (!responses || responses.length === 0) {
+            container.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>Пока нет откликов на ваши заявки</div>';
+            return;
+        }
+        
+        container.innerHTML = responses.map(r => {
+            const order = myOrders.find(o => o.id === r.order_id);
+            const acceptBtn = r.status === 'pending' ? 
+                `<button class="btn btn-success" onclick="acceptResponse(${r.id}, ${r.order_id})">✅ Принять мастера</button>` : '';
+            return `
+                <div class="response-item">
+                    <div style="font-size:13px; color:#888; margin-bottom:5px;">На заявку: ${order?.title || '#' + r.order_id}</div>
+                    <div style="font-size:14px; color:#666; margin-bottom:8px;">${r.message || 'Без сообщения'}</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <span class="price-tag">${r.price ? r.price + ' ₽' : 'Цена не указана'}</span>
+                        <span style="font-size:13px;">Пользователь #${r.user_id}</span>
+                    </div>
+                    ${acceptBtn}
+                </div>
+            `;
+        }).join('');
+    }
+}
 
         async function acceptResponse(responseId, orderId) {
             console.log(' Принятие отклика:', responseId, orderId);
