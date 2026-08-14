@@ -127,6 +127,69 @@
             margin: 10px 0;
             font-size: 14px;
         }
+          /* Стили для модального окна */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            width: 100%;
+            max-width: 350px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .modal-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .modal-text {
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .modal-features {
+            text-align: left;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .modal-features div {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .modal-features div:last-child { margin-bottom: 0; }
+        .modal-close {
+            background: #f0f2f5;
+            color: #333;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            width: 100%;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -675,8 +738,19 @@
         }
 
         // Функция покупки Pro (заглушка)
-        function buyPro() {
-            alert('🚧 Функция оплаты в разработке!\n\nВ будущем здесь будет интеграция с VK Pay.\n\nТариф Pro:\n• Безлимитные отклики\n• Выделение профиля\n• Приоритет в поиске\n\nЦена: 299 ₽/месяц');
+         function buyPro() {
+            document.getElementById('pro-modal').classList.add('active');
+        }
+
+        function closeProModal() {
+            document.getElementById('pro-modal').classList.remove('active');
+        }
+
+        function connectVKPay() {
+            // Здесь в будущем будет реальный вызов VK Pay
+            // Пока просто показываем уведомление и закрываем окно
+            alert('🚧 Оплата через VK Pay будет подключена в следующем обновлении!');
+            closeProModal();
         }
 
         function updateProfileUI() {
@@ -746,5 +820,28 @@
 
         initApp();
     </script>
+    
+    <!-- Модальное окно покупки Pro -->
+    <div class="modal-overlay" id="pro-modal">
+        <div class="modal-content">
+            <div style="font-size: 40px; margin-bottom: 10px;">⭐</div>
+            <div class="modal-title">Оформить PRO-мастера</div>
+            <div class="modal-text">
+                Получите неограниченные возможности для заработка!
+            </div>
+            <div class="modal-features">
+                <div>✅ Безлимитные отклики на заявки</div>
+                <div>⭐ Золотой значок в профиле</div>
+                <div>🚀 Приоритетное отображение</div>
+                <div>📊 Доступ к статистике</div>
+            </div>
+            <div style="font-size: 24px; font-weight: bold; color: #0077FF; margin-bottom: 15px;">
+                299 ₽ / месяц
+            </div>
+            <button class="btn btn-pro" style="margin-bottom: 10px;" onclick="connectVKPay()">💳 Подключить VK Pay</button>
+            <button class="modal-close" onclick="closeProModal()">Позже</button>
+        </div>
+    </div>
+
 </body>
 </html>
