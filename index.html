@@ -426,28 +426,85 @@
     }
 
     async function acceptResponse(responseId, orderId) {
-        if (!confirm('Принять этого мастера? Заявка перейдёт в статус "В работе"')) return;
+    console.log('📥 Принятие отклика:', responseId, orderId);
+    
+    if (!confirm('Принять этого мастера? Заявка перейдёт в статус "В работе"')) {
+        console.log('❌ Отменено пользователем');
+        return;
+    }
+    
+    try {
+        // 1. Получаем данные отклика
+        const { data: responseData, error: responseError } = await supabaseClient
+            .from('responses')
+            .select('user_id, order_id')
+            .eq('id', responseId)
+            .single();
         
-        await supabaseClient
+        if (responseError) {
+            console.error('❌ Ошибка получения отклика:', responseError);
+            alert('Ошибка: ' + responseError.message);
+            return;
+        }
+        
+        console.log('✅ Отклик найден:', responseData);
+        
+        // 2. Обновляем статус отклика на "accepted"
+        const { error: updateResponseError } = await supabaseClient
             .from('responses')
             .update({ status: 'accepted' })
             .eq('id', responseId);
         
-        const { data: resp } = await supabaseClient
-            .from('responses')
-            .select('user_id')
-            .eq('id', responseId)
-            .single();
+        if (updateResponseError) {
+            console.error('❌ Ошибка обновления отклика:', updateResponseError);
+            alert('Ошибка обновления отклика: ' + updateResponseError.message);
+            return;
+        }
         
-        await supabaseClient
+        console.log('✅ Статус отклика обновлен');
+        
+        // 3. Обновляем заявку - назначаем мастера и меняем статус
+        const { error: updateOrderError } = await supabaseClient
             .from('orders')
-            .update({ status: 'in_progress', assigned_master_id: resp.user_id })
+            .update({ 
+                status: 'in_progress', 
+                assigned_master_id: responseData.user_id 
+            })
             .eq('id', orderId);
         
+        if (updateOrderError) {
+            console.error('❌ Ошибка обновления заявки:', updateOrderError);
+            alert('Ошибка обновления заявки: ' + updateOrderError.message);
+            return;
+        }
+        
+        console.log('✅ Заявка обновлена');
+        
+        // 4. Отклоняем остальные отклики на эту заявку
+        const { error: rejectOthersError } = await supabaseClient
+            .from('responses')
+            .update({ status: 'rejected' })
+            .eq('order_id', orderId)
+            .neq('id', responseId)
+            .eq('status', 'pending');
+        
+        if (rejectOthersError) {
+            console.error('️ Ошибка отклонения других откликов:', rejectOthersError);
+        } else {
+            console.log('✅ Другие отклики отклонены');
+        }
+        
         alert('✅ Мастер принят! Заявка в работе.');
+        
+        // 5. Обновляем данные
         await loadOrders();
         await loadResponses();
+        
+    } catch (err) {
+        console.error(' Критическая ошибка:', err);
+        alert('Критическая ошибка: ' + err.message);
     }
+}
 
     async function createOrder() {
         if (!currentUser) return alert('Подождите загрузку');
