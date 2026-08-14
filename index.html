@@ -10,62 +10,98 @@
         * { box-sizing: border-box; }
         body { 
             font-family: -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif; 
-            margin: 0; padding: 0; background: #f5f5f5; color: #333; padding-bottom: 70px;
+            margin: 0; padding: 0; background: #f0f2f5; color: #333; padding-bottom: 70px;
         }
         .header { 
             background: linear-gradient(135deg, #0077FF 0%, #005ce6 100%); 
             color: white; padding: 20px 15px; text-align: center; font-weight: bold; font-size: 20px;
+            box-shadow: 0 2px 10px rgba(0,119,255,0.3);
         }
+        .header-sub { font-size: 13px; opacity: 0.9; margin-top: 4px; font-weight: normal; }
         .container { padding: 15px; }
         .card { 
-            background: white; border-radius: 12px; padding: 15px; margin-bottom: 15px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            background: white; border-radius: 14px; padding: 16px; margin-bottom: 14px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
-        .card h3 { margin: 0 0 15px 0; font-size: 16px; }
+        .card h3 { margin: 0 0 14px 0; font-size: 16px; color: #222; }
         .btn { 
-            background: #0077FF; color: white; border: none; padding: 14px; border-radius: 10px; 
-            width: 100%; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 10px;
+            background: #0077FF; color: white; border: none; padding: 13px; border-radius: 10px; 
+            width: 100%; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 10px;
+            transition: all 0.2s;
         }
-        .btn:active { background: #005ce6; }
-        .btn:disabled { background: #999; cursor: not-allowed; }
+        .btn:active { background: #005ce6; transform: scale(0.98); }
+        .btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+        .btn-success { background: #4CAF50; }
+        .btn-success:active { background: #388E3C; }
+        .btn-warning { background: #FF9800; }
+        .btn-secondary { background: #757575; }
         input, select, textarea { 
             width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ddd; 
-            border-radius: 8px; font-size: 15px; box-sizing: border-box;
+            border-radius: 10px; font-size: 15px; box-sizing: border-box; font-family: inherit;
         }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #0077FF; }
         .nav { 
             position: fixed; bottom: 0; left: 0; right: 0; background: white; 
-            display: flex; border-top: 1px solid #eee;
+            display: flex; border-top: 1px solid #eee; z-index: 100;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
         }
         .nav-item { 
-            flex: 1; text-align: center; padding: 12px 0; font-size: 12px; color: #888; cursor: pointer;
+            flex: 1; text-align: center; padding: 10px 0; font-size: 11px; color: #888; cursor: pointer;
         }
         .nav-item.active { color: #0077FF; font-weight: bold; }
-        .nav-icon { font-size: 22px; display: block; margin-bottom: 4px; }
+        .nav-icon { font-size: 22px; display: block; margin-bottom: 3px; }
         .tab { display: none; }
-        .tab.active { display: block; }
+        .tab.active { display: block; animation: fadeIn 0.25s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .loading { text-align: center; color: #888; padding: 30px 20px; }
-        .error { 
-            background: #ffebee; color: #c62828; padding: 12px; border-radius: 8px; margin: 10px 0;
-        }
+        .error { background: #ffebee; color: #c62828; padding: 12px; border-radius: 10px; margin: 10px 0; }
+        .success { background: #e8f5e9; color: #2e7d32; padding: 12px; border-radius: 10px; margin: 10px 0; }
         .order-item { 
-            border-bottom: 1px solid #eee; padding-bottom: 12px; margin-bottom: 12px;
+            border-bottom: 1px solid #f0f0f0; padding-bottom: 12px; margin-bottom: 12px;
         }
+        .order-item:last-child { border-bottom: none; margin-bottom: 0; }
         .badge { 
             display: inline-block; background: #e3f2fd; color: #0077FF; padding: 5px 10px; 
             border-radius: 6px; font-size: 12px; font-weight: 600; margin-bottom: 8px;
         }
+        .badge-status { 
+            display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600;
+        }
+        .status-open { background: #e8f5e9; color: #2e7d32; }
+        .status-progress { background: #fff3e0; color: #e65100; }
+        .status-completed { background: #e3f2fd; color: #1565c0; }
         .profile-avatar {
             width: 80px; height: 80px; border-radius: 50%;
             background: linear-gradient(135deg, #0077FF 0%, #005ce6 100%);
             display: flex; align-items: center; justify-content: center;
             color: white; font-size: 32px; font-weight: bold; margin: 0 auto 15px;
         }
+        .role-switcher {
+            display: flex; gap: 10px; margin: 15px 0;
+        }
+        .role-btn {
+            flex: 1; padding: 12px; border: 2px solid #ddd; border-radius: 10px;
+            background: white; cursor: pointer; text-align: center; font-size: 14px;
+            transition: all 0.2s;
+        }
+        .role-btn.active { border-color: #0077FF; background: #e3f2fd; color: #0077FF; font-weight: bold; }
+        .response-item {
+            background: #f8f9fa; padding: 12px; border-radius: 10px; margin-bottom: 10px;
+            border-left: 3px solid #0077FF;
+        }
+        .price-tag { font-weight: bold; color: #0077FF; font-size: 16px; }
+        .empty-state { text-align: center; padding: 30px; color: #888; }
+        .empty-icon { font-size: 48px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="header">🛠 Мой Мастер</div>
+    <div class="header">
+        🛠 Мой Мастер
+        <div class="header-sub">Поиск мастеров в Барнауле</div>
+    </div>
 
+    <!-- ГЛАВНАЯ -->
     <div id="tab-home" class="tab active">
         <div class="container">
             <div class="card">
@@ -73,20 +109,19 @@
                 <div id="categories-list" class="loading">Загрузка...</div>
             </div>
             <div class="card">
-                <h3>🔥 Последние заявки</h3>
+                <h3> Активные заявки</h3>
                 <div id="orders-list" class="loading">Загрузка...</div>
             </div>
         </div>
     </div>
 
+    <!-- НОВАЯ ЗАЯВКА -->
     <div id="tab-order" class="tab">
         <div class="container">
             <div class="card">
                 <h3>📝 Новая заявка</h3>
-                <select id="order-category">
-                    <option value="">Выберите категорию</option>
-                </select>
-                <input type="text" id="order-title" placeholder="Заголовок">
+                <select id="order-category"><option value="">Выберите категорию</option></select>
+                <input type="text" id="order-title" placeholder="Заголовок (например: Починить розетку)">
                 <textarea id="order-description" rows="4" placeholder="Описание проблемы..."></textarea>
                 <input type="number" id="order-budget" placeholder="Бюджет (руб)">
                 <button class="btn" onclick="createOrder()">📤 Создать заявку</button>
@@ -94,21 +129,36 @@
         </div>
     </div>
 
+    <!-- ОТКЛИКИ -->
+    <div id="tab-responses" class="tab">
+        <div class="container">
+            <div class="card">
+                <h3 id="responses-title">Отклики</h3>
+                <div id="responses-list" class="loading">Загрузка...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ПРОФИЛЬ -->
     <div id="tab-profile" class="tab">
         <div class="container">
             <div class="card">
-                <h3> Профиль</h3>
+                <h3>👤 Профиль</h3>
                 <div id="profile-info" class="loading">Загрузка...</div>
             </div>
         </div>
     </div>
 
+    <!-- НАВИГАЦИЯ -->
     <div class="nav">
         <div class="nav-item active" onclick="switchTab('home')">
             <span class="nav-icon">🏠</span>Главная
         </div>
         <div class="nav-item" onclick="switchTab('order')">
             <span class="nav-icon">➕</span>Заявка
+        </div>
+        <div class="nav-item" onclick="switchTab('responses')">
+            <span class="nav-icon"></span>Отклики
         </div>
         <div class="nav-item" onclick="switchTab('profile')">
             <span class="nav-icon">👤</span>Профиль
@@ -123,50 +173,33 @@
         let currentUser = null;
         let categoriesCache = [];
 
-        console.log('🚀 Приложение запускается...');
+        console.log('🚀 Запуск...');
 
         async function initApp() {
             try {
                 await vkBridge.send('VKWebAppInit');
-                console.log('✅ VK Bridge OK');
-                
                 const userData = await vkBridge.send('VKWebAppGetUserInfo');
                 await loadOrCreateUser(userData.id, `${userData.first_name} ${userData.last_name}`.trim());
-                
             } catch (err) {
-                console.log('⚠️ VK Bridge не доступен, тестовый режим:', err.message);
+                console.log('⚠️ Тестовый режим:', err.message);
                 await loadOrCreateUser(999999, 'Тестовый Пользователь');
             }
         }
 
         async function loadOrCreateUser(vkId, name) {
-            console.log('👤 Пользователь:', vkId, name);
-            
             try {
-                let { data: users, error } = await supabaseClient
+                let { data: users } = await supabaseClient
                     .from('users')
                     .select('*')
                     .eq('vk_id', vkId)
                     .single();
 
-                if (error && error.code !== 'PGRST116') {
-                    console.error('Ошибка поиска:', error);
-                }
-
                 if (!users) {
-                    console.log('📝 Создаем пользователя...');
-                    const { data: newUser, error: insertError } = await supabaseClient
+                    const { data: newUser } = await supabaseClient
                         .from('users')
                         .insert([{ vk_id: vkId, name: name, role: 'customer' }])
                         .select()
                         .single();
-                    
-                    if (insertError) {
-                        console.error('Ошибка создания:', insertError);
-                        document.getElementById('profile-info').innerHTML = 
-                            `<div class="error">Ошибка: ${insertError.message}</div>`;
-                        return;
-                    }
                     currentUser = newUser;
                 } else {
                     currentUser = users;
@@ -176,7 +209,7 @@
                 updateProfileUI();
                 await loadCategories();
                 await loadOrders();
-
+                await loadResponses();
             } catch (err) {
                 console.error('❌ Ошибка:', err);
                 document.getElementById('profile-info').innerHTML = 
@@ -185,8 +218,6 @@
         }
 
         async function loadCategories() {
-            console.log('📂 Загрузка категорий...');
-            
             const { data, error } = await supabaseClient
                 .from('categories')
                 .select('*')
@@ -195,151 +226,283 @@
             const container = document.getElementById('categories-list');
             const select = document.getElementById('order-category');
             
-            if (error) {
-                console.error('Ошибка категорий:', error);
-                container.innerHTML = `<div class="error">Ошибка: ${error.message}</div>`;
-                return;
-            }
-
-            if (!data || data.length === 0) {
-                container.innerHTML = '<div class="loading">Категории пусты</div>';
+            if (error || !data) {
+                container.innerHTML = '<div class="error">Ошибка загрузки</div>';
                 return;
             }
 
             categoriesCache = data;
-            console.log(`✅ Категорий: ${data.length}`);
-
-            container.innerHTML = data.map(c => 
-                `<span class="badge">${c.name}</span>`
-            ).join(' ');
-            
+            container.innerHTML = data.map(c => `<span class="badge">${c.name}</span>`).join(' ');
             select.innerHTML = '<option value="">Выберите категорию</option>' + 
                 data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
         }
 
         async function loadOrders() {
-            console.log('📋 Загрузка заявок...');
-            
-            // ПРОСТОЙ ЗАПРОС БЕЗ JOIN
             const { data, error } = await supabaseClient
                 .from('orders')
                 .select('*')
-                .eq('status', 'open')
                 .order('created_at', { ascending: false })
-                .limit(10);
+                .limit(20);
 
             const container = document.getElementById('orders-list');
             
-            if (error) {
-                console.error('Ошибка заявок:', error);
-                container.innerHTML = `<div class="error">Ошибка: ${error.message}</div>`;
+            if (error || !data) {
+                container.innerHTML = '<div class="error">Ошибка загрузки</div>';
                 return;
             }
 
-            if (!data || data.length === 0) {
-                container.innerHTML = '<div class="loading">Пока нет заявок</div>';
+            if (data.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div>Пока нет заявок</div>';
                 return;
             }
-
-            console.log(`✅ Заявок: ${data.length}`);
 
             container.innerHTML = data.map(order => {
-                // Находим название категории из кэша
                 const cat = categoriesCache.find(c => c.id === order.category_id);
-                const catName = cat ? cat.name : 'Без категории';
+                const statusClass = order.status === 'open' ? 'status-open' : 
+                                   order.status === 'in_progress' ? 'status-progress' : 'status-completed';
+                const statusText = order.status === 'open' ? 'Открыта' : 
+                                  order.status === 'in_progress' ? 'В работе' : 'Завершена';
+                
+                // Кнопка отклика только для мастеров и открытых заявок
+                let responseBtn = '';
+                if (currentUser?.role === 'master' && order.status === 'open') {
+                    responseBtn = `<button class="btn btn-success" onclick="openResponseModal(${order.id})"> Откликнуться</button>`;
+                }
                 
                 return `
                     <div class="order-item">
-                        <span class="badge">${catName}</span>
-                        <div style="font-weight:bold; margin-bottom:5px;">${order.title}</div>
+                        <span class="badge">${cat?.name || 'Без категории'}</span>
+                        <span class="badge-status ${statusClass}">${statusText}</span>
+                        <div style="font-weight:bold; margin:8px 0 5px;">${order.title}</div>
                         <div style="font-size:14px; color:#666; margin-bottom:8px;">${order.description || 'Нет описания'}</div>
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                             <span style="color:#888; font-size:13px;">ID: ${order.id}</span>
-                            <span style="font-weight:bold; color:#0077FF;">
-                                ${order.budget ? order.budget + ' ₽' : 'Договорная'}
-                            </span>
+                            <span class="price-tag">${order.budget ? order.budget + ' ₽' : 'Договорная'}</span>
                         </div>
+                        ${responseBtn}
                     </div>
                 `;
             }).join('');
         }
 
-        async function createOrder() {
-            if (!currentUser) {
-                alert('Подождите загрузку профиля');
-                return;
+        async function loadResponses() {
+            if (!currentUser) return;
+            
+            const container = document.getElementById('responses-list');
+            const title = document.getElementById('responses-title');
+            
+            if (currentUser.role === 'master') {
+                // Мастер видит свои отклики
+                title.textContent = '💼 Мои отклики';
+                const { data, error } = await supabaseClient
+                    .from('responses')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .order('created_at', { ascending: false });
+                
+                if (error || !data || data.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><div class="empty-icon"></div>Вы пока не откликались на заявки</div>';
+                    return;
+                }
+                
+                container.innerHTML = data.map(r => {
+                    const order = null; // упрощенно
+                    const statusText = r.status === 'pending' ? '⏳ Ожидает' : 
+                                      r.status === 'accepted' ? '✅ Принят' : '❌ Отклонен';
+                    return `
+                        <div class="response-item">
+                            <div style="font-weight:bold; margin-bottom:5px;">Заявка #${r.order_id}</div>
+                            <div style="font-size:14px; color:#666; margin-bottom:8px;">${r.message || 'Без сообщения'}</div>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span class="price-tag">${r.price ? r.price + ' ₽' : 'Цена не указана'}</span>
+                                <span style="font-size:13px; color:#888;">${statusText}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                // Заказчик видит отклики на свои заявки
+                title.textContent = ' Отклики на мои заявки';
+                
+                // Сначала получаем мои заявки
+                const { data: myOrders } = await supabaseClient
+                    .from('orders')
+                    .select('id, title')
+                    .eq('user_id', currentUser.id);
+                
+                if (!myOrders || myOrders.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div>У вас пока нет заявок</div>';
+                    return;
+                }
+                
+                const orderIds = myOrders.map(o => o.id);
+                const { data: responses, error } = await supabaseClient
+                    .from('responses')
+                    .select('*')
+                    .in('order_id', orderIds)
+                    .order('created_at', { ascending: false });
+                
+                if (error || !responses || responses.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>Пока нет откликов на ваши заявки</div>';
+                    return;
+                }
+                
+                container.innerHTML = responses.map(r => {
+                    const order = myOrders.find(o => o.id === r.order_id);
+                    const acceptBtn = r.status === 'pending' ? 
+                        `<button class="btn btn-success" onclick="acceptResponse(${r.id}, ${r.order_id})">✅ Принять мастера</button>` : '';
+                    return `
+                        <div class="response-item">
+                            <div style="font-size:13px; color:#888; margin-bottom:5px;">На заявку: ${order?.title || '#' + r.order_id}</div>
+                            <div style="font-size:14px; color:#666; margin-bottom:8px;">${r.message || 'Без сообщения'}</div>
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                                <span class="price-tag">${r.price ? r.price + ' ₽' : 'Цена не указана'}</span>
+                                <span style="font-size:13px;">Пользователь #${r.user_id}</span>
+                            </div>
+                            ${acceptBtn}
+                        </div>
+                    `;
+                }).join('');
             }
+        }
+
+        function openResponseModal(orderId) {
+            const price = prompt('Ваша цена за работу (руб):');
+            if (price === null) return;
+            const message = prompt('Сообщение заказчику (необязательно):') || '';
+            createResponse(orderId, price, message);
+        }
+
+        async function createResponse(orderId, price, message) {
+            const btn = event.target;
+            btn.textContent = '⏳ Отправка...';
+            btn.disabled = true;
+            
+            const { error } = await supabaseClient
+                .from('responses')
+                .insert([{
+                    order_id: orderId,
+                    user_id: currentUser.id,
+                    price: price ? parseFloat(price) : null,
+                    message: message,
+                    status: 'pending'
+                }]);
+            
+            if (error) {
+                alert(' Ошибка: ' + error.message);
+            } else {
+                alert('✅ Отклик отправлен!');
+                await loadResponses();
+            }
+            
+            btn.textContent = '✋ Откликнуться';
+            btn.disabled = false;
+        }
+
+        async function acceptResponse(responseId, orderId) {
+            if (!confirm('Принять этого мастера? Заявка перейдёт в статус "В работе"')) return;
+            
+            // Обновляем статус отклика
+            await supabaseClient
+                .from('responses')
+                .update({ status: 'accepted' })
+                .eq('id', responseId);
+            
+            // Получаем user_id мастера
+            const { data: resp } = await supabaseClient
+                .from('responses')
+                .select('user_id')
+                .eq('id', responseId)
+                .single();
+            
+            // Обновляем заявку
+            await supabaseClient
+                .from('orders')
+                .update({ status: 'in_progress', assigned_master_id: resp.user_id })
+                .eq('id', orderId);
+            
+            alert('✅ Мастер принят! Заявка в работе.');
+            await loadOrders();
+            await loadResponses();
+        }
+
+        async function createOrder() {
+            if (!currentUser) return alert('Подождите загрузку');
             
             const categoryId = document.getElementById('order-category').value;
             const title = document.getElementById('order-title').value.trim();
             const description = document.getElementById('order-description').value.trim();
             const budget = document.getElementById('order-budget').value;
 
-            if (!categoryId) { alert('Выберите категорию'); return; }
-            if (!title) { alert('Введите заголовок'); return; }
+            if (!categoryId || !title) return alert('Заполните категорию и заголовок');
 
             const btn = document.querySelector('#tab-order .btn');
             btn.textContent = '⏳ Создание...';
             btn.disabled = true;
 
-            try {
-                const { data, error } = await supabaseClient
-                    .from('orders')
-                    .insert([{ 
-                        user_id: currentUser.id, 
-                        category_id: parseInt(categoryId), 
-                        title: title, 
-                        description: description || null, 
-                        budget: budget ? parseFloat(budget) : null,
-                        status: 'open'
-                    }])
-                    .select();
+            const { error } = await supabaseClient
+                .from('orders')
+                .insert([{ 
+                    user_id: currentUser.id, 
+                    category_id: parseInt(categoryId), 
+                    title, description: description || null, 
+                    budget: budget ? parseFloat(budget) : null,
+                    status: 'open'
+                }]);
 
-                if (error) {
-                    console.error('Ошибка создания:', error);
-                    alert('Ошибка: ' + error.message);
-                } else {
-                    alert('✅ Заявка создана!');
-                    document.getElementById('order-title').value = '';
-                    document.getElementById('order-description').value = '';
-                    document.getElementById('order-budget').value = '';
-                    document.getElementById('order-category').value = '';
-                    await loadOrders();
-                    switchTab('home');
-                }
-            } catch (err) {
-                alert('Ошибка: ' + err.message);
+            if (error) {
+                alert('❌ Ошибка: ' + error.message);
+            } else {
+                alert('✅ Заявка создана!');
+                document.getElementById('order-title').value = '';
+                document.getElementById('order-description').value = '';
+                document.getElementById('order-budget').value = '';
+                document.getElementById('order-category').value = '';
+                await loadOrders();
+                switchTab('home');
             }
             
             btn.textContent = '📤 Создать заявку';
             btn.disabled = false;
         }
 
-        function updateProfileUI() {
-            if (!currentUser) {
-                document.getElementById('profile-info').innerHTML = 
-                    '<div class="error">Пользователь не загружен</div>';
-                return;
+        async function toggleRole() {
+            const newRole = currentUser.role === 'customer' ? 'master' : 'customer';
+            const { error } = await supabaseClient
+                .from('users')
+                .update({ role: newRole })
+                .eq('id', currentUser.id);
+            
+            if (error) {
+                alert('Ошибка: ' + error.message);
+            } else {
+                currentUser.role = newRole;
+                updateProfileUI();
+                await loadOrders();
+                await loadResponses();
+                alert(`✅ Роль изменена на: ${newRole === 'master' ? 'Мастер' : 'Заказчик'}`);
             }
+        }
 
+        function updateProfileUI() {
+            if (!currentUser) return;
             const firstLetter = currentUser.name.charAt(0).toUpperCase();
+            const roleText = currentUser.role === 'customer' ? ' Заказчик' : '👷 Мастер';
+            const switchText = currentUser.role === 'customer' ? 'Стать мастером' : 'Стать заказчиком';
             
             document.getElementById('profile-info').innerHTML = `
                 <div class="profile-avatar">${firstLetter}</div>
                 <div style="text-align:center;">
-                    <div style="font-size:20px; font-weight:bold; margin-bottom:15px;">
-                        ${currentUser.name}
+                    <div style="font-size:20px; font-weight:bold; margin-bottom:10px;">${currentUser.name}</div>
+                    <div style="background:#f5f5f5; padding:12px; border-radius:10px; margin-bottom:10px;">
+                        <div style="color:#888; font-size:13px;">Текущая роль</div>
+                        <div style="font-weight:600; margin-top:4px; font-size:16px;">${roleText}</div>
                     </div>
-                    <div style="background:#f5f5f5; padding:12px; border-radius:8px; margin-bottom:10px;">
-                        <div style="color:#888; font-size:13px;">Роль</div>
-                        <div style="font-weight:600; margin-top:4px;">
-                            ${currentUser.role === 'customer' ? '👤 Заказчик' : '👷 Мастер'}
-                        </div>
-                    </div>
-                    <div style="background:#f5f5f5; padding:12px; border-radius:8px;">
+                    <div style="background:#f5f5f5; padding:12px; border-radius:10px; margin-bottom:15px;">
                         <div style="color:#888; font-size:13px;">VK ID</div>
                         <div style="font-weight:600; margin-top:4px;">${currentUser.vk_id}</div>
                     </div>
+                    <button class="btn btn-warning" onclick="toggleRole()">🔄 ${switchText}</button>
                 </div>
             `;
         }
@@ -347,13 +510,14 @@
         function switchTab(tabName) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            
             document.getElementById(`tab-${tabName}`).classList.add('active');
             
             const navItems = document.querySelectorAll('.nav-item');
-            if (tabName === 'home') navItems[0].classList.add('active');
-            else if (tabName === 'order') navItems[1].classList.add('active');
-            else if (tabName === 'profile') navItems[2].classList.add('active');
+            const tabs = ['home', 'order', 'responses', 'profile'];
+            const idx = tabs.indexOf(tabName);
+            if (idx >= 0) navItems[idx].classList.add('active');
+            
+            if (tabName === 'responses') loadResponses();
         }
 
         initApp();
