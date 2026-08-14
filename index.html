@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Мой Мастер</title>
-    <!-- VK Bridge -->
     <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
-    <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { box-sizing: border-box; }
@@ -17,7 +15,6 @@
             background: #f5f5f5; 
             color: #333; 
             padding-bottom: 70px;
-            min-height: 100vh;
         }
         .header { 
             background: linear-gradient(135deg, #0077FF 0%, #005ce6 100%); 
@@ -26,17 +23,8 @@
             text-align: center; 
             font-weight: bold; 
             font-size: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-        .header-subtitle {
-            font-size: 13px;
-            opacity: 0.9;
-            margin-top: 4px;
-            font-weight: normal;
-        }
-        .container { 
-            padding: 15px; 
-        }
+        .container { padding: 15px; }
         .card { 
             background: white; 
             border-radius: 12px; 
@@ -44,11 +32,7 @@
             margin-bottom: 15px; 
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
-        .card h3 { 
-            margin: 0 0 15px 0; 
-            font-size: 16px;
-            color: #333;
-        }
+        .card h3 { margin: 0 0 15px 0; font-size: 16px; }
         .btn { 
             background: #0077FF; 
             color: white; 
@@ -59,18 +43,10 @@
             font-size: 16px; 
             font-weight: 600; 
             cursor: pointer;
-            transition: all 0.2s;
             margin-top: 10px;
         }
-        .btn:active { 
-            background: #005ce6;
-            transform: scale(0.98);
-        }
-        .btn:disabled {
-            background: #999;
-            cursor: not-allowed;
-            transform: none;
-        }
+        .btn:active { background: #005ce6; }
+        .btn:disabled { background: #999; cursor: not-allowed; }
         input, select, textarea { 
             width: 100%; 
             padding: 12px; 
@@ -79,11 +55,6 @@
             border-radius: 8px; 
             font-size: 15px;
             box-sizing: border-box;
-            font-family: inherit;
-        }
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #0077FF;
         }
         .nav { 
             position: fixed; 
@@ -93,8 +64,6 @@
             background: white; 
             display: flex; 
             border-top: 1px solid #eee;
-            padding-bottom: env(safe-area-inset-bottom);
-            box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
         }
         .nav-item { 
             flex: 1; 
@@ -103,68 +72,33 @@
             font-size: 12px; 
             color: #888; 
             cursor: pointer;
-            transition: all 0.2s;
         }
-        .nav-item.active { 
-            color: #0077FF; 
-            font-weight: bold;
-        }
-        .nav-icon { 
-            font-size: 22px; 
-            display: block; 
-            margin-bottom: 4px;
-        }
-        .tab { 
-            display: none;
-            animation: fadeIn 0.3s;
-        }
-        .tab.active { 
-            display: block;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .loading { 
-            text-align: center; 
-            color: #888; 
-            padding: 30px 20px;
-            font-size: 15px;
+        .nav-item.active { color: #0077FF; font-weight: bold; }
+        .nav-icon { font-size: 22px; display: block; margin-bottom: 4px; }
+        .tab { display: none; }
+        .tab.active { display: block; }
+        .loading { text-align: center; color: #888; padding: 30px 20px; }
+        .error { 
+            background: #ffebee; 
+            color: #c62828; 
+            padding: 12px; 
+            border-radius: 8px; 
+            margin: 10px 0;
         }
         .order-item { 
             border-bottom: 1px solid #eee; 
             padding-bottom: 12px; 
             margin-bottom: 12px;
         }
-        .order-item:last-child { 
-            border-bottom: none; 
-            margin-bottom: 0;
-        }
         .badge { 
             display: inline-block; 
-            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); 
+            background: #e3f2fd; 
             color: #0077FF; 
             padding: 5px 10px; 
             border-radius: 6px; 
             font-size: 12px;
             font-weight: 600;
             margin-bottom: 8px;
-        }
-        .error {
-            background: #ffebee;
-            color: #c62828;
-            padding: 12px;
-            border-radius: 8px;
-            margin: 10px 0;
-            font-size: 14px;
-        }
-        .success {
-            background: #e8f5e9;
-            color: #2e7d32;
-            padding: 12px;
-            border-radius: 8px;
-            margin: 10px 0;
-            font-size: 14px;
         }
         .profile-avatar {
             width: 80px;
@@ -179,22 +113,11 @@
             font-weight: bold;
             margin: 0 auto 15px;
         }
-        .profile-info div {
-            margin-bottom: 8px;
-            font-size: 15px;
-        }
-        .profile-label {
-            color: #888;
-            font-size: 13px;
-        }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        🛠 Мой Мастер
-        <div class="header-subtitle">Поиск проверенных мастеров</div>
-    </div>
+    <div class="header">🛠 Мой Мастер</div>
 
     <!-- Вкладка: Главная -->
     <div id="tab-home" class="tab active">
@@ -221,7 +144,7 @@
                 <input type="text" id="order-title" placeholder="Заголовок (например: Починить розетку)">
                 <textarea id="order-description" rows="4" placeholder="Описание проблемы..."></textarea>
                 <input type="number" id="order-budget" placeholder="Бюджет (руб)">
-                <button class="btn" onclick="createOrder()"> Создать заявку</button>
+                <button class="btn" onclick="createOrder()">📤 Создать заявку</button>
             </div>
         </div>
     </div>
@@ -239,13 +162,13 @@
     <!-- Нижняя навигация -->
     <div class="nav">
         <div class="nav-item active" onclick="switchTab('home')">
-            <span class="nav-icon"></span>Главная
+            <span class="nav-icon">🏠</span>Главная
         </div>
         <div class="nav-item" onclick="switchTab('order')">
             <span class="nav-icon">➕</span>Заявка
         </div>
         <div class="nav-item" onclick="switchTab('profile')">
-            <span class="nav-icon">👤</span>Профиль
+            <span class="nav-icon"></span>Профиль
         </div>
     </div>
 
@@ -256,59 +179,49 @@
         const SUPABASE_URL = 'https://kmjuddmhvlccrbyyfcce.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttanVkZG1odmxjY3JieXlmY2NlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2Mjc5ODcsImV4cCI6MjEwMjIwMzk4N30.PhJxMFSRlF9tmUuvOLH-JC9Tn-9kAgQ11XEg69eJZ6c';
         
-        // ВАЖНО: используем supabaseClient вместо supabase!
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
         let currentUser = null;
 
-        // ============================================
-        // 2. ИНИЦИАЛИЗАЦИЯ VK BRIDGE
-        // ============================================
         console.log('🚀 Приложение запускается...');
-        console.log('Supabase URL:', SUPABASE_URL);
-        console.log('Supabase Client:', supabaseClient);
-
-        vkBridge.send('VKWebAppInit').then(() => {
-            console.log('✅ VK Bridge инициализирован');
-            loadUserData();
-        }).catch(err => {
-            console.error('❌ Ошибка VK Bridge:', err);
-            // Для тестирования в обычном браузере
-            console.log('🧪 Тестовый режим (без VK)');
-            currentUser = { 
-                id: 1, 
-                vk_id: 999999, 
-                name: 'Тестовый Пользователь', 
-                role: 'customer' 
-            };
-            updateProfileUI();
-            loadCategories();
-            loadOrders();
-        });
 
         // ============================================
-        // 3. ПОЛУЧЕНИЕ ДАННЫХ ПОЛЬЗОВАТЕЛЯ
+        // 2. ИНИЦИАЛИЗАЦИЯ
         // ============================================
-        async function loadUserData() {
+        async function initApp() {
             try {
-                console.log('📥 Получение данных пользователя из VK...');
+                // Пробуем получить данные из VK
+                await vkBridge.send('VKWebAppInit');
+                console.log('✅ VK Bridge инициализирован');
+                
                 const userData = await vkBridge.send('VKWebAppGetUserInfo');
-                const vkId = userData.id;
-                const name = `${userData.first_name} ${userData.last_name}`.trim();
+                await loadOrCreateUser(userData.id, `${userData.first_name} ${userData.last_name}`.trim());
+                
+            } catch (err) {
+                console.log('⚠️ VK Bridge не доступен (тестовый режим):', err.message);
+                // Тестовый пользователь для браузера
+                await loadOrCreateUser(999999, 'Тестовый Пользователь');
+            }
+        }
 
-                console.log('👤 Пользователь VK:', vkId, name);
-
-                // Проверяем или создаем пользователя в Supabase
-                let { data: users, error } = await supabaseClient
+        // ============================================
+        // 3. ЗАГРУЗКА ИЛИ СОЗДАНИЕ ПОЛЬЗОВАТЕЛЯ
+        // ============================================
+        async function loadOrCreateUser(vkId, name) {
+            console.log('👤 Загрузка пользователя:', vkId, name);
+            
+            try {
+                // Ищем пользователя
+                let { data: users, error: selectError } = await supabaseClient
                     .from('users')
                     .select('*')
                     .eq('vk_id', vkId)
                     .single();
 
-                if (error && error.code !== 'PGRST116') {
-                    console.error('Ошибка при поиске пользователя:', error);
+                if (selectError && selectError.code !== 'PGRST116') {
+                    console.error('❌ Ошибка поиска пользователя:', selectError);
                 }
 
+                // Если не найден - создаем
                 if (!users) {
                     console.log('📝 Создаем нового пользователя...');
                     const { data: newUser, error: insertError } = await supabaseClient
@@ -316,29 +229,33 @@
                         .insert([{ 
                             vk_id: vkId, 
                             name: name, 
-                            role: 'customer',
-                            rating: 0,
-                            reviews_count: 0
+                            role: 'customer'
                         }])
                         .select()
                         .single();
                     
                     if (insertError) {
-                        console.error('Ошибка при создании пользователя:', insertError);
-                    } else {
-                        currentUser = newUser;
-                        console.log('✅ Пользователь создан:', currentUser);
+                        console.error('❌ Ошибка создания пользователя:', insertError);
+                        showProfileError('Ошибка создания профиля');
+                        return;
                     }
+                    
+                    currentUser = newUser;
+                    console.log('✅ Пользователь создан:', currentUser);
                 } else {
                     currentUser = users;
                     console.log('✅ Пользователь найден:', currentUser);
                 }
-                
+
                 updateProfileUI();
-                loadCategories();
-                loadOrders();
-            } catch (e) {
-                console.error('❌ Ошибка получения данных VK:', e);
+                
+                // Загружаем данные
+                await loadCategories();
+                await loadOrders();
+
+            } catch (err) {
+                console.error('❌ Ошибка работы с пользователем:', err);
+                showProfileError('Ошибка: ' + err.message);
             }
         }
 
@@ -357,25 +274,25 @@
             const select = document.getElementById('order-category');
             
             if (error) {
-                console.error('Ошибка загрузки категорий:', error);
-                container.innerHTML = '<div class="error">Ошибка: ' + error.message + '</div>';
+                console.error('❌ Ошибка загрузки категорий:', error);
+                container.innerHTML = `<div class="error">Ошибка: ${error.message}</div>`;
                 return;
             }
 
             if (!data || data.length === 0) {
                 console.log('⚠️ Категории пусты');
-                container.innerHTML = '<div class="loading">Категории пока пусты</div>';
+                container.innerHTML = '<div class="loading">Категории пусты. Добавьте в Supabase!</div>';
                 return;
             }
 
-            console.log('✅ Категории загружены:', data);
+            console.log(`✅ Загружено категорий: ${data.length}`);
 
             // Отображаем на главной
             container.innerHTML = data.map(c => 
                 `<span class="badge">${c.name}</span>`
             ).join(' ');
             
-            // Заполняем селект в форме
+            // Заполняем селект
             select.innerHTML = '<option value="">Выберите категорию</option>' + 
                 data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
         }
@@ -384,7 +301,7 @@
         // 5. ЗАГРУЗКА ЗАЯВОК
         // ============================================
         async function loadOrders() {
-            console.log(' Загрузка заявок...');
+            console.log('📋 Загрузка заявок...');
             
             const { data, error } = await supabaseClient
                 .from('orders')
@@ -400,27 +317,27 @@
             const container = document.getElementById('orders-list');
             
             if (error) {
-                console.error('Ошибка загрузки заявок:', error);
-                container.innerHTML = '<div class="error">Ошибка: ' + error.message + '</div>';
+                console.error('❌ Ошибка загрузки заявок:', error);
+                container.innerHTML = `<div class="error">Ошибка: ${error.message}</div>`;
                 return;
             }
 
             if (!data || data.length === 0) {
-                console.log('⚠️ Заявок пока нет');
-                container.innerHTML = '<div class="loading">Пока нет активных заявок</div>';
+                console.log('️ Заявок пока нет');
+                container.innerHTML = '<div class="loading">Пока нет активных заявок.<br>Будь первым!</div>';
                 return;
             }
 
-            console.log('✅ Заявки загружены:', data);
+            console.log(`✅ Загружено заявок: ${data.length}`);
 
             container.innerHTML = data.map(order => `
                 <div class="order-item">
                     <span class="badge">${order.categories?.name || 'Без категории'}</span>
-                    <div style="font-weight:bold; margin-bottom:5px; font-size:16px;">${order.title}</div>
+                    <div style="font-weight:bold; margin-bottom:5px;">${order.title}</div>
                     <div style="font-size:14px; color:#666; margin-bottom:8px;">${order.description || 'Нет описания'}</div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; font-size:14px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
                         <span style="color:#888;">${order.users?.name || 'Аноним'}</span>
-                        <span style="font-weight:bold; color:#0077FF; font-size:16px;">
+                        <span style="font-weight:bold; color:#0077FF;">
                             ${order.budget ? order.budget + ' ₽' : 'Договорная'}
                         </span>
                     </div>
@@ -433,7 +350,7 @@
         // ============================================
         async function createOrder() {
             if (!currentUser) {
-                alert('Пожалуйста, подождите загрузку профиля');
+                alert('Подождите загрузку профиля');
                 return;
             }
             
@@ -443,52 +360,56 @@
             const budget = document.getElementById('order-budget').value;
 
             if (!categoryId) {
-                alert('Пожалуйста, выберите категорию');
+                alert('Выберите категорию');
                 return;
             }
             if (!title) {
-                alert('Пожалуйста, введите заголовок');
+                alert('Введите заголовок');
                 return;
             }
 
             const btn = document.querySelector('#tab-order .btn');
-            const originalText = btn.textContent;
             btn.textContent = '⏳ Создание...';
             btn.disabled = true;
 
-            console.log('📤 Создание заявки:', { categoryId, title, description, budget });
+            console.log('📤 Создание заявки...', { categoryId, title, budget });
 
-            const { data, error } = await supabaseClient
-                .from('orders')
-                .insert([{ 
-                    user_id: currentUser.id, 
-                    category_id: parseInt(categoryId), 
-                    title: title, 
-                    description: description || null, 
-                    budget: budget ? parseFloat(budget) : null,
-                    status: 'open'
-                }])
-                .select();
+            try {
+                const { data, error } = await supabaseClient
+                    .from('orders')
+                    .insert([{ 
+                        user_id: currentUser.id, 
+                        category_id: parseInt(categoryId), 
+                        title: title, 
+                        description: description || null, 
+                        budget: budget ? parseFloat(budget) : null,
+                        status: 'open'
+                    }])
+                    .select();
 
-            if (error) {
-                console.error('Ошибка при создании заявки:', error);
-                alert('❌ Ошибка: ' + error.message);
-            } else {
-                console.log('✅ Заявка создана:', data);
-                alert('✅ Заявка успешно создана!');
-                
-                // Очищаем форму
-                document.getElementById('order-title').value = '';
-                document.getElementById('order-description').value = '';
-                document.getElementById('order-budget').value = '';
-                document.getElementById('order-category').value = '';
-                
-                // Переключаемся на главную и обновляем
-                switchTabHome();
-                loadOrders();
+                if (error) {
+                    console.error('❌ Ошибка создания заявки:', error);
+                    alert('Ошибка: ' + error.message);
+                } else {
+                    console.log('✅ Заявка создана:', data);
+                    alert('✅ Заявка успешно создана!');
+                    
+                    // Очищаем форму
+                    document.getElementById('order-title').value = '';
+                    document.getElementById('order-description').value = '';
+                    document.getElementById('order-budget').value = '';
+                    document.getElementById('order-category').value = '';
+                    
+                    // Обновляем список
+                    await loadOrders();
+                    switchTab('home');
+                }
+            } catch (err) {
+                console.error('❌ Ошибка:', err);
+                alert('Ошибка при создании: ' + err.message);
             }
             
-            btn.textContent = originalText;
+            btn.textContent = ' Создать заявку';
             btn.disabled = false;
         }
 
@@ -497,8 +418,7 @@
         // ============================================
         function updateProfileUI() {
             if (!currentUser) {
-                document.getElementById('profile-info').innerHTML = 
-                    '<div class="error">Ошибка загрузки профиля</div>';
+                showProfileError('Пользователь не загружен');
                 return;
             }
 
@@ -506,79 +426,48 @@
             
             document.getElementById('profile-info').innerHTML = `
                 <div class="profile-avatar">${firstLetter}</div>
-                <div class="profile-info">
-                    <div style="font-size:20px; font-weight:bold; margin-bottom:15px; text-align:center;">
+                <div style="text-align:center;">
+                    <div style="font-size:20px; font-weight:bold; margin-bottom:15px;">
                         ${currentUser.name}
                     </div>
                     <div style="background:#f5f5f5; padding:12px; border-radius:8px; margin-bottom:10px;">
-                        <div class="profile-label">Роль</div>
+                        <div style="color:#888; font-size:13px;">Роль</div>
                         <div style="font-weight:600; margin-top:4px;">
                             ${currentUser.role === 'customer' ? '👤 Заказчик' : '👷 Мастер'}
                         </div>
                     </div>
                     <div style="background:#f5f5f5; padding:12px; border-radius:8px; margin-bottom:10px;">
-                        <div class="profile-label">VK ID</div>
+                        <div style="color:#888; font-size:13px;">VK ID</div>
                         <div style="font-weight:600; margin-top:4px;">${currentUser.vk_id}</div>
-                    </div>
-                    <div style="background:#f5f5f5; padding:12px; border-radius:8px;">
-                        <div class="profile-label">Рейтинг</div>
-                        <div style="font-weight:600; margin-top:4px;">
-                            ${currentUser.rating || 0}  (${currentUser.reviews_count || 0} отзывов)
-                        </div>
                     </div>
                 </div>
             `;
+        }
+
+        function showProfileError(message) {
+            document.getElementById('profile-info').innerHTML = 
+                `<div class="error">️ ${message}</div>`;
         }
 
         // ============================================
         // 8. ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
         // ============================================
         function switchTab(tabName) {
-            // Скрываем все вкладки
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             
-            // Показываем нужную
             document.getElementById(`tab-${tabName}`).classList.add('active');
             
-            // Обновляем навигацию
             const navItems = document.querySelectorAll('.nav-item');
             if (tabName === 'home') navItems[0].classList.add('active');
             else if (tabName === 'order') navItems[1].classList.add('active');
             else if (tabName === 'profile') navItems[2].classList.add('active');
         }
 
-        function switchTabHome() {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById('tab-home').classList.add('active');
-            document.querySelectorAll('.nav-item')[0].classList.add('active');
-        }
-
         // ============================================
-        // 9. ТЕСТИРОВАНИЕ СОЕДИНЕНИЯ
+        // ЗАПУСК ПРИЛОЖЕНИЯ
         // ============================================
-        async function testConnection() {
-            console.log('🔌 Тестирование соединения с Supabase...');
-            
-            const { data, error } = await supabaseClient
-                .from('categories')
-                .select('*')
-                .limit(1);
-            
-            if (error) {
-                console.error('❌ Ошибка подключения:', error);
-                return false;
-            } else {
-                console.log('✅ Подключение успешно!');
-                return true;
-            }
-        }
-
-        // Запускаем тест при загрузке
-        setTimeout(() => {
-            testConnection();
-        }, 2000);
+        initApp();
     </script>
 </body>
 </html>
