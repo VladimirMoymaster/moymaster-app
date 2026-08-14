@@ -27,7 +27,7 @@
         .btn { 
             background: #0077FF; color: white; border: none; padding: 13px; border-radius: 10px; 
             width: 100%; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 10px;
-            transition: all 0.2s;
+            transition: all 0.2s; min-height: 44px;
         }
         .btn:active { background: #005ce6; transform: scale(0.98); }
         .btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
@@ -38,6 +38,7 @@
         input, select, textarea { 
             width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ddd; 
             border-radius: 10px; font-size: 15px; box-sizing: border-box; font-family: inherit;
+            background: white;
         }
         input:focus, select:focus, textarea:focus { outline: none; border-color: #0077FF; }
         .nav { 
@@ -55,15 +56,15 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .loading { text-align: center; color: #888; padding: 30px 20px; }
         .error { background: #ffebee; color: #c62828; padding: 12px; border-radius: 10px; margin: 10px 0; }
-        .success { background: #e8f5e9; color: #2e7d32; padding: 12px; border-radius: 10px; margin: 10px 0; }
         .order-item { 
             border-bottom: 1px solid #f0f0f0; padding-bottom: 12px; margin-bottom: 12px;
         }
         .order-item:last-child { border-bottom: none; margin-bottom: 0; }
         .badge { 
             display: inline-block; background: #e3f2fd; color: #0077FF; padding: 5px 10px; 
-            border-radius: 6px; font-size: 12px; font-weight: 600; margin-bottom: 8px;
+            border-radius: 6px; font-size: 12px; font-weight: 600; margin-right: 6px; margin-bottom: 8px;
         }
+        .badge-district { background: #fff3e0; color: #e65100; }
         .badge-status { 
             display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600;
         }
@@ -76,15 +77,6 @@
             display: flex; align-items: center; justify-content: center;
             color: white; font-size: 32px; font-weight: bold; margin: 0 auto 15px;
         }
-        .role-switcher {
-            display: flex; gap: 10px; margin: 15px 0;
-        }
-        .role-btn {
-            flex: 1; padding: 12px; border: 2px solid #ddd; border-radius: 10px;
-            background: white; cursor: pointer; text-align: center; font-size: 14px;
-            transition: all 0.2s;
-        }
-        .role-btn.active { border-color: #0077FF; background: #e3f2fd; color: #0077FF; font-weight: bold; }
         .response-item {
             background: #f8f9fa; padding: 12px; border-radius: 10px; margin-bottom: 10px;
             border-left: 3px solid #0077FF;
@@ -93,22 +85,19 @@
         .empty-state { text-align: center; padding: 30px; color: #888; }
         .empty-icon { font-size: 48px; margin-bottom: 10px; }
         
-        /* Улучшаем кнопки для мобильных */
-.btn {
-    min-height: 44px; /* Минимальный размер для touch */
-    font-size: 15px;
-    -webkit-tap-highlight-color: rgba(0,119,255,0.1);
-    touch-action: manipulation;
-}
-
-.btn:active {
-    transform: scale(0.96);
-}
-
-/* Убираем задержку на мобильных */
-* {
-    -webkit-tap-highlight-color: transparent;
-}
+        /* Фильтр районов */
+        .district-filter {
+            display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; margin-bottom: 10px;
+            scrollbar-width: none; /* Firefox */
+        }
+        .district-filter::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+        .district-chip {
+            padding: 8px 14px; border-radius: 20px; background: white; border: 1px solid #ddd;
+            font-size: 13px; white-space: nowrap; cursor: pointer; transition: all 0.2s;
+        }
+        .district-chip.active {
+            background: #0077FF; color: white; border-color: #0077FF; font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -126,7 +115,13 @@
                 <div id="categories-list" class="loading">Загрузка...</div>
             </div>
             <div class="card">
-                <h3> Активные заявки</h3>
+                <h3> Фильтр по району</h3>
+                <div class="district-filter" id="district-filter">
+                    <!-- Кнопки районов генерируются JS -->
+                </div>
+            </div>
+            <div class="card">
+                <h3>📝 Активные заявки</h3>
                 <div id="orders-list" class="loading">Загрузка...</div>
             </div>
         </div>
@@ -136,11 +131,19 @@
     <div id="tab-order" class="tab">
         <div class="container">
             <div class="card">
-                <h3>📝 Новая заявка</h3>
+                <h3> Новая заявка</h3>
+                <label style="font-size:13px; color:#666; margin-bottom:5px; display:block;">Район Барнаула</label>
+                <select id="order-district">
+                    <option value="">Выберите район</option>
+                </select>
+                <label style="font-size:13px; color:#666; margin-bottom:5px; display:block;">Категория</label>
                 <select id="order-category"><option value="">Выберите категорию</option></select>
-                <input type="text" id="order-title" placeholder="Заголовок (например: Починить розетку)">
-                <textarea id="order-description" rows="4" placeholder="Описание проблемы..."></textarea>
-                <input type="number" id="order-budget" placeholder="Бюджет (руб)">
+                <label style="font-size:13px; color:#666; margin-bottom:5px; display:block;">Заголовок</label>
+                <input type="text" id="order-title" placeholder="Например: Починить розетку">
+                <label style="font-size:13px; color:#666; margin-bottom:5px; display:block;">Описание</label>
+                <textarea id="order-description" rows="4" placeholder="Опишите проблему подробнее..."></textarea>
+                <label style="font-size:13px; color:#666; margin-bottom:5px; display:block;">Бюджет (руб)</label>
+                <input type="number" id="order-budget" placeholder="Например: 1500">
                 <button class="btn" onclick="createOrder()">📤 Создать заявку</button>
             </div>
         </div>
@@ -160,7 +163,7 @@
     <div id="tab-profile" class="tab">
         <div class="container">
             <div class="card">
-                <h3>👤 Профиль</h3>
+                <h3> Профиль</h3>
                 <div id="profile-info" class="loading">Загрузка...</div>
             </div>
         </div>
@@ -175,7 +178,7 @@
             <span class="nav-icon">➕</span>Заявка
         </div>
         <div class="nav-item" onclick="switchTab('responses')">
-            <span class="nav-icon"></span>Отклики
+            <span class="nav-icon">💬</span>Отклики
         </div>
         <div class="nav-item" onclick="switchTab('profile')">
             <span class="nav-icon">👤</span>Профиль
@@ -183,442 +186,441 @@
     </div>
 
     <script>
-    const SUPABASE_URL = 'https://kmjuddmhvlccrbyyfcce.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttanVkZG1odmxjY3JieXlmY2NlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2Mjc5ODcsImV4cCI6MjEwMjIwMzk4N30.PhJxMFSRlF9tmUuvOLH-JC9Tn-9kAgQ11XEg69eJZ6c';
-    
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    let currentUser = null;
-    let categoriesCache = [];
-    let activeResponseOrderId = null;
+        const SUPABASE_URL = 'https://kmjuddmhvlccrbyyfcce.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttanVkZG1odmxjY3JieXlmY2NlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2Mjc5ODcsImV4cCI6MjEwMjIwMzk4N30.PhJxMFSRlF9tmUuvOLH-JC9Tn-9kAgQ11XEg69eJZ6c';
+        
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // Районы Барнаула
+        const BARNaul_DISTRICTS = ['Центральный', 'Железнодорожный', 'Октябрьский', 'Индустриальный', 'Ленинский'];
+        
+        let currentUser = null;
+        let categoriesCache = [];
+        let allOrders = []; // Кэш всех заявок для фильтрации
+        let currentDistrictFilter = 'all';
 
-    console.log('🚀 Запуск...');
+        console.log(' Запуск...');
 
-    async function initApp() {
-        try {
-            await vkBridge.send('VKWebAppInit');
-            const userData = await vkBridge.send('VKWebAppGetUserInfo');
-            await loadOrCreateUser(userData.id, `${userData.first_name} ${userData.last_name}`.trim());
-        } catch (err) {
-            console.log('️ Тестовый режим:', err.message);
-            await loadOrCreateUser(999999, 'Тестовый Пользователь');
+        async function initApp() {
+            try {
+                await vkBridge.send('VKWebAppInit');
+                const userData = await vkBridge.send('VKWebAppGetUserInfo');
+                await loadOrCreateUser(userData.id, `${userData.first_name} ${userData.last_name}`.trim());
+            } catch (err) {
+                console.log('⚠️ Тестовый режим:', err.message);
+                await loadOrCreateUser(999999, 'Тестовый Пользователь');
+            }
         }
-    }
 
-    async function loadOrCreateUser(vkId, name) {
-        try {
-            let { data: users } = await supabaseClient
-                .from('users')
-                .select('*')
-                .eq('vk_id', vkId)
-                .single();
-
-            if (!users) {
-                const { data: newUser } = await supabaseClient
+        async function loadOrCreateUser(vkId, name) {
+            try {
+                let { data: users } = await supabaseClient
                     .from('users')
-                    .insert([{ vk_id: vkId, name: name, role: 'customer' }])
-                    .select()
+                    .select('*')
+                    .eq('vk_id', vkId)
                     .single();
-                currentUser = newUser;
-            } else {
-                currentUser = users;
+
+                if (!users) {
+                    const { data: newUser } = await supabaseClient
+                        .from('users')
+                        .insert([{ vk_id: vkId, name: name, role: 'customer' }])
+                        .select()
+                        .single();
+                    currentUser = newUser;
+                } else {
+                    currentUser = users;
+                }
+
+                console.log('✅ Пользователь:', currentUser);
+                updateProfileUI();
+                renderDistrictFilters();
+                await loadCategories();
+                await loadOrders();
+                await loadResponses();
+            } catch (err) {
+                console.error('❌ Ошибка:', err);
+                document.getElementById('profile-info').innerHTML = 
+                    `<div class="error">Ошибка: ${err.message}</div>`;
+            }
+        }
+
+        function renderDistrictFilters() {
+            const container = document.getElementById('district-filter');
+            const select = document.getElementById('order-district');
+            
+            // Рендер чипсов фильтра
+            let html = `<div class="district-chip active" onclick="filterByDistrict('all', this)"> Все районы</div>`;
+            BARNaul_DISTRICTS.forEach(d => {
+                html += `<div class="district-chip" onclick="filterByDistrict('${d}', this)">${d}</div>`;
+            });
+            container.innerHTML = html;
+
+            // Заполнение селекта в форме
+            select.innerHTML = '<option value="">Выберите район</option>' + 
+                BARNaul_DISTRICTS.map(d => `<option value="${d}">${d}</option>`).join('');
+        }
+
+        function filterByDistrict(district, element) {
+            currentDistrictFilter = district;
+            
+            // Обновляем визуальное состояние кнопок
+            document.querySelectorAll('.district-chip').forEach(c => c.classList.remove('active'));
+            element.classList.add('active');
+            
+            // Перерисовываем заявки
+            renderOrders();
+        }
+
+        async function loadCategories() {
+            const { data, error } = await supabaseClient
+                .from('categories')
+                .select('*')
+                .order('sort_order', { ascending: true });
+
+            const container = document.getElementById('categories-list');
+            const select = document.getElementById('order-category');
+            
+            if (error || !data) {
+                container.innerHTML = '<div class="error">Ошибка загрузки</div>';
+                return;
             }
 
-            console.log('✅ Пользователь:', currentUser);
-            updateProfileUI();
-            await loadCategories();
-            await loadOrders();
-            await loadResponses();
-        } catch (err) {
-            console.error('❌ Ошибка:', err);
-            document.getElementById('profile-info').innerHTML = 
-                `<div class="error">Ошибка: ${err.message}</div>`;
-        }
-    }
-
-    async function loadCategories() {
-        const { data, error } = await supabaseClient
-            .from('categories')
-            .select('*')
-            .order('sort_order', { ascending: true });
-
-        const container = document.getElementById('categories-list');
-        const select = document.getElementById('order-category');
-        
-        if (error || !data) {
-            container.innerHTML = '<div class="error">Ошибка загрузки</div>';
-            return;
+            categoriesCache = data;
+            container.innerHTML = data.map(c => `<span class="badge">${c.name}</span>`).join(' ');
+            select.innerHTML = '<option value="">Выберите категорию</option>' + 
+                data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
         }
 
-        categoriesCache = data;
-        container.innerHTML = data.map(c => `<span class="badge">${c.name}</span>`).join(' ');
-        select.innerHTML = '<option value="">Выберите категорию</option>' + 
-            data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-    }
+        async function loadOrders() {
+            const { data, error } = await supabaseClient
+                .from('orders')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(50);
 
-    async function loadOrders() {
-        const { data, error } = await supabaseClient
-            .from('orders')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .limit(20);
-
-        const container = document.getElementById('orders-list');
-        
-        if (error || !data) {
-            container.innerHTML = '<div class="error">Ошибка загрузки</div>';
-            return;
-        }
-
-        if (data.length === 0) {
-            container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div>Пока нет заявок</div>';
-            return;
-        }
-
-        container.innerHTML = data.map(order => {
-            const cat = categoriesCache.find(c => c.id === order.category_id);
-            const statusClass = order.status === 'open' ? 'status-open' : 
-                               order.status === 'in_progress' ? 'status-progress' : 'status-completed';
-            const statusText = order.status === 'open' ? 'Открыта' : 
-                              order.status === 'in_progress' ? 'В работе' : 'Завершена';
-            
-            // Проверяем, что это не собственная заявка
-            const isOwnOrder = currentUser && order.user_id === currentUser.id;
-            
-            // Кнопка отклика только для мастеров, открытых заявок и НЕ своих заявок
-            let responseBtn = '';
-            if (currentUser?.role === 'master' && order.status === 'open' && !isOwnOrder) {
-                responseBtn = `<button class="btn btn-success" onclick="showResponseForm(${order.id})"> Откликнуться</button>`;
-            } else if (isOwnOrder) {
-                responseBtn = '<div style="color:#888; font-size:13px; margin-top:10px;">📌 Ваша заявка</div>';
+            if (error || !data) {
+                document.getElementById('orders-list').innerHTML = '<div class="error">Ошибка загрузки</div>';
+                return;
             }
+
+            allOrders = data;
+            renderOrders();
+        }
+
+        function renderOrders() {
+            const container = document.getElementById('orders-list');
             
-            return `
-                <div class="order-item">
-                    <span class="badge">${cat?.name || 'Без категории'}</span>
-                    <span class="badge-status ${statusClass}">${statusText}</span>
-                    <div style="font-weight:bold; margin:8px 0 5px;">${order.title}</div>
-                    <div style="font-size:14px; color:#666; margin-bottom:8px;">${order.description || 'Нет описания'}</div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                        <span style="color:#888; font-size:13px;">ID: ${order.id}</span>
-                        <span class="price-tag">${order.budget ? order.budget + ' ₽' : 'Договорная'}</span>
+            // Фильтрация по району
+            const filteredOrders = currentDistrictFilter === 'all' 
+                ? allOrders 
+                : allOrders.filter(o => o.district === currentDistrictFilter);
+
+            if (filteredOrders.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div>В этом районе заявок пока нет</div>';
+                return;
+            }
+
+            container.innerHTML = filteredOrders.map(order => {
+                const cat = categoriesCache.find(c => c.id === order.category_id);
+                const statusClass = order.status === 'open' ? 'status-open' : 
+                                   order.status === 'in_progress' ? 'status-progress' : 'status-completed';
+                const statusText = order.status === 'open' ? 'Открыта' : 
+                                  order.status === 'in_progress' ? 'В работе' : 'Завершена';
+                
+                const isOwnOrder = currentUser && order.user_id === currentUser.id;
+                
+                let responseBtn = '';
+                if (currentUser?.role === 'master' && order.status === 'open' && !isOwnOrder) {
+                    responseBtn = `<button class="btn btn-success" onclick="showResponseForm(${order.id})"> Откликнуться</button>`;
+                } else if (isOwnOrder) {
+                    responseBtn = '<div style="color:#888; font-size:13px; margin-top:10px;">📌 Ваша заявка</div>';
+                }
+                
+                // Бейдж района
+                const districtBadge = order.district ? `<span class="badge badge-district">📍 ${order.district}</span>` : '';
+
+                return `
+                    <div class="order-item">
+                        <span class="badge">${cat?.name || 'Без категории'}</span>
+                        ${districtBadge}
+                        <span class="badge-status ${statusClass}">${statusText}</span>
+                        <div style="font-weight:bold; margin:8px 0 5px;">${order.title}</div>
+                        <div style="font-size:14px; color:#666; margin-bottom:8px;">${order.description || 'Нет описания'}</div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                            <span style="color:#888; font-size:13px;">ID: ${order.id}</span>
+                            <span class="price-tag">${order.budget ? order.budget + ' ₽' : 'Договорная'}</span>
+                        </div>
+                        <div id="response-form-${order.id}"></div>
+                        ${responseBtn}
                     </div>
-                    <div id="response-form-${order.id}"></div>
-                    ${responseBtn}
+                `;
+            }).join('');
+        }
+
+        function showResponseForm(orderId) {
+            const formContainer = document.getElementById(`response-form-${orderId}`);
+            formContainer.innerHTML = `
+                <div style="background:#f8f9fa; padding:12px; border-radius:10px; margin-top:10px;">
+                    <input type="number" id="response-price-${orderId}" placeholder="Ваша цена (руб)" style="margin-bottom:8px;">
+                    <textarea id="response-message-${orderId}" rows="2" placeholder="Сообщение заказчику" style="margin-bottom:8px;"></textarea>
+                    <button class="btn btn-success" onclick="submitResponse(${orderId})" style="margin-bottom:5px;">✅ Отправить отклик</button>
+                    <button class="btn btn-secondary" onclick="cancelResponse(${orderId})">Отмена</button>
                 </div>
             `;
-        }).join('');
-    }
-
-    function showResponseForm(orderId) {
-        activeResponseOrderId = orderId;
-        const formContainer = document.getElementById(`response-form-${orderId}`);
-        formContainer.innerHTML = `
-            <div style="background:#f8f9fa; padding:12px; border-radius:10px; margin-top:10px;">
-                <input type="number" id="response-price-${orderId}" placeholder="Ваша цена (руб)" style="margin-bottom:8px;">
-                <textarea id="response-message-${orderId}" rows="2" placeholder="Сообщение заказчику" style="margin-bottom:8px;"></textarea>
-                <button class="btn btn-success" onclick="submitResponse(${orderId})" style="margin-bottom:5px;">✅ Отправить отклик</button>
-                <button class="btn btn-secondary" onclick="cancelResponse(${orderId})">Отмена</button>
-            </div>
-        `;
-    }
-
-    function cancelResponse(orderId) {
-        const formContainer = document.getElementById(`response-form-${orderId}`);
-        formContainer.innerHTML = '';
-        activeResponseOrderId = null;
-    }
-
-    async function submitResponse(orderId) {
-        const priceInput = document.getElementById(`response-price-${orderId}`);
-        const messageInput = document.getElementById(`response-message-${orderId}`);
-        
-        const price = priceInput.value.trim();
-        const message = messageInput.value.trim();
-
-        if (!price) {
-            alert('Укажите цену');
-            return;
         }
 
-        const btn = event.target;
-        btn.textContent = '⏳ Отправка...';
-        btn.disabled = true;
-
-        const { error } = await supabaseClient
-            .from('responses')
-            .insert([{
-                order_id: orderId,
-                user_id: currentUser.id,
-                price: parseFloat(price),
-                message: message || null,
-                status: 'pending'
-            }]);
-
-        if (error) {
-            alert('❌ Ошибка: ' + error.message);
-            btn.textContent = '✅ Отправить отклик';
-            btn.disabled = false;
-        } else {
-            alert('✅ Отклик отправлен!');
-            cancelResponse(orderId);
-            await loadResponses();
+        function cancelResponse(orderId) {
+            const formContainer = document.getElementById(`response-form-${orderId}`);
+            formContainer.innerHTML = '';
         }
-    }
 
-    async function loadResponses() {
-        if (!currentUser) return;
-        
-        const container = document.getElementById('responses-list');
-        const title = document.getElementById('responses-title');
-        
-        if (currentUser.role === 'master') {
-            title.textContent = '💼 Мои отклики';
-            const { data, error } = await supabaseClient
+        async function submitResponse(orderId) {
+            const priceInput = document.getElementById(`response-price-${orderId}`);
+            const messageInput = document.getElementById(`response-message-${orderId}`);
+            
+            const price = priceInput.value.trim();
+            const message = messageInput.value.trim();
+
+            if (!price) { alert('Укажите цену'); return; }
+
+            const btn = event.target;
+            btn.textContent = ' Отправка...';
+            btn.disabled = true;
+
+            const { error } = await supabaseClient
                 .from('responses')
-                .select('*')
-                .eq('user_id', currentUser.id)
-                .order('created_at', { ascending: false });
-            
-            if (error || !data || data.length === 0) {
-                container.innerHTML = '<div class="empty-state"><div class="empty-icon"></div>Вы пока не откликались на заявки</div>';
-                return;
+                .insert([{
+                    order_id: orderId,
+                    user_id: currentUser.id,
+                    price: parseFloat(price),
+                    message: message || null,
+                    status: 'pending'
+                }]);
+
+            if (error) {
+                alert('❌ Ошибка: ' + error.message);
+                btn.textContent = '✅ Отправить отклик';
+                btn.disabled = false;
+            } else {
+                alert('✅ Отклик отправлен!');
+                cancelResponse(orderId);
+                await loadResponses();
             }
+        }
+
+        async function loadResponses() {
+            if (!currentUser) return;
             
-            container.innerHTML = data.map(r => {
-                const statusText = r.status === 'pending' ? '⏳ Ожидает' : 
-                                  r.status === 'accepted' ? '✅ Принят' : '❌ Отклонен';
-                return `
-                    <div class="response-item">
-                        <div style="font-weight:bold; margin-bottom:5px;">Заявка #${r.order_id}</div>
-                        <div style="font-size:14px; color:#666; margin-bottom:8px;">${r.message || 'Без сообщения'}</div>
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span class="price-tag">${r.price ? r.price + ' ₽' : 'Цена не указана'}</span>
-                            <span style="font-size:13px; color:#888;">${statusText}</span>
+            const container = document.getElementById('responses-list');
+            const title = document.getElementById('responses-title');
+            
+            if (currentUser.role === 'master') {
+                title.textContent = '💼 Мои отклики';
+                const { data, error } = await supabaseClient
+                    .from('responses')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .order('created_at', { ascending: false });
+                
+                if (error || !data || data.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div>Вы пока не откликались на заявки</div>';
+                    return;
+                }
+                
+                container.innerHTML = data.map(r => {
+                    const statusText = r.status === 'pending' ? '⏳ Ожидает' : 
+                                      r.status === 'accepted' ? '✅ Принят' : '❌ Отклонен';
+                    return `
+                        <div class="response-item">
+                            <div style="font-weight:bold; margin-bottom:5px;">Заявка #${r.order_id}</div>
+                            <div style="font-size:14px; color:#666; margin-bottom:8px;">${r.message || 'Без сообщения'}</div>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span class="price-tag">${r.price ? r.price + ' ₽' : 'Цена не указана'}</span>
+                                <span style="font-size:13px; color:#888;">${statusText}</span>
+                            </div>
                         </div>
-                    </div>
-                `;
-            }).join('');
-        } else {
-            title.textContent = '📬 Отклики на мои заявки';
-            
-            const { data: myOrders } = await supabaseClient
-                .from('orders')
-                .select('id, title')
-                .eq('user_id', currentUser.id);
-            
-            if (!myOrders || myOrders.length === 0) {
-                container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div>У вас пока нет заявок</div>';
-                return;
-            }
-            
-            const orderIds = myOrders.map(o => o.id);
-            const { data: responses, error } = await supabaseClient
-                .from('responses')
-                .select('*')
-                .in('order_id', orderIds)
-                .order('created_at', { ascending: false });
-            
-            if (error || !responses || responses.length === 0) {
-                container.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>Пока нет откликов на ваши заявки</div>';
-                return;
-            }
-            
-            container.innerHTML = responses.map(r => {
-                const order = myOrders.find(o => o.id === r.order_id);
-                const acceptBtn = r.status === 'pending' ? 
-                    `<button class="btn btn-success" onclick="acceptResponse(${r.id}, ${r.order_id})">✅ Принять мастера</button>` : '';
-                return `
-                    <div class="response-item">
-                        <div style="font-size:13px; color:#888; margin-bottom:5px;">На заявку: ${order?.title || '#' + r.order_id}</div>
-                        <div style="font-size:14px; color:#666; margin-bottom:8px;">${r.message || 'Без сообщения'}</div>
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                            <span class="price-tag">${r.price ? r.price + ' ₽' : 'Цена не указана'}</span>
-                            <span style="font-size:13px;">Пользователь #${r.user_id}</span>
+                    `;
+                }).join('');
+            } else {
+                title.textContent = '📬 Отклики на мои заявки';
+                
+                const { data: myOrders } = await supabaseClient
+                    .from('orders')
+                    .select('id, title')
+                    .eq('user_id', currentUser.id);
+                
+                if (!myOrders || myOrders.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div>У вас пока нет заявок</div>';
+                    return;
+                }
+                
+                const orderIds = myOrders.map(o => o.id);
+                const { data: responses, error } = await supabaseClient
+                    .from('responses')
+                    .select('*')
+                    .in('order_id', orderIds)
+                    .order('created_at', { ascending: false });
+                
+                if (error || !responses || responses.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>Пока нет откликов на ваши заявки</div>';
+                    return;
+                }
+                
+                container.innerHTML = responses.map(r => {
+                    const order = myOrders.find(o => o.id === r.order_id);
+                    const acceptBtn = r.status === 'pending' ? 
+                        `<button class="btn btn-success" onclick="acceptResponse(${r.id}, ${r.order_id})">✅ Принять мастера</button>` : '';
+                    return `
+                        <div class="response-item">
+                            <div style="font-size:13px; color:#888; margin-bottom:5px;">На заявку: ${order?.title || '#' + r.order_id}</div>
+                            <div style="font-size:14px; color:#666; margin-bottom:8px;">${r.message || 'Без сообщения'}</div>
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                                <span class="price-tag">${r.price ? r.price + ' ₽' : 'Цена не указана'}</span>
+                                <span style="font-size:13px;">Пользователь #${r.user_id}</span>
+                            </div>
+                            ${acceptBtn}
                         </div>
-                        ${acceptBtn}
-                    </div>
-                `;
-            }).join('');
+                    `;
+                }).join('');
+            }
         }
-    }
 
-    async function acceptResponse(responseId, orderId) {
-    console.log('📥 Принятие отклика:', responseId, orderId);
-    
-    // Вместо confirm() используем простой alert с подтверждением через кнопку
-    const btn = event.target;
-    const originalText = btn.textContent;
-    btn.textContent = '⚠️ Подтвердить?';
-    btn.onclick = async function() {
-        btn.textContent = ' Принятие...';
-        btn.disabled = true;
-        
-        try {
-            // 1. Получаем данные отклика
-            const { data: responseData, error: responseError } = await supabaseClient
-                .from('responses')
-                .select('user_id, order_id')
-                .eq('id', responseId)
-                .single();
+        async function acceptResponse(responseId, orderId) {
+            console.log(' Принятие отклика:', responseId, orderId);
             
-            if (responseError) {
-                console.error('❌ Ошибка получения отклика:', responseError);
-                alert('Ошибка: ' + responseError.message);
-                resetButton();
-                return;
-            }
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '⚠️ Подтвердить?';
+            btn.onclick = async function() {
+                btn.textContent = '⏳ Принятие...';
+                btn.disabled = true;
+                
+                try {
+                    const { data: responseData, error: responseError } = await supabaseClient
+                        .from('responses')
+                        .select('user_id, order_id')
+                        .eq('id', responseId)
+                        .single();
+                    
+                    if (responseError) throw responseError;
+                    
+                    await supabaseClient.from('responses').update({ status: 'accepted' }).eq('id', responseId);
+                    await supabaseClient.from('orders').update({ status: 'in_progress', assigned_master_id: responseData.user_id }).eq('id', orderId);
+                    await supabaseClient.from('responses').update({ status: 'rejected' }).eq('order_id', orderId).neq('id', responseId).eq('status', 'pending');
+                    
+                    alert('✅ Мастер принят!');
+                    await loadOrders();
+                    await loadResponses();
+                    
+                } catch (err) {
+                    console.error('❌ Ошибка:', err);
+                    alert('Ошибка: ' + err.message);
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                    btn.onclick = function() { acceptResponse(responseId, orderId); };
+                }
+            };
+        }
+
+        async function createOrder() {
+            if (!currentUser) return alert('Подождите загрузку');
             
-            console.log('✅ Отклик найден:', responseData);
-            
-            // 2. Обновляем статус отклика
-            const { error: updateResponseError } = await supabaseClient
-                .from('responses')
-                .update({ status: 'accepted' })
-                .eq('id', responseId);
-            
-            if (updateResponseError) {
-                console.error('❌ Ошибка обновления отклика:', updateResponseError);
-                alert('Ошибка: ' + updateResponseError.message);
-                resetButton();
-                return;
-            }
-            
-            // 3. Обновляем заявку
-            const { error: updateOrderError } = await supabaseClient
+            const district = document.getElementById('order-district').value;
+            const categoryId = document.getElementById('order-category').value;
+            const title = document.getElementById('order-title').value.trim();
+            const description = document.getElementById('order-description').value.trim();
+            const budget = document.getElementById('order-budget').value;
+
+            if (!district) return alert('Выберите район Барнаула');
+            if (!categoryId || !title) return alert('Заполните категорию и заголовок');
+
+            const btn = document.querySelector('#tab-order .btn');
+            btn.textContent = '⏳ Создание...';
+            btn.disabled = true;
+
+            const { error } = await supabaseClient
                 .from('orders')
-                .update({ 
-                    status: 'in_progress', 
-                    assigned_master_id: responseData.user_id 
-                })
-                .eq('id', orderId);
-            
-            if (updateOrderError) {
-                console.error('❌ Ошибка обновления заявки:', updateOrderError);
-                alert('Ошибка: ' + updateOrderError.message);
-                resetButton();
-                return;
+                .insert([{ 
+                    user_id: currentUser.id, 
+                    district: district,
+                    category_id: parseInt(categoryId), 
+                    title, description: description || null, 
+                    budget: budget ? parseFloat(budget) : null,
+                    status: 'open'
+                }]);
+
+            if (error) {
+                alert('❌ Ошибка: ' + error.message);
+            } else {
+                alert('✅ Заявка создана!');
+                document.getElementById('order-title').value = '';
+                document.getElementById('order-description').value = '';
+                document.getElementById('order-budget').value = '';
+                document.getElementById('order-category').value = '';
+                document.getElementById('order-district').value = '';
+                await loadOrders();
+                switchTab('home');
             }
             
-            // 4. Отклоняем остальные отклики
-            await supabaseClient
-                .from('responses')
-                .update({ status: 'rejected' })
-                .eq('order_id', orderId)
-                .neq('id', responseId)
-                .eq('status', 'pending');
-            
-            alert('✅ Мастер принят!');
-            await loadOrders();
-            await loadResponses();
-            
-        } catch (err) {
-            console.error('❌ Критическая ошибка:', err);
-            alert('Ошибка: ' + err.message);
-            resetButton();
-        }
-        
-        function resetButton() {
-            btn.textContent = originalText;
+            btn.textContent = '📤 Создать заявку';
             btn.disabled = false;
-            btn.onclick = function() { acceptResponse(responseId, orderId); };
         }
-    };
-} 
-    async function createOrder() {
-        if (!currentUser) return alert('Подождите загрузку');
-        
-        const categoryId = document.getElementById('order-category').value;
-        const title = document.getElementById('order-title').value.trim();
-        const description = document.getElementById('order-description').value.trim();
-        const budget = document.getElementById('order-budget').value;
 
-        if (!categoryId || !title) return alert('Заполните категорию и заголовок');
-
-        const btn = document.querySelector('#tab-order .btn');
-        btn.textContent = ' Создание...';
-        btn.disabled = true;
-
-        const { error } = await supabaseClient
-            .from('orders')
-            .insert([{ 
-                user_id: currentUser.id, 
-                category_id: parseInt(categoryId), 
-                title, description: description || null, 
-                budget: budget ? parseFloat(budget) : null,
-                status: 'open'
-            }]);
-
-        if (error) {
-            alert('❌ Ошибка: ' + error.message);
-        } else {
-            alert('✅ Заявка создана!');
-            document.getElementById('order-title').value = '';
-            document.getElementById('order-description').value = '';
-            document.getElementById('order-budget').value = '';
-            document.getElementById('order-category').value = '';
-            await loadOrders();
-            switchTab('home');
+        async function toggleRole() {
+            const newRole = currentUser.role === 'customer' ? 'master' : 'customer';
+            const { error } = await supabaseClient
+                .from('users')
+                .update({ role: newRole })
+                .eq('id', currentUser.id);
+            
+            if (error) {
+                alert('Ошибка: ' + error.message);
+            } else {
+                currentUser.role = newRole;
+                updateProfileUI();
+                await loadOrders();
+                await loadResponses();
+                alert(`✅ Роль изменена на: ${newRole === 'master' ? 'Мастер' : 'Заказчик'}`);
+            }
         }
-        
-        btn.textContent = '📤 Создать заявку';
-        btn.disabled = false;
-    }
 
-    async function toggleRole() {
-        const newRole = currentUser.role === 'customer' ? 'master' : 'customer';
-        const { error } = await supabaseClient
-            .from('users')
-            .update({ role: newRole })
-            .eq('id', currentUser.id);
-        
-        if (error) {
-            alert('Ошибка: ' + error.message);
-        } else {
-            currentUser.role = newRole;
-            updateProfileUI();
-            await loadOrders();
-            await loadResponses();
-            alert(`✅ Роль изменена на: ${newRole === 'master' ? 'Мастер' : 'Заказчик'}`);
-        }
-    }
-
-    function updateProfileUI() {
-        if (!currentUser) return;
-        const firstLetter = currentUser.name.charAt(0).toUpperCase();
-        const roleText = currentUser.role === 'customer' ? '👤 Заказчик' : '👷 Мастер';
-        const switchText = currentUser.role === 'customer' ? 'Стать мастером' : 'Стать заказчиком';
-        
-        document.getElementById('profile-info').innerHTML = `
-            <div class="profile-avatar">${firstLetter}</div>
-            <div style="text-align:center;">
-                <div style="font-size:20px; font-weight:bold; margin-bottom:10px;">${currentUser.name}</div>
-                <div style="background:#f5f5f5; padding:12px; border-radius:10px; margin-bottom:10px;">
-                    <div style="color:#888; font-size:13px;">Текущая роль</div>
-                    <div style="font-weight:600; margin-top:4px; font-size:16px;">${roleText}</div>
+        function updateProfileUI() {
+            if (!currentUser) return;
+            const firstLetter = currentUser.name.charAt(0).toUpperCase();
+            const roleText = currentUser.role === 'customer' ? '👤 Заказчик' : '👷 Мастер';
+            const switchText = currentUser.role === 'customer' ? 'Стать мастером' : 'Стать заказчиком';
+            
+            document.getElementById('profile-info').innerHTML = `
+                <div class="profile-avatar">${firstLetter}</div>
+                <div style="text-align:center;">
+                    <div style="font-size:20px; font-weight:bold; margin-bottom:10px;">${currentUser.name}</div>
+                    <div style="background:#f5f5f5; padding:12px; border-radius:10px; margin-bottom:10px;">
+                        <div style="color:#888; font-size:13px;">Текущая роль</div>
+                        <div style="font-weight:600; margin-top:4px; font-size:16px;">${roleText}</div>
+                    </div>
+                    <div style="background:#f5f5f5; padding:12px; border-radius:10px; margin-bottom:15px;">
+                        <div style="color:#888; font-size:13px;">VK ID</div>
+                        <div style="font-weight:600; margin-top:4px;">${currentUser.vk_id}</div>
+                    </div>
+                    <button class="btn btn-warning" onclick="toggleRole()">🔄 ${switchText}</button>
                 </div>
-                <div style="background:#f5f5f5; padding:12px; border-radius:10px; margin-bottom:15px;">
-                    <div style="color:#888; font-size:13px;">VK ID</div>
-                    <div style="font-weight:600; margin-top:4px;">${currentUser.vk_id}</div>
-                </div>
-                <button class="btn btn-warning" onclick="toggleRole()">🔄 ${switchText}</button>
-            </div>
-        `;
-    }
+            `;
+        }
 
-    function switchTab(tabName) {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.getElementById(`tab-${tabName}`).classList.add('active');
-        
-        const navItems = document.querySelectorAll('.nav-item');
-        const tabs = ['home', 'order', 'responses', 'profile'];
-        const idx = tabs.indexOf(tabName);
-        if (idx >= 0) navItems[idx].classList.add('active');
-        
-        if (tabName === 'responses') loadResponses();
-    }
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            
+            const navItems = document.querySelectorAll('.nav-item');
+            const tabs = ['home', 'order', 'responses', 'profile'];
+            const idx = tabs.indexOf(tabName);
+            if (idx >= 0) navItems[idx].classList.add('active');
+            
+            if (tabName === 'responses') loadResponses();
+        }
 
-    initApp();
-  </script>
+        initApp();
+    </script>
 </body>
 </html>
