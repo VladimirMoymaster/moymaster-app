@@ -92,6 +92,23 @@
         .price-tag { font-weight: bold; color: #0077FF; font-size: 16px; }
         .empty-state { text-align: center; padding: 30px; color: #888; }
         .empty-icon { font-size: 48px; margin-bottom: 10px; }
+        
+        /* Улучшаем кнопки для мобильных */
+.btn {
+    min-height: 44px; /* Минимальный размер для touch */
+    font-size: 15px;
+    -webkit-tap-highlight-color: rgba(0,119,255,0.1);
+    touch-action: manipulation;
+}
+
+.btn:active {
+    transform: scale(0.96);
+}
+
+/* Убираем задержку на мобильных */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
     </style>
 </head>
 <body>
@@ -428,84 +445,85 @@
     async function acceptResponse(responseId, orderId) {
     console.log('📥 Принятие отклика:', responseId, orderId);
     
-    if (!confirm('Принять этого мастера? Заявка перейдёт в статус "В работе"')) {
-        console.log('❌ Отменено пользователем');
-        return;
-    }
-    
-    try {
-        // 1. Получаем данные отклика
-        const { data: responseData, error: responseError } = await supabaseClient
-            .from('responses')
-            .select('user_id, order_id')
-            .eq('id', responseId)
-            .single();
+    // Вместо confirm() используем простой alert с подтверждением через кнопку
+    const btn = event.target;
+    const originalText = btn.textContent;
+    btn.textContent = '⚠️ Подтвердить?';
+    btn.onclick = async function() {
+        btn.textContent = ' Принятие...';
+        btn.disabled = true;
         
-        if (responseError) {
-            console.error('❌ Ошибка получения отклика:', responseError);
-            alert('Ошибка: ' + responseError.message);
-            return;
+        try {
+            // 1. Получаем данные отклика
+            const { data: responseData, error: responseError } = await supabaseClient
+                .from('responses')
+                .select('user_id, order_id')
+                .eq('id', responseId)
+                .single();
+            
+            if (responseError) {
+                console.error('❌ Ошибка получения отклика:', responseError);
+                alert('Ошибка: ' + responseError.message);
+                resetButton();
+                return;
+            }
+            
+            console.log('✅ Отклик найден:', responseData);
+            
+            // 2. Обновляем статус отклика
+            const { error: updateResponseError } = await supabaseClient
+                .from('responses')
+                .update({ status: 'accepted' })
+                .eq('id', responseId);
+            
+            if (updateResponseError) {
+                console.error('❌ Ошибка обновления отклика:', updateResponseError);
+                alert('Ошибка: ' + updateResponseError.message);
+                resetButton();
+                return;
+            }
+            
+            // 3. Обновляем заявку
+            const { error: updateOrderError } = await supabaseClient
+                .from('orders')
+                .update({ 
+                    status: 'in_progress', 
+                    assigned_master_id: responseData.user_id 
+                })
+                .eq('id', orderId);
+            
+            if (updateOrderError) {
+                console.error('❌ Ошибка обновления заявки:', updateOrderError);
+                alert('Ошибка: ' + updateOrderError.message);
+                resetButton();
+                return;
+            }
+            
+            // 4. Отклоняем остальные отклики
+            await supabaseClient
+                .from('responses')
+                .update({ status: 'rejected' })
+                .eq('order_id', orderId)
+                .neq('id', responseId)
+                .eq('status', 'pending');
+            
+            alert('✅ Мастер принят!');
+            await loadOrders();
+            await loadResponses();
+            
+        } catch (err) {
+            console.error('❌ Критическая ошибка:', err);
+            alert('Ошибка: ' + err.message);
+            resetButton();
         }
         
-        console.log('✅ Отклик найден:', responseData);
-        
-        // 2. Обновляем статус отклика на "accepted"
-        const { error: updateResponseError } = await supabaseClient
-            .from('responses')
-            .update({ status: 'accepted' })
-            .eq('id', responseId);
-        
-        if (updateResponseError) {
-            console.error('❌ Ошибка обновления отклика:', updateResponseError);
-            alert('Ошибка обновления отклика: ' + updateResponseError.message);
-            return;
+        function resetButton() {
+            btn.textContent = originalText;
+            btn.disabled = false;
+            btn.onclick = function() { acceptResponse(responseId, orderId); };
         }
-        
-        console.log('✅ Статус отклика обновлен');
-        
-        // 3. Обновляем заявку - назначаем мастера и меняем статус
-        const { error: updateOrderError } = await supabaseClient
-            .from('orders')
-            .update({ 
-                status: 'in_progress', 
-                assigned_master_id: responseData.user_id 
-            })
-            .eq('id', orderId);
-        
-        if (updateOrderError) {
-            console.error('❌ Ошибка обновления заявки:', updateOrderError);
-            alert('Ошибка обновления заявки: ' + updateOrderError.message);
-            return;
-        }
-        
-        console.log('✅ Заявка обновлена');
-        
-        // 4. Отклоняем остальные отклики на эту заявку
-        const { error: rejectOthersError } = await supabaseClient
-            .from('responses')
-            .update({ status: 'rejected' })
-            .eq('order_id', orderId)
-            .neq('id', responseId)
-            .eq('status', 'pending');
-        
-        if (rejectOthersError) {
-            console.error('️ Ошибка отклонения других откликов:', rejectOthersError);
-        } else {
-            console.log('✅ Другие отклики отклонены');
-        }
-        
-        alert('✅ Мастер принят! Заявка в работе.');
-        
-        // 5. Обновляем данные
-        await loadOrders();
-        await loadResponses();
-        
-    } catch (err) {
-        console.error(' Критическая ошибка:', err);
-        alert('Критическая ошибка: ' + err.message);
-    }
-}
-
+    };
+} 
     async function createOrder() {
         if (!currentUser) return alert('Подождите загрузку');
         
