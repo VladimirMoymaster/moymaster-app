@@ -369,6 +369,12 @@
             `;
         }
 
+        function cancelResponse(orderId) {
+    const formContainer = document.getElementById(`response-form-${orderId}`);
+    if (formContainer) {
+        formContainer.innerHTML = '';
+    }
+}
         async function submitResponse(orderId) {
     const priceInput = document.getElementById(`response-price-${orderId}`);
     const messageInput = document.getElementById(`response-message-${orderId}`);
