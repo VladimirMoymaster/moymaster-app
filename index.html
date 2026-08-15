@@ -1208,53 +1208,59 @@
             }
         }
 
-        async function createOrder() {
-            if (!currentUser) return alert('Подождите загрузку');
-            
-            const district = document.getElementById('order-district').value;
-            const categoryId = document.getElementById('order-category').value;
-            const title = document.getElementById('order-title').value.trim();
-            const description = document.getElementById('order-description').value.trim();
-            const budget = document.getElementById('order-budget').value;
+       async function createOrder() {
+    if (!currentUser) return alert('Подождите загрузку');
+    
+    const district = document.getElementById('order-district').value;
+    const categoryId = document.getElementById('order-category').value;
+    const title = document.getElementById('order-title').value.trim();
+    const description = document.getElementById('order-description').value.trim();
+    const budget = document.getElementById('order-budget').value;
 
-            if (!district) return alert('Выберите район');
-            if (!categoryId || !title) return alert('Заполните категорию и заголовок');
+    if (!district) return alert('Выберите район');
+    if (!categoryId || !title) return alert('Заполните категорию и заголовок');
 
-            const btn = document.querySelector('#tab-order .btn');
-            btn.textContent = '⏳ Создание...';
-            btn.disabled = true;
+    const btn = document.querySelector('#tab-order .btn');
+    btn.textContent = '⏳ Создание...';
+    btn.disabled = true;
 
-            const { error } = await supabaseClient
-                .from('orders')
-                .insert([{ 
-                    user_id: currentUser.id, 
-                    district,
-                    category_id: parseInt(categoryId), 
-                    title, 
-                    description: description || null, 
-                    budget: budget ? parseFloat(budget) : null,
-                    status: 'open',
-                    photos: uploadedPhotos.length > 0 ? uploadedPhotos : null
-                }]);
+    const { data, error } = await supabaseClient
+        .from('orders')
+        .insert([{ 
+            user_id: currentUser.id, 
+            district,
+            category_id: parseInt(categoryId), 
+            title, 
+            description: description || null, 
+            budget: budget ? parseFloat(budget) : null,
+            status: 'open',
+            photos: uploadedPhotos.length > 0 ? uploadedPhotos : null
+        }])
+        .select();
 
-            if (error) {
-                alert('❌ Ошибка: ' + error.message);
-            } else {
-                alert('✅ Заявка создана!');
-                document.getElementById('order-title').value = '';
-                document.getElementById('order-description').value = '';
-                document.getElementById('order-budget').value = '';
-                document.getElementById('order-category').value = '';
-                document.getElementById('order-district').value = '';
-                uploadedPhotos = [];
-                renderPhotoPreview();
-                await loadOrders();
-                switchTab('home');
-            }
-            
-            btn.textContent = '📤 Создать заявку';
-            btn.disabled = false;
-        }
+    if (error) {
+        alert(' Ошибка: ' + error.message);
+    } else {
+        // Отправляем на сервер для публикации в группу ВК
+        const newOrder = data[0];
+        postOrderToServer(newOrder);
+        
+        alert('✅ Заявка создана! Пост в группу ВК публикуется...');
+        
+        document.getElementById('order-title').value = '';
+        document.getElementById('order-description').value = '';
+        document.getElementById('order-budget').value = '';
+        document.getElementById('order-category').value = '';
+        document.getElementById('order-district').value = '';
+        uploadedPhotos = [];
+        renderPhotoPreview();
+        await loadOrders();
+        switchTab('home');
+    }
+    
+    btn.textContent = '📤 Создать заявку';
+    btn.disabled = false;
+}
 
         async function toggleRole() {
             const newRole = currentUser.role === 'customer' ? 'master' : 'customer';
@@ -1813,6 +1819,42 @@ async function activateProSubscription(vkOrderId) {
             if (tabName === 'responses') loadResponses();
         }
 
+// Отправка заявки на сервер для публикации в группу ВК
+async function postOrderToServer(order) {
+    const SERVER_URL = 'https://moymaster-server.vercel.app';
+    
+    try {
+        console.log('📢 Отправка заявки на сервер:', order);
+        
+        const response = await fetch(`${SERVER_URL}/api/new-order`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                id: order.id,
+                title: order.title,
+                description: order.description,
+                budget: order.budget,
+                district: order.district,
+                category_id: order.category_id,
+                user_id: order.user_id
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            console.log('✅ Пост опубликован в группе ВК! ID поста:', result.post_id);
+        } else {
+            console.error('❌ Ошибка публикации:', result.error);
+        }
+    } catch (err) {
+        console.error('❌ Ошибка соединения с сервером:', err);
+    }
+}
+
+        
         initApp();
     </script>
 </body>
