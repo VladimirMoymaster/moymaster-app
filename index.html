@@ -1221,7 +1221,7 @@
                     description: description || null, 
                     budget: budget ? parseFloat(budget) : null,
                     status: 'open',
-                    photos: uploadedPhotos.length > 0 ? JSON.stringify(uploadedPhotos) : null
+                    photos: uploadedPhotos.length > 0 ? uploadedPhotos : null
                 }]);
 
             if (error) {
