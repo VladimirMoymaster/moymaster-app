@@ -1136,18 +1136,27 @@ else if (isOwnOrder) {
         async function confirmCompletion(orderId) {
     console.log('🔍 Подтверждение выполнения заявки:', orderId);
     
-    if (!confirm('Подтвердить выполнение работы? После этого вы сможете оставить отзыв.')) {
-        console.log('❌ Отменено пользователем');
+    const btn = event.target;
+    const originalText = btn.textContent;
+    
+    // Двухэтапное подтверждение (вместо confirm)
+    if (originalText.includes('Подтвердить')) {
+        btn.textContent = '⚠️ Точно подтвердить?';
+        btn.style.background = '#FF9800';
+        
+        setTimeout(() => {
+            btn.textContent = originalText;
+            btn.style.background = '';
+        }, 3000);
+        
         return;
     }
     
-    const btn = event.target;
-    const originalText = btn.textContent;
     btn.textContent = '⏳ Подтверждение...';
     btn.disabled = true;
     
     try {
-        console.log(' Отправка запроса в Supabase...');
+        console.log('📤 Отправка запроса в Supabase...');
         
         const { data, error } = await supabaseClient
             .from('orders')
@@ -1181,13 +1190,22 @@ else if (isOwnOrder) {
 async function rejectCompletion(orderId) {
     console.log('🔍 Отклонение выполнения заявки:', orderId);
     
-    if (!confirm('Отклонить выполнение? Заявка вернется в статус "В работе".')) {
-        console.log('❌ Отменено пользователем');
+    const btn = event.target;
+    const originalText = btn.textContent;
+    
+    // Двухэтапное подтверждение (вместо confirm)
+    if (originalText.includes('Отклонить')) {
+        btn.textContent = '⚠️ Точно отклонить?';
+        btn.style.background = '#FF5722';
+        
+        setTimeout(() => {
+            btn.textContent = originalText;
+            btn.style.background = '';
+        }, 3000);
+        
         return;
     }
     
-    const btn = event.target;
-    const originalText = btn.textContent;
     btn.textContent = '⏳ Отклонение...';
     btn.disabled = true;
     
@@ -1202,7 +1220,7 @@ async function rejectCompletion(orderId) {
         if (error) throw error;
         
         console.log('✅ Выполнение отклонено');
-        alert('⚠️ Выполнение отклонено. Мастер может отметить работу снова.');
+        alert('️ Выполнение отклонено. Мастер может отметить работу снова.');
         await loadOrders();
         await loadResponses();
         
