@@ -868,30 +868,30 @@
                     }
                 } 
                 // Кнопки для заказчика на своих заявках
-                else if (isOwnOrder) {
-                    if (order.awaiting_confirmation) {
-                        // Мастер отметил работу выполненной - ждем подтверждения
-                        const createdAt = new Date(order.created_at);
-                        const autoCompleteDate = new Date(createdAt.getTime() + AUTO_COMPLETE_DAYS * 24 * 60 * 60 * 1000);
-                        const daysLeft = Math.ceil((autoCompleteDate - new Date()) / (1000 * 60 * 60 * 24));
-                        
-                        responseBtn = `
-                            <div class="confirmation-banner">
-                                 Мастер отметил работу выполненной. Подтвердите или отклоните.
-                            </div>
-                            <div class="auto-complete-timer">
-                                 Автоподтверждение через ${daysLeft} дн.
-                            </div>
-                            <button class="btn btn-success" onclick="confirmCompletion(${order.id})" style="margin-bottom:5px;">✅ Подтвердить выполнение</button>
-                            <button class="btn btn-danger" onclick="rejectCompletion(${order.id})">❌ Отклонить</button>
-                        `;
-                    } else if (order.status === 'completed') {
-                        // Заявка завершена - можно оставить отзыв
-                        responseBtn = `<button class="btn btn-warning" onclick="openReviewModal(${order.id}, ${order.assigned_master_id})">⭐ Оставить отзыв</button>`;
-                    } else {
-                        responseBtn = '<div style="color:#888; font-size:13px; margin-top:10px;">📌 Ваша заявка</div>';
-                    }
-                }
+else if (isOwnOrder) {
+    if (order.awaiting_confirmation) {
+        // Мастер отметил работу выполненной - ждем подтверждения
+        const createdAt = new Date(order.created_at);
+        const autoCompleteDate = new Date(createdAt.getTime() + AUTO_COMPLETE_DAYS * 24 * 60 * 60 * 1000);
+        const daysLeft = Math.ceil((autoCompleteDate - new Date()) / (1000 * 60 * 60 * 24));
+        
+        responseBtn = `
+            <div class="confirmation-banner">
+                 Мастер отметил работу выполненной. Подтвердите или отклоните.
+            </div>
+            <div class="auto-complete-timer">
+                 Автоподтверждение через ${daysLeft} дн.
+            </div>
+            <button class="btn btn-success" onclick="confirmCompletion(${order.id})" style="margin-bottom:5px;">✅ Подтвердить выполнение</button>
+            <button class="btn btn-danger" onclick="rejectCompletion(${order.id})">❌ Отклонить</button>
+        `;
+    } else if (order.status === 'completed') {
+        // Заявка завершена - можно оставить отзыв
+        responseBtn = `<button class="btn btn-warning" onclick="openReviewModal(${order.id}, ${order.assigned_master_id})">⭐ Оставить отзыв</button>`;
+    } else {
+        responseBtn = '<div style="color:#888; font-size:13px; margin-top:10px;">📌 Ваша заявка</div>';
+    }
+}
                 
                 const districtBadge = order.district ? `<span class="badge badge-district">📍 ${order.district}</span>` : '';
                 
@@ -1134,67 +1134,87 @@
         }
 
         async function confirmCompletion(orderId) {
-            if (!confirm('Подтвердить выполнение работы? После этого вы сможете оставить отзыв.')) {
-                return;
-            }
-            
-            const btn = event.target;
-            btn.textContent = '⏳ Подтверждение...';
-            btn.disabled = true;
-            
-            try {
-                const { error } = await supabaseClient
-                    .from('orders')
-                    .update({ 
-                        status: 'completed',
-                        completed_at: new Date().toISOString(),
-                        awaiting_confirmation: false
-                    })
-                    .eq('id', orderId);
-                
-                if (error) throw error;
-                
-                alert('✅ Работа подтверждена! Теперь вы можете оставить отзыв.');
-                await loadOrders();
-                await loadResponses();
-                
-            } catch (err) {
-                alert('❌ Ошибка: ' + err.message);
-                btn.textContent = '✅ Подтвердить выполнение';
-                btn.disabled = false;
-            }
+    console.log('🔍 Подтверждение выполнения заявки:', orderId);
+    
+    if (!confirm('Подтвердить выполнение работы? После этого вы сможете оставить отзыв.')) {
+        console.log('❌ Отменено пользователем');
+        return;
+    }
+    
+    const btn = event.target;
+    const originalText = btn.textContent;
+    btn.textContent = '⏳ Подтверждение...';
+    btn.disabled = true;
+    
+    try {
+        console.log(' Отправка запроса в Supabase...');
+        
+        const { data, error } = await supabaseClient
+            .from('orders')
+            .update({ 
+                status: 'completed',
+                completed_at: new Date().toISOString(),
+                awaiting_confirmation: false
+            })
+            .eq('id', orderId)
+            .select();
+        
+        if (error) {
+            console.error('❌ Ошибка Supabase:', error);
+            throw error;
         }
+        
+        console.log('✅ Заявка обновлена:', data);
+        
+        alert('✅ Работа подтверждена! Теперь вы можете оставить отзыв.');
+        await loadOrders();
+        await loadResponses();
+        
+    } catch (err) {
+        console.error('❌ Критическая ошибка:', err);
+        alert('❌ Ошибка: ' + err.message);
+        btn.textContent = originalText;
+        btn.disabled = false;
+    }
+}
 
-        async function rejectCompletion(orderId) {
-            if (!confirm('Отклонить выполнение? Заявка вернется в статус "В работе".')) {
-                return;
-            }
-            
-            const btn = event.target;
-            btn.textContent = '⏳ Отклонение...';
-            btn.disabled = true;
-            
-            try {
-                const { error } = await supabaseClient
-                    .from('orders')
-                    .update({ 
-                        awaiting_confirmation: false
-                    })
-                    .eq('id', orderId);
-                
-                if (error) throw error;
-                
-                alert(' Выполнение отклонено. Мастер может отметить работу снова.');
-                await loadOrders();
-                await loadResponses();
-                
-            } catch (err) {
-                alert('❌ Ошибка: ' + err.message);
-                btn.textContent = '❌ Отклонить';
-                btn.disabled = false;
-            }
-        }
+async function rejectCompletion(orderId) {
+    console.log('🔍 Отклонение выполнения заявки:', orderId);
+    
+    if (!confirm('Отклонить выполнение? Заявка вернется в статус "В работе".')) {
+        console.log('❌ Отменено пользователем');
+        return;
+    }
+    
+    const btn = event.target;
+    const originalText = btn.textContent;
+    btn.textContent = '⏳ Отклонение...';
+    btn.disabled = true;
+    
+    try {
+        const { error } = await supabaseClient
+            .from('orders')
+            .update({ 
+                awaiting_confirmation: false
+            })
+            .eq('id', orderId);
+        
+        if (error) throw error;
+        
+        console.log('✅ Выполнение отклонено');
+        alert('⚠️ Выполнение отклонено. Мастер может отметить работу снова.');
+        await loadOrders();
+        await loadResponses();
+        
+    } catch (err) {
+        console.error('❌ Ошибка:', err);
+        alert('❌ Ошибка: ' + err.message);
+        btn.textContent = originalText;
+        btn.disabled = false;
+    }
+}
 
+        
         async function createOrder() {
             if (!currentUser) return alert('Подождите загрузку');
             
