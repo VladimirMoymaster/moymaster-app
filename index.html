@@ -1149,7 +1149,7 @@
             document.getElementById('partner-balance').textContent = Math.round(currentUser.partner_balance || 0) + ' ₽';
             
             // Генерируем реферальную ссылку
-            const partnerLink = appId ? `https://vk.com/app${appId}?ref=${currentUser.id}` : `https://vk.com/app?ref=${currentUser.id}`;
+            const partnerLink = appId ? `https://vk.com/app${appId}?ref=${currentUser.id}` : `https://vk.com/app12345678?ref=${currentUser.id}`;
             document.getElementById('partner-link').textContent = partnerLink;
             
             const withdrawBtn = document.getElementById('withdraw-btn');
