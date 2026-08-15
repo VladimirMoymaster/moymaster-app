@@ -32,12 +32,14 @@
         .btn:active { background: #005ce6; transform: scale(0.98); }
         .btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
         .btn-success { background: #4CAF50; }
-        .btn-success:active { background: #388E3C; }
         .btn-warning { background: #FF9800; }
         .btn-secondary { background: #757575; }
         .btn-pro { 
             background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
             color: #333; font-weight: bold;
+        }
+        .btn-partner {
+            background: linear-gradient(135deg, #9C27B0 0%, #673AB7 100%);
         }
         input, select, textarea { 
             width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ddd; 
@@ -85,6 +87,9 @@
             background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
             color: #333;
         }
+        .profile-avatar.partner {
+            background: linear-gradient(135deg, #9C27B0 0%, #673AB7 100%);
+        }
         .response-item {
             background: #f8f9fa; padding: 12px; border-radius: 10px; margin-bottom: 10px;
             border-left: 3px solid #0077FF;
@@ -128,7 +133,6 @@
             font-size: 14px;
         }
         
-        /* Модальное окно */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -151,6 +155,8 @@
             text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             animation: slideUp 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
         }
         @keyframes slideUp {
             from { transform: translateY(50px); opacity: 0; }
@@ -179,7 +185,6 @@
             margin-bottom: 8px;
             font-size: 14px;
         }
-        .modal-features div:last-child { margin-bottom: 0; }
         .modal-close {
             background: #f0f2f5;
             color: #333;
@@ -192,77 +197,45 @@
             cursor: pointer;
         }
         
-        /* Фотографии */
         .photo-upload {
-            border: 2px dashed #ddd;
+            border: 2px dashed #0077FF;
             border-radius: 10px;
             padding: 20px;
             text-align: center;
             cursor: pointer;
             transition: all 0.2s;
             margin-bottom: 12px;
+            background: #f8f9fa;
         }
-        .photo-upload {
-    border: 2px dashed #0077FF;
-    border-radius: 10px;
-    padding: 20px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    margin-bottom: 12px;
-    background: #f8f9fa;
-    user-select: none;
-    -webkit-tap-highlight-color: rgba(0,119,255,0.1);
-}
-.photo-upload:active {
-    border-color: #005ce6;
-    background: #e3f2fd;
-    transform: scale(0.98);
-}
-.photo-upload:hover {
-    border-color: #005ce6;
-    background: #e3f2fd;
-}
-.photo-upload-icon {
-    font-size: 32px;
-    margin-bottom: 8px;
-    pointer-events: none;
-}
-        .photo-upload-icon {
-            font-size: 32px;
-            margin-bottom: 8px;
+        .photo-upload:active {
+            border-color: #005ce6;
+            background: #e3f2fd;
         }
         .photo-preview {
             display: flex;
             gap: 8px;
             overflow-x: auto;
             margin-top: 10px;
-            padding-bottom: 5px;
         }
         .photo-preview img {
             width: 80px;
             height: 80px;
             object-fit: cover;
             border-radius: 8px;
-            border: 2px solid #fff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .order-photos {
             display: flex;
             gap: 8px;
             overflow-x: auto;
             margin: 10px 0;
-            padding-bottom: 5px;
         }
         .order-photos img {
             width: 100px;
             height: 100px;
             object-fit: cover;
             border-radius: 8px;
-            cursor: pointer;
         }
         
-        /* Рейтинг */
         .rating-stars {
             display: flex;
             gap: 4px;
@@ -273,49 +246,66 @@
             font-size: 28px;
             cursor: pointer;
             color: #ddd;
-            transition: all 0.2s;
         }
         .star.active {
             color: #FFD700;
         }
-        .star:active {
-            transform: scale(1.2);
+        
+        /* Партнерская программа */
+        .partner-card {
+            background: linear-gradient(135deg, #9C27B0 0%, #673AB7 100%);
+            color: white;
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 15px;
+            text-align: center;
         }
-        .rating-display {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            margin: 5px 0;
-        }
-        .rating-value {
-            font-weight: bold;
-            color: #FFD700;
-            font-size: 16px;
-        }
-        .review-item {
-            background: #f8f9fa;
-            padding: 12px;
+        .partner-link-box {
+            background: rgba(255,255,255,0.2);
             border-radius: 10px;
-            margin-bottom: 10px;
+            padding: 12px;
+            margin: 15px 0;
+            word-break: break-all;
+            font-size: 14px;
         }
-        .review-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
+        .partner-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 15px 0;
         }
-        .review-author {
+        .partner-stat {
+            background: white;
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+        }
+        .partner-stat-value {
+            font-size: 24px;
             font-weight: bold;
-            font-size: 14px;
+            color: #9C27B0;
         }
-        .review-date {
+        .partner-stat-label {
             font-size: 12px;
-            color: #888;
-        }
-        .review-text {
-            font-size: 14px;
             color: #666;
-            line-height: 1.4;
+            margin-top: 4px;
+        }
+        .balance-card {
+            background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+            color: white;
+            border-radius: 14px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .balance-amount {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .withdraw-info {
+            font-size: 13px;
+            opacity: 0.9;
         }
     </style>
 </head>
@@ -348,7 +338,7 @@
     <div id="tab-order" class="tab">
         <div class="container">
             <div class="card">
-                <h3> Новая заявка</h3>
+                <h3>📝 Новая заявка</h3>
                 <label style="font-size:13px; color:#666; margin-bottom:5px; display:block;">Район Барнаула</label>
                 <select id="order-district">
                     <option value="">Выберите район</option>
@@ -364,7 +354,7 @@
                 
                 <label style="font-size:13px; color:#666; margin-bottom:5px; display:block;">Фотографии</label>
                 <div class="photo-upload" onclick="uploadPhotos()">
-                    <div class="photo-upload-icon">📸</div>
+                    <div style="font-size:32px; margin-bottom:8px;">📸</div>
                     <div style="font-size:14px; color:#666;">Нажмите, чтобы добавить фото</div>
                 </div>
                 <div class="photo-preview" id="photo-preview"></div>
@@ -391,6 +381,65 @@
                 <h3> Профиль</h3>
                 <div id="profile-info" class="loading">Загрузка...</div>
             </div>
+            
+            <!-- Блок партнера (показывается только если is_partner = true) -->
+            <div id="partner-section" style="display:none;">
+                <div class="partner-card">
+                    <div style="font-size:24px; margin-bottom:10px;">🤝</div>
+                    <div style="font-size:18px; font-weight:bold; margin-bottom:10px;">Партнерская программа</div>
+                    <div style="font-size:14px; opacity:0.9;">Приглашайте мастеров и получайте 30% с их подписки Pro</div>
+                    
+                    <div class="partner-link-box" id="partner-link">
+                        Загрузка ссылки...
+                    </div>
+                    
+                    <button class="btn" style="background:white; color:#9C27B0; margin-bottom:10px;" onclick="copyPartnerLink()">
+                        📋 Копировать ссылку
+                    </button>
+                    <button class="btn" style="background:rgba(255,255,255,0.3); color:white;" onclick="sharePartnerLink()">
+                        📤 Поделиться
+                    </button>
+                </div>
+                
+                <div class="partner-stats">
+                    <div class="partner-stat">
+                        <div class="partner-stat-value" id="stat-invited">0</div>
+                        <div class="partner-stat-label">Приглашено</div>
+                    </div>
+                    <div class="partner-stat">
+                        <div class="partner-stat-value" id="stat-pro">0</div>
+                        <div class="partner-stat-label">Pro мастеров</div>
+                    </div>
+                    <div class="partner-stat">
+                        <div class="partner-stat-value" id="stat-earnings">0 ₽</div>
+                        <div class="partner-stat-label">Заработано</div>
+                    </div>
+                </div>
+                
+                <div class="balance-card">
+                    <div style="font-size:14px; opacity:0.9;">Ваш баланс</div>
+                    <div class="balance-amount" id="partner-balance">0 ₽</div>
+                    <div class="withdraw-info">Минимальный вывод: 1000 ₽</div>
+                    <button class="btn" style="background:white; color:#2E7D32; margin-top:15px;" onclick="openWithdrawModal()" id="withdraw-btn">
+                        💳 Вывести средства
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Кнопка стать партнером (если еще не партнер) -->
+            <div id="become-partner-section" style="display:none;">
+                <div class="card">
+                    <h3>🤝 Стать партнером</h3>
+                    <p style="color:#666; font-size:14px; margin-bottom:15px;">
+                        Приглашайте мастеров и получайте <b>30% с каждой Pro-подписки</b>. 
+                        Пассивный доход от 89 ₽ с каждого мастера в месяц!
+                    </p>
+                    <button class="btn btn-partner" onclick="openPartnerApplicationModal()">
+                        📝 Оставить заявку на партнерство
+                    </button>
+                </div>
+            </div>
+            
             <div class="card" id="reviews-section" style="display:none;">
                 <h3>⭐ Отзывы</h3>
                 <div id="reviews-list"></div>
@@ -401,7 +450,7 @@
     <!-- НАВИГАЦИЯ -->
     <div class="nav">
         <div class="nav-item active" onclick="switchTab('home')">
-            <span class="nav-icon"></span>Главная
+            <span class="nav-icon">🏠</span>Главная
         </div>
         <div class="nav-item" onclick="switchTab('order')">
             <span class="nav-icon">➕</span>Заявка
@@ -419,41 +468,52 @@
         <div class="modal-content">
             <div style="font-size: 40px; margin-bottom: 10px;">⭐</div>
             <div class="modal-title">Оформить PRO-мастера</div>
-            <div class="modal-text">
-                Получите неограниченные возможности для заработка!
-            </div>
+            <div class="modal-text">Получите неограниченные возможности для заработка!</div>
             <div class="modal-features">
                 <div>✅ Безлимитные отклики на заявки</div>
                 <div>⭐ Золотой значок в профиле</div>
                 <div>🚀 Приоритетное отображение</div>
-                <div>📊 Доступ к статистике</div>
             </div>
-            <div style="font-size: 24px; font-weight: bold; color: #0077FF; margin-bottom: 15px;">
-                299 ₽ / месяц
-            </div>
+            <div style="font-size: 24px; font-weight: bold; color: #0077FF; margin-bottom: 15px;">299 ₽ / месяц</div>
             <button class="btn btn-pro" style="margin-bottom: 10px;" onclick="connectVKPay()">💳 Подключить VK Pay</button>
             <button class="modal-close" onclick="closeProModal()">Позже</button>
         </div>
     </div>
 
-    <!-- Модальное окно отзыва -->
-    <div class="modal-overlay" id="review-modal">
+    <!-- Модальное окно заявки на партнерство -->
+    <div class="modal-overlay" id="partner-application-modal">
         <div class="modal-content">
-            <div style="font-size: 40px; margin-bottom: 10px;">⭐</div>
-            <div class="modal-title">Оставить отзыв</div>
+            <div style="font-size: 40px; margin-bottom: 10px;">🤝</div>
+            <div class="modal-title">Заявка на партнерство</div>
             <div class="modal-text">
-                Оцените работу мастера
+                Заполните анкету, и мы рассмотрим вашу заявку в течение 24 часов
             </div>
-            <div class="rating-stars" id="rating-stars">
-                <span class="star" data-rating="1" onclick="setRating(1)">★</span>
-                <span class="star" data-rating="2" onclick="setRating(2)">★</span>
-                <span class="star" data-rating="3" onclick="setRating(3)">★</span>
-                <span class="star" data-rating="4" onclick="setRating(4)">★</span>
-                <span class="star" data-rating="5" onclick="setRating(5)">★</span>
+            <input type="text" id="partner-vk" placeholder="Ссылка на ваш профиль ВК">
+            <textarea id="partner-description" rows="4" placeholder="Откуда вы будете привлекать мастеров и заказчиков? (например: у меня база из 50 мастеров, я админ паблика 'Ремонт Барнаул' и т.д.)"></textarea>
+            <button class="btn btn-partner" onclick="submitPartnerApplication()"> Отправить заявку</button>
+            <button class="modal-close" onclick="closePartnerApplicationModal()">Отмена</button>
+        </div>
+    </div>
+
+    <!-- Модальное окно вывода средств -->
+    <div class="modal-overlay" id="withdraw-modal">
+        <div class="modal-content">
+            <div style="font-size: 40px; margin-bottom: 10px;">💳</div>
+            <div class="modal-title">Вывод средств</div>
+            <div class="modal-text">
+                Минимальная сумма: 1000 ₽<br>
+                Комиссия: 0%<br>
+                Срок: 1-3 рабочих дня
             </div>
-            <textarea id="review-comment" rows="3" placeholder="Комментарий (необязательно)" style="margin-bottom: 15px;"></textarea>
-            <button class="btn btn-success" onclick="submitReview()" style="margin-bottom: 10px;">✅ Отправить отзыв</button>
-            <button class="modal-close" onclick="closeReviewModal()">Отмена</button>
+            <input type="number" id="withdraw-amount" placeholder="Сумма вывода (мин. 1000 ₽)" min="1000">
+            <select id="withdraw-method">
+                <option value="">Выберите способ вывода</option>
+                <option value="vk_pay">VK Pay</option>
+                <option value="card">Банковская карта</option>
+            </select>
+            <input type="text" id="withdraw-details" placeholder="Реквизиты (номер карты или VK Pay)">
+            <button class="btn btn-success" onclick="submitWithdrawal()">✅ Запросить вывод</button>
+            <button class="modal-close" onclick="closeWithdrawModal()">Отмена</button>
         </div>
     </div>
 
@@ -465,6 +525,8 @@
         
         const BARNAUL_DISTRICTS = ['Центральный', 'Железнодорожный', 'Октябрьский', 'Индустриальный', 'Ленинский'];
         const DAILY_RESPONSE_LIMIT = 3;
+        const PARTNER_COMMISSION = 0.30; // 30% с подписки
+        const MIN_WITHDRAW = 1000; // Минимальный вывод
         
         let currentUser = null;
         let categoriesCache = [];
@@ -472,9 +534,7 @@
         let currentDistrictFilter = 'all';
         let todayResponsesCount = 0;
         let uploadedPhotos = [];
-        let currentReviewOrderId = null;
-        let currentReviewMasterId = null;
-        let selectedRating = 0;
+        let partnerStats = { invited: 0, pro: 0, earnings: 0 };
 
         console.log('🚀 Запуск...');
 
@@ -505,7 +565,9 @@
                             name: name, 
                             role: 'customer',
                             subscription_type: 'free',
-                            average_rating: 0
+                            average_rating: 0,
+                            is_partner: false,
+                            partner_balance: 0
                         }])
                         .select()
                         .single();
@@ -525,6 +587,11 @@
                 await loadCategories();
                 await loadOrders();
                 await loadResponses();
+                
+                // Загружаем статистику партнера
+                if (currentUser.is_partner) {
+                    await loadPartnerStats();
+                }
             } catch (err) {
                 console.error('❌ Ошибка:', err);
                 document.getElementById('profile-info').innerHTML = 
@@ -546,11 +613,9 @@
                 .gte('created_at', todayISO);
             
             if (error) {
-                console.error('Ошибка подсчета откликов:', error);
                 todayResponsesCount = 0;
             } else {
                 todayResponsesCount = count || 0;
-                console.log(` Откликов сегодня: ${todayResponsesCount}/${DAILY_RESPONSE_LIMIT}`);
             }
         }
 
@@ -619,7 +684,7 @@
                 : allOrders.filter(o => o.district === currentDistrictFilter);
 
             if (filteredOrders.length === 0) {
-                container.innerHTML = '<div class="empty-state"><div class="empty-icon"></div>В этом районе заявок пока нет</div>';
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div>В этом районе заявок пока нет</div>';
                 return;
             }
 
@@ -639,35 +704,17 @@
                     
                     if (limitReached) {
                         responseBtn = `
-                            <div class="limit-warning">
-                                ⚠️ Лимит бесплатных откликов исчерпан (${DAILY_RESPONSE_LIMIT}/${DAILY_RESPONSE_LIMIT})
-                                <br><small>Оформите Pro-подписку для безлимита</small>
-                            </div>
-                            <button class="btn btn-pro" onclick="buyPro()">⭐ Оформить Pro за 299 ₽/мес</button>
+                            <div class="limit-warning">⚠️ Лимит исчерпан</div>
+                            <button class="btn btn-pro" onclick="buyPro()">⭐ Оформить Pro</button>
                         `;
                     } else {
-                        const remaining = isPro ? '' : (DAILY_RESPONSE_LIMIT - todayResponsesCount);
-                        responseBtn = `
-                            <div style="font-size:12px; color:#888; margin-bottom:5px;">
-                                ${isPro ? '⭐ Pro-мастер (безлимит)' : `Осталось откликов сегодня: ${remaining}/${DAILY_RESPONSE_LIMIT}`}
-                            </div>
-                            <button class="btn btn-success" onclick="showResponseForm(${order.id})">✋ Откликнуться</button>
-                        `;
+                        responseBtn = `<button class="btn btn-success" onclick="showResponseForm(${order.id})">✋ Откликнуться</button>`;
                     }
-                } else if (isOwnOrder && order.status === 'completed') {
-                    // Кнопка оставить отзыв для завершенных заявок
-                    responseBtn = `<button class="btn btn-warning" onclick="openReviewModal(${order.id}, ${order.assigned_master_id})">⭐ Оставить отзыв</button>`;
                 } else if (isOwnOrder) {
                     responseBtn = '<div style="color:#888; font-size:13px; margin-top:10px;">📌 Ваша заявка</div>';
                 }
                 
                 const districtBadge = order.district ? `<span class="badge badge-district">📍 ${order.district}</span>` : '';
-                
-                // Фотографии
-                let photosHtml = '';
-                if (order.photos && order.photos.length > 0) {
-                    photosHtml = `<div class="order-photos">${order.photos.map(p => `<img src="${p}" onclick="window.open('${p}')">`).join('')}</div>`;
-                }
 
                 return `
                     <div class="order-item">
@@ -676,7 +723,6 @@
                         <span class="badge-status ${statusClass}">${statusText}</span>
                         <div style="font-weight:bold; margin:8px 0 5px;">${order.title}</div>
                         <div style="font-size:14px; color:#666; margin-bottom:8px;">${order.description || 'Нет описания'}</div>
-                        ${photosHtml}
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                             <span style="color:#888; font-size:13px;">ID: ${order.id}</span>
                             <span class="price-tag">${order.budget ? order.budget + ' ₽' : 'Договорная'}</span>
@@ -688,95 +734,13 @@
             }).join('');
         }
 
-        // Загрузка фотографий - универсальный способ
-async function uploadPhotos() {
-    console.log('📸 Попытка загрузки фото...');
-    
-    // Создаем скрытый input для загрузки файлов
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.multiple = true;
-    input.style.display = 'none';
-    
-    input.onchange = async () => {
-        if (input.files && input.files.length > 0) {
-            console.log(`Выбрано файлов: ${input.files.length}`);
-            
-            for (let i = 0; i < input.files.length; i++) {
-                const file = input.files[i];
-                
-                // Проверяем размер файла (макс 5MB)
-                if (file.size > 5 * 1024 * 1024) {
-                    alert(`Файл "${file.name}" слишком большой (макс. 5MB)`);
-                    continue;
-                }
-                
-                try {
-                    // Конвертируем в base64
-                    const base64 = await fileToBase64(file);
-                    uploadedPhotos.push(base64);
-                    console.log('✅ Фото добавлено:', base64.substring(0, 50) + '...');
-                } catch (err) {
-                    console.error('❌ Ошибка конвертации фото:', err);
-                    alert('Не удалось обработать фото: ' + file.name);
-                }
-            }
-            
-            renderPhotoPreview();
-        }
-    };
-    
-    input.onerror = () => {
-        console.error('❌ Ошибка input');
-        alert('Не удалось открыть выбор файлов');
-    };
-    
-    // Добавляем в DOM и кликаем
-    document.body.appendChild(input);
-    input.click();
-    
-    // Удаляем через секунду
-    setTimeout(() => {
-        if (input.parentNode) {
-            input.parentNode.removeChild(input);
-        }
-    }, 1000);
-}
-
-// Вспомогательная функция для конвертации в base64
-function fileToBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-    });
-}
-
-        function renderPhotoPreview() {
-            const container = document.getElementById('photo-preview');
-            if (uploadedPhotos.length === 0) {
-                container.innerHTML = '';
-                return;
-            }
-            container.innerHTML = uploadedPhotos.map((photo, idx) => `
-                <img src="${photo}" onclick="removePhoto(${idx})" style="cursor:pointer;" title="Нажмите, чтобы удалить">
-            `).join('');
-        }
-
-        function removePhoto(idx) {
-            uploadedPhotos.splice(idx, 1);
-            renderPhotoPreview();
-        }
-
         function showResponseForm(orderId) {
             const formContainer = document.getElementById(`response-form-${orderId}`);
             formContainer.innerHTML = `
                 <div style="background:#f8f9fa; padding:12px; border-radius:10px; margin-top:10px;">
                     <input type="number" id="response-price-${orderId}" placeholder="Ваша цена (руб)" style="margin-bottom:8px;">
-                    <textarea id="response-message-${orderId}" rows="2" placeholder="Сообщение заказчику" style="margin-bottom:8px;"></textarea>
-                    <button class="btn btn-success" onclick="submitResponse(${orderId})" style="margin-bottom:5px;">✅ Отправить отклик</button>
+                    <textarea id="response-message-${orderId}" rows="2" placeholder="Сообщение" style="margin-bottom:8px;"></textarea>
+                    <button class="btn btn-success" onclick="submitResponse(${orderId})" style="margin-bottom:5px;">✅ Отправить</button>
                     <button class="btn btn-secondary" onclick="cancelResponse(${orderId})">Отмена</button>
                 </div>
             `;
@@ -788,11 +752,8 @@ function fileToBase64(file) {
         }
 
         async function submitResponse(orderId) {
-            const priceInput = document.getElementById(`response-price-${orderId}`);
-            const messageInput = document.getElementById(`response-message-${orderId}`);
-            
-            const price = priceInput.value.trim();
-            const message = messageInput.value.trim();
+            const price = document.getElementById(`response-price-${orderId}`).value.trim();
+            const message = document.getElementById(`response-message-${orderId}`).value.trim();
 
             if (!price) { alert('Укажите цену'); return; }
 
@@ -800,7 +761,7 @@ function fileToBase64(file) {
             btn.textContent = '⏳ Отправка...';
             btn.disabled = true;
 
-            const { data, error } = await supabaseClient
+            const { error } = await supabaseClient
                 .from('responses')
                 .insert([{
                     order_id: orderId,
@@ -808,16 +769,13 @@ function fileToBase64(file) {
                     price: parseFloat(price),
                     message: message || null,
                     status: 'pending'
-                }])
-                .select();
+                }]);
 
             if (error) {
-                console.error('❌ Ошибка:', error);
                 alert('❌ Ошибка: ' + error.message);
-                btn.textContent = '✅ Отправить отклик';
+                btn.textContent = '✅ Отправить';
                 btn.disabled = false;
             } else {
-                console.log('✅ Отклик создан:', data);
                 alert('✅ Отклик отправлен!');
                 cancelResponse(orderId);
                 todayResponsesCount++;
@@ -834,7 +792,7 @@ function fileToBase64(file) {
             const title = document.getElementById('responses-title');
             
             if (currentUser.role === 'master') {
-                title.textContent = ' Мои отклики';
+                title.textContent = '💼 Мои отклики';
                 const { data, error } = await supabaseClient
                     .from('responses')
                     .select('*')
@@ -842,19 +800,19 @@ function fileToBase64(file) {
                     .order('created_at', { ascending: false });
                 
                 if (error || !data || data.length === 0) {
-                    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div>Вы пока не откликались на заявки</div>';
+                    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div>Вы пока не откликались</div>';
                     return;
                 }
                 
                 container.innerHTML = data.map(r => {
-                    const statusText = r.status === 'pending' ? '⏳ Ожидает' : 
+                    const statusText = r.status === 'pending' ? ' Ожидает' : 
                                       r.status === 'accepted' ? '✅ Принят' : '❌ Отклонен';
                     return `
                         <div class="response-item">
                             <div style="font-weight:bold; margin-bottom:5px;">Заявка #${r.order_id}</div>
-                            <div style="font-size:14px; color:#666; margin-bottom:8px;">${r.message || 'Без сообщения'}</div>
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <span class="price-tag">${r.price ? r.price + ' ₽' : 'Цена не указана'}</span>
+                            <div style="font-size:14px; color:#666;">${r.message || 'Без сообщения'}</div>
+                            <div style="display:flex; justify-content:space-between; margin-top:8px;">
+                                <span class="price-tag">${r.price} ₽</span>
                                 <span style="font-size:13px; color:#888;">${statusText}</span>
                             </div>
                         </div>
@@ -869,32 +827,32 @@ function fileToBase64(file) {
                     .eq('user_id', currentUser.id);
                 
                 if (!myOrders || myOrders.length === 0) {
-                    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div>У вас пока нет заявок</div>';
+                    container.innerHTML = '<div class="empty-state"><div class="empty-icon"></div>Нет заявок</div>';
                     return;
                 }
                 
                 const orderIds = myOrders.map(o => o.id);
-                const { data: responses, error } = await supabaseClient
+                const { data: responses } = await supabaseClient
                     .from('responses')
                     .select('*')
                     .in('order_id', orderIds)
                     .order('created_at', { ascending: false });
                 
-                if (error || !responses || responses.length === 0) {
-                    container.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>Пока нет откликов на ваши заявки</div>';
+                if (!responses || responses.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>Нет откликов</div>';
                     return;
                 }
                 
                 container.innerHTML = responses.map(r => {
                     const order = myOrders.find(o => o.id === r.order_id);
                     const acceptBtn = r.status === 'pending' ? 
-                        `<button class="btn btn-success" onclick="acceptResponse(${r.id}, ${r.order_id})">✅ Принять мастера</button>` : '';
+                        `<button class="btn btn-success" onclick="acceptResponse(${r.id}, ${r.order_id})">✅ Принять</button>` : '';
                     return `
                         <div class="response-item">
-                            <div style="font-size:13px; color:#888; margin-bottom:5px;">На заявку: ${order?.title || '#' + r.order_id}</div>
-                            <div style="font-size:14px; color:#666; margin-bottom:8px;">${r.message || 'Без сообщения'}</div>
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                                <span class="price-tag">${r.price ? r.price + ' ₽' : 'Цена не указана'}</span>
+                            <div style="font-size:13px; color:#888;">На: ${order?.title || '#' + r.order_id}</div>
+                            <div style="font-size:14px; color:#666; margin:5px 0;">${r.message || 'Без сообщения'}</div>
+                            <div style="display:flex; justify-content:space-between; margin-top:8px;">
+                                <span class="price-tag">${r.price} ₽</span>
                                 <span style="font-size:13px;">Пользователь #${r.user_id}</span>
                             </div>
                             ${acceptBtn}
@@ -924,8 +882,6 @@ function fileToBase64(file) {
                         status: 'in_progress', 
                         assigned_master_id: responseData.user_id 
                     }).eq('id', orderId);
-                    await supabaseClient.from('responses').update({ status: 'rejected' })
-                        .eq('order_id', orderId).neq('id', responseId).eq('status', 'pending');
                     
                     alert('✅ Мастер принят!');
                     await loadOrders();
@@ -941,60 +897,53 @@ function fileToBase64(file) {
         }
 
         async function createOrder() {
-    console.log('📤 Создание заявки...', {
-        district: document.getElementById('order-district').value,
-        categoryId: document.getElementById('order-category').value,
-        photosCount: uploadedPhotos ? uploadedPhotos.length : 0
-    });
-    
-    if (!currentUser) return alert('Подождите загрузку');
-    
-    const district = document.getElementById('order-district').value;
-    const categoryId = document.getElementById('order-category').value;
-    const title = document.getElementById('order-title').value.trim();
-    const description = document.getElementById('order-description').value.trim();
-    const budget = document.getElementById('order-budget').value;
+            if (!currentUser) return alert('Подождите загрузку');
+            
+            const district = document.getElementById('order-district').value;
+            const categoryId = document.getElementById('order-category').value;
+            const title = document.getElementById('order-title').value.trim();
+            const description = document.getElementById('order-description').value.trim();
+            const budget = document.getElementById('order-budget').value;
 
-    if (!district) return alert('Выберите район Барнаула');
-    if (!categoryId || !title) return alert('Заполните категорию и заголовок');
+            if (!district) return alert('Выберите район');
+            if (!categoryId || !title) return alert('Заполните категорию и заголовок');
 
-    const btn = document.querySelector('#tab-order .btn');
-    btn.textContent = '⏳ Создание...';
-    btn.disabled = true;
+            const btn = document.querySelector('#tab-order .btn');
+            btn.textContent = '⏳ Создание...';
+            btn.disabled = true;
 
-    const { error } = await supabaseClient
-        .from('orders')
-        .insert([{ 
-            user_id: currentUser.id, 
-            district: district,
-            category_id: parseInt(categoryId), 
-            title, 
-            description: description || null, 
-            budget: budget ? parseFloat(budget) : null,
-            status: 'open',
-            photos: uploadedPhotos && uploadedPhotos.length > 0 ? uploadedPhotos : null
-        }]);
+            const { error } = await supabaseClient
+                .from('orders')
+                .insert([{ 
+                    user_id: currentUser.id, 
+                    district,
+                    category_id: parseInt(categoryId), 
+                    title, 
+                    description: description || null, 
+                    budget: budget ? parseFloat(budget) : null,
+                    status: 'open',
+                    photos: uploadedPhotos.length > 0 ? uploadedPhotos : null
+                }]);
 
-    if (error) {
-        alert('❌ Ошибка: ' + error.message);
-    } else {
-        alert('✅ Заявка создана!');
-        // Очистка формы
-        document.getElementById('order-title').value = '';
-        document.getElementById('order-description').value = '';
-        document.getElementById('order-budget').value = '';
-        document.getElementById('order-category').value = '';
-        document.getElementById('order-district').value = '';
-        uploadedPhotos = [];
-        renderPhotoPreview();
-        await loadOrders();
-        switchTab('home');
-    }
-    
-    btn.textContent = '📤 Создать заявку';
-    btn.disabled = false;
-}
-        
+            if (error) {
+                alert('❌ Ошибка: ' + error.message);
+            } else {
+                alert('✅ Заявка создана!');
+                document.getElementById('order-title').value = '';
+                document.getElementById('order-description').value = '';
+                document.getElementById('order-budget').value = '';
+                document.getElementById('order-category').value = '';
+                document.getElementById('order-district').value = '';
+                uploadedPhotos = [];
+                renderPhotoPreview();
+                await loadOrders();
+                switchTab('home');
+            }
+            
+            btn.textContent = '📤 Создать заявку';
+            btn.disabled = false;
+        }
+
         async function toggleRole() {
             const newRole = currentUser.role === 'customer' ? 'master' : 'customer';
             const { error } = await supabaseClient
@@ -1033,123 +982,174 @@ function fileToBase64(file) {
             closeProModal();
         }
 
-        // Система отзывов
-        function openReviewModal(orderId, masterId) {
-            currentReviewOrderId = orderId;
-            currentReviewMasterId = masterId;
-            selectedRating = 0;
-            document.getElementById('review-comment').value = '';
-            updateRatingStars();
-            document.getElementById('review-modal').classList.add('active');
+        // Партнерская программа
+        function openPartnerApplicationModal() {
+            document.getElementById('partner-application-modal').classList.add('active');
         }
 
-        function closeReviewModal() {
-            document.getElementById('review-modal').classList.remove('active');
-            currentReviewOrderId = null;
-            currentReviewMasterId = null;
-            selectedRating = 0;
+        function closePartnerApplicationModal() {
+            document.getElementById('partner-application-modal').classList.remove('active');
         }
 
-        function setRating(rating) {
-            selectedRating = rating;
-            updateRatingStars();
-        }
-
-        function updateRatingStars() {
-            const stars = document.querySelectorAll('#rating-stars .star');
-            stars.forEach((star, idx) => {
-                if (idx < selectedRating) {
-                    star.classList.add('active');
-                } else {
-                    star.classList.remove('active');
-                }
-            });
-        }
-
-        async function submitReview() {
-            if (selectedRating === 0) {
-                alert('Пожалуйста, выберите рейтинг');
+        async function submitPartnerApplication() {
+            const vk = document.getElementById('partner-vk').value.trim();
+            const description = document.getElementById('partner-description').value.trim();
+            
+            if (!vk || !description) {
+                alert('Заполните все поля');
                 return;
             }
             
-            const comment = document.getElementById('review-comment').value.trim();
             const btn = event.target;
             btn.textContent = '⏳ Отправка...';
             btn.disabled = true;
             
-            try {
-                const { error } = await supabaseClient
-                    .from('reviews')
-                    .insert([{
-                        order_id: currentReviewOrderId,
-                        reviewer_id: currentUser.id,
-                        master_id: currentReviewMasterId,
-                        rating: selectedRating,
-                        comment: comment || null
-                    }]);
-                
-                if (error) throw error;
-                
-                // Обновляем средний рейтинг мастера
-                const { data: reviews } = await supabaseClient
-                    .from('reviews')
-                    .select('rating')
-                    .eq('master_id', currentReviewMasterId);
-                
-                if (reviews && reviews.length > 0) {
-                    const avgRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
-                    await supabaseClient
-                        .from('users')
-                        .update({ average_rating: avgRating })
-                        .eq('id', currentReviewMasterId);
-                }
-                
-                // Завершаем заявку
-                await supabaseClient
-                    .from('orders')
-                    .update({ status: 'completed' })
-                    .eq('id', currentReviewOrderId);
-                
-                alert('✅ Отзыв отправлен!');
-                closeReviewModal();
-                await loadOrders();
-                await loadResponses();
-                
-            } catch (err) {
-                alert('Ошибка: ' + err.message);
-                btn.textContent = '✅ Отправить отзыв';
+            const { error } = await supabaseClient
+                .from('partner_applications')
+                .insert([{
+                    user_id: currentUser.id,
+                    vk_profile: vk,
+                    description: description,
+                    status: 'pending'
+                }]);
+            
+            if (error) {
+                alert('❌ Ошибка: ' + error.message);
+                btn.textContent = '📤 Отправить заявку';
                 btn.disabled = false;
+            } else {
+                alert('✅ Заявка отправлена! Мы рассмотрим её в течение 24 часов.');
+                closePartnerApplicationModal();
+                document.getElementById('partner-vk').value = '';
+                document.getElementById('partner-description').value = '';
             }
         }
 
-        async function loadMasterReviews(masterId) {
-            const { data: reviews, error } = await supabaseClient
-                .from('reviews')
-                .select('*, users!reviewer_id(name)')
-                .eq('master_id', masterId)
-                .order('created_at', { ascending: false });
+        async function loadPartnerStats() {
+            if (!currentUser.is_partner) return;
             
-            const container = document.getElementById('reviews-list');
+            // Считаем приглашенных
+            const { count: invitedCount } = await supabaseClient
+                .from('users')
+                .select('*', { count: 'exact', head: true })
+                .eq('invited_by_partner_id', currentUser.id);
             
-            if (error || !reviews || reviews.length === 0) {
-                container.innerHTML = '<div style="color:#888; text-align:center; padding:20px;">Пока нет отзывов</div>';
+            // Считаем Pro мастеров
+            const { count: proCount } = await supabaseClient
+                .from('users')
+                .select('*', { count: 'exact', head: true })
+                .eq('invited_by_partner_id', currentUser.id)
+                .eq('subscription_type', 'pro');
+            
+            // Считаем заработок
+            const { data: earnings } = await supabaseClient
+                .from('partner_earnings')
+                .select('amount')
+                .eq('partner_id', currentUser.id);
+            
+            const totalEarnings = earnings ? earnings.reduce((sum, e) => sum + parseFloat(e.amount), 0) : 0;
+            
+            partnerStats = {
+                invited: invitedCount || 0,
+                pro: proCount || 0,
+                earnings: totalEarnings
+            };
+            
+            // Обновляем UI
+            document.getElementById('stat-invited').textContent = partnerStats.invited;
+            document.getElementById('stat-pro').textContent = partnerStats.pro;
+            document.getElementById('stat-earnings').textContent = Math.round(partnerStats.earnings) + ' ₽';
+            document.getElementById('partner-balance').textContent = Math.round(currentUser.partner_balance || 0) + ' ₽';
+            
+            // Генерируем реферальную ссылку
+            const partnerLink = `https://vk.com/appТВОЙ_APP_ID?ref=${currentUser.id}`;
+            document.getElementById('partner-link').textContent = partnerLink;
+            
+            // Блокируем кнопку вывода если баланс < 1000
+            const withdrawBtn = document.getElementById('withdraw-btn');
+            if (currentUser.partner_balance < MIN_WITHDRAW) {
+                withdrawBtn.disabled = true;
+                withdrawBtn.textContent = `💳 Недостаточно средств (мин. ${MIN_WITHDRAW} ₽)`;
+            }
+        }
+
+        function copyPartnerLink() {
+            const link = document.getElementById('partner-link').textContent;
+            navigator.clipboard.writeText(link).then(() => {
+                alert('✅ Ссылка скопирована!');
+            }).catch(() => {
+                alert('Не удалось скопировать');
+            });
+        }
+
+        async function sharePartnerLink() {
+            const link = document.getElementById('partner-link').textContent;
+            try {
+                await vkBridge.send('VKWebAppShare', {
+                    link: link,
+                    title: 'Мой Мастер - поиск мастеров в Барнауле',
+                    description: 'Присоединяйся и найди проверенного мастера!'
+                });
+            } catch (err) {
+                alert('Не удалось поделиться');
+            }
+        }
+
+        function openWithdrawModal() {
+            if (currentUser.partner_balance < MIN_WITHDRAW) {
+                alert(`Минимальная сумма вывода: ${MIN_WITHDRAW} ₽`);
+                return;
+            }
+            document.getElementById('withdraw-modal').classList.add('active');
+        }
+
+        function closeWithdrawModal() {
+            document.getElementById('withdraw-modal').classList.remove('active');
+        }
+
+        async function submitWithdrawal() {
+            const amount = parseFloat(document.getElementById('withdraw-amount').value);
+            const method = document.getElementById('withdraw-method').value;
+            const details = document.getElementById('withdraw-details').value.trim();
+            
+            if (!amount || amount < MIN_WITHDRAW) {
+                alert(`Минимальная сумма: ${MIN_WITHDRAW} ₽`);
+                return;
+            }
+            if (!method || !details) {
+                alert('Заполните все поля');
+                return;
+            }
+            if (amount > currentUser.partner_balance) {
+                alert('Недостаточно средств');
                 return;
             }
             
-            container.innerHTML = reviews.map(r => {
-                const date = new Date(r.created_at).toLocaleDateString('ru-RU');
-                const stars = '⭐'.repeat(r.rating);
-                return `
-                    <div class="review-item">
-                        <div class="review-header">
-                            <div class="review-author">${r.users?.name || 'Аноним'}</div>
-                            <div class="review-date">${date}</div>
-                        </div>
-                        <div style="margin-bottom:8px;">${stars}</div>
-                        <div class="review-text">${r.comment || 'Без комментария'}</div>
-                    </div>
-                `;
-            }).join('');
+            const btn = event.target;
+            btn.textContent = '⏳ Отправка...';
+            btn.disabled = true;
+            
+            const { error } = await supabaseClient
+                .from('partner_withdrawals')
+                .insert([{
+                    partner_id: currentUser.id,
+                    amount: amount,
+                    payment_method: method,
+                    payment_details: details,
+                    status: 'pending'
+                }]);
+            
+            if (error) {
+                alert('❌ Ошибка: ' + error.message);
+                btn.textContent = '✅ Запросить вывод';
+                btn.disabled = false;
+            } else {
+                alert('✅ Заявка на вывод отправлена! Обработка 1-3 рабочих дня.');
+                closeWithdrawModal();
+                document.getElementById('withdraw-amount').value = '';
+                document.getElementById('withdraw-method').value = '';
+                document.getElementById('withdraw-details').value = '';
+            }
         }
 
         function updateProfileUI() {
@@ -1165,40 +1165,35 @@ function fileToBase64(file) {
                     subscriptionBlock = `
                         <div class="subscription-info">
                             <div style="font-size:13px; color:#888;">Текущий тариф</div>
-                            <div style="font-weight:bold; color:#FFA500; font-size:18px; margin-top:4px;">⭐ PRO-мастер</div>
-                            <div style="font-size:12px; color:#666; margin-top:4px;">Безлимитные отклики</div>
+                            <div style="font-weight:bold; color:#FFA500; font-size:18px;">⭐ PRO-мастер</div>
                         </div>
                     `;
                 } else {
                     subscriptionBlock = `
                         <div class="subscription-info free">
                             <div style="font-size:13px; color:#888;">Текущий тариф</div>
-                            <div style="font-weight:bold; font-size:18px; margin-top:4px;">Free-мастер</div>
-                            <div style="font-size:12px; color:#666; margin-top:4px;">
-                                Откликов сегодня: ${todayResponsesCount}/${DAILY_RESPONSE_LIMIT}
-                            </div>
+                            <div style="font-weight:bold; font-size:18px;">Free-мастер</div>
+                            <div style="font-size:12px; color:#666;">Откликов: ${todayResponsesCount}/${DAILY_RESPONSE_LIMIT}</div>
                         </div>
                         <button class="btn btn-pro" onclick="buyPro()">⭐ Оформить Pro за 299 ₽/мес</button>
                     `;
                 }
             }
             
-            // Рейтинг мастера
             let ratingBlock = '';
             if (currentUser.role === 'master') {
                 const avgRating = currentUser.average_rating || 0;
                 const stars = avgRating > 0 ? '⭐'.repeat(Math.round(avgRating)) : 'Нет оценок';
                 ratingBlock = `
-                    <div style="background:#f5f5f5; padding:12px; border-radius:10px; margin-top:10px; margin-bottom:10px;">
+                    <div style="background:#f5f5f5; padding:12px; border-radius:10px; margin-top:10px;">
                         <div style="color:#888; font-size:13px;">Рейтинг</div>
                         <div style="font-size:18px; margin-top:4px;">${stars}</div>
-                        <div style="font-size:12px; color:#666;">${avgRating.toFixed(1)} из 5</div>
                     </div>
                 `;
             }
             
             document.getElementById('profile-info').innerHTML = `
-                <div class="profile-avatar ${currentUser.subscription_type === 'pro' ? 'pro' : ''}">
+                <div class="profile-avatar ${currentUser.subscription_type === 'pro' ? 'pro' : ''} ${currentUser.is_partner ? 'partner' : ''}">
                     ${firstLetter}${currentUser.subscription_type === 'pro' ? '⭐' : ''}
                 </div>
                 <div style="text-align:center;">
@@ -1213,14 +1208,21 @@ function fileToBase64(file) {
                         <div style="color:#888; font-size:13px;">VK ID</div>
                         <div style="font-weight:600; margin-top:4px;">${currentUser.vk_id}</div>
                     </div>
-                    <button class="btn btn-warning" onclick="toggleRole()">🔄 ${switchText}</button>
+                    <button class="btn btn-warning" onclick="toggleRole()"> ${switchText}</button>
                 </div>
             `;
             
-            // Загружаем отзывы для мастера
+            // Показываем/скрываем блок партнера
+            if (currentUser.is_partner) {
+                document.getElementById('partner-section').style.display = 'block';
+                document.getElementById('become-partner-section').style.display = 'none';
+            } else {
+                document.getElementById('partner-section').style.display = 'none';
+                document.getElementById('become-partner-section').style.display = 'block';
+            }
+            
             if (currentUser.role === 'master') {
                 document.getElementById('reviews-section').style.display = 'block';
-                loadMasterReviews(currentUser.id);
             } else {
                 document.getElementById('reviews-section').style.display = 'none';
             }
