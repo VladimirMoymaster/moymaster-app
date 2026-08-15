@@ -1289,10 +1289,143 @@
             document.getElementById('pro-modal').classList.remove('active');
         }
 
-        function connectVKPay() {
-            alert('🚧 Оплата через VK Pay будет подключена в следующем обновлении!');
-            closeProModal();
+        async function connectVKPay() {
+    if (!currentUser) {
+        alert('Подождите загрузку профиля');
+        return;
+    }
+    
+    if (currentUser.subscription_type === 'pro') {
+        alert('У вас уже активна Pro-подписка!');
+        return;
+    }
+    
+    const btn = event.target;
+    btn.textContent = '⏳ Обработка...';
+    btn.disabled = true;
+    
+    try {
+        console.log('💳 Инициация оплаты через VK Pay...');
+        
+        // Создаем заказ через VK Bridge
+        const orderData = {
+            action: 'pay-to-group',
+            app_id: parseInt(appId),
+            order_id: `order_${currentUser.id}_${Date.now()}`,
+            amount: 29900, // 299.00 ₽ в копейках
+            description: 'Pro-подписка на 1 месяц',
+            currency: 'RUB',
+            test_mode: 1  // Тестовый режим (убрать при продакшене)
+        };
+        
+        console.log('📤 Отправка запроса в VK Pay:', orderData);
+        
+        const result = await vkBridge.send('VKWebAppShowOrderBox', orderData);
+        
+        console.log('✅ Результат оплаты:', result);
+        
+        if (result.status === 'success' || result.status === 'success_new') {
+            // Оплата успешна - активируем Pro
+            await activateProSubscription(result.order_id);
+        } else {
+            alert('Оплата отменена или не завершена');
         }
+        
+    } catch (err) {
+        console.error('❌ Ошибка VK Pay:', err);
+        alert('Ошибка оплаты: ' + err.message);
+    }
+    
+    btn.textContent = ' Подключить VK Pay';
+    btn.disabled = false;
+}
+
+async function activateProSubscription(vkOrderId) {
+    console.log(' Активация Pro-подписки...');
+    
+    const proDuration = 30; // дней
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + proDuration);
+    
+    // 1. Обновляем статус пользователя на Pro
+    const { error: userError } = await supabaseClient
+        .from('users')
+        .update({ 
+            subscription_type: 'pro',
+            subscription_expires_at: expiresAt.toISOString()
+        })
+        .eq('id', currentUser.id);
+    
+    if (userError) {
+        console.error('❌ Ошибка обновления пользователя:', userError);
+        throw userError;
+    }
+    
+    // 2. Проверяем, есть ли партнер, который пригласил этого мастера
+    let partnerId = null;
+    let partnerAmount = 0;
+    
+    if (currentUser.invited_by_partner_id) {
+        partnerId = currentUser.invited_by_partner_id;
+        partnerAmount = 299 * 0.30; // 30% от 299 ₽ = 89.7 ₽
+        
+        console.log(`🤝 Начисление партнеру #${partnerId}: ${partnerAmount} ₽`);
+        
+        // 3. Начисляем баланс партнеру
+        const { data: partnerData } = await supabaseClient
+            .from('users')
+            .select('partner_balance')
+            .eq('id', partnerId)
+            .single();
+        
+        if (partnerData) {
+            const newBalance = (partnerData.partner_balance || 0) + partnerAmount;
+            
+            await supabaseClient
+                .from('users')
+                .update({ partner_balance: newBalance })
+                .eq('id', partnerId);
+            
+            console.log('✅ Баланс партнера обновлен:', newBalance);
+        }
+        
+        // 4. Записываем начисление в earnings
+        await supabaseClient
+            .from('partner_earnings')
+            .insert([{
+                partner_id: partnerId,
+                master_id: currentUser.id,
+                amount: partnerAmount,
+                source: 'subscription',
+                description: `Pro-подписка мастера #${currentUser.id}`
+            }]);
+    }
+    
+    // 5. Записываем платеж в историю
+    await supabaseClient
+        .from('payments')
+        .insert([{
+            user_id: currentUser.id,
+            amount: 299,
+            currency: 'RUB',
+            status: 'completed',
+            vk_order_id: vkOrderId,
+            description: 'Pro-подписка на 1 месяц',
+            partner_id: partnerId,
+            partner_amount: partnerAmount,
+            completed_at: new Date().toISOString()
+        }]);
+    
+    // 6. Обновляем currentUser
+    currentUser.subscription_type = 'pro';
+    currentUser.subscription_expires_at = expiresAt.toISOString();
+    
+    alert(`✅ Pro-подписка активирована!\nДействует до: ${expiresAt.toLocaleDateString('ru-RU')}`);
+    
+    // 7. Обновляем интерфейс
+    updateProfileUI();
+    await loadOrders();
+}
 
         // ========== ПАРТНЕРСКАЯ ПРОГРАММА ==========
         function openPartnerApplicationModal() {
