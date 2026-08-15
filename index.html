@@ -202,10 +202,32 @@
             transition: all 0.2s;
             margin-bottom: 12px;
         }
-        .photo-upload:active {
-            border-color: #0077FF;
-            background: #f0f8ff;
-        }
+        .photo-upload {
+    border: 2px dashed #0077FF;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 12px;
+    background: #f8f9fa;
+    user-select: none;
+    -webkit-tap-highlight-color: rgba(0,119,255,0.1);
+}
+.photo-upload:active {
+    border-color: #005ce6;
+    background: #e3f2fd;
+    transform: scale(0.98);
+}
+.photo-upload:hover {
+    border-color: #005ce6;
+    background: #e3f2fd;
+}
+.photo-upload-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+    pointer-events: none;
+}
         .photo-upload-icon {
             font-size: 32px;
             margin-bottom: 8px;
@@ -666,19 +688,71 @@
             }).join('');
         }
 
-        // Загрузка фотографий через VK Bridge
-        async function uploadPhotos() {
-            try {
-                const result = await vkBridge.send('VKWebAppGetImages', { type: 'photo' });
-                if (result.images && result.images.length > 0) {
-                    uploadedPhotos = [...uploadedPhotos, ...result.images.map(img => img.url)];
-                    renderPhotoPreview();
+        // Загрузка фотографий - универсальный способ
+async function uploadPhotos() {
+    console.log('📸 Попытка загрузки фото...');
+    
+    // Создаем скрытый input для загрузки файлов
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.multiple = true;
+    input.style.display = 'none';
+    
+    input.onchange = async () => {
+        if (input.files && input.files.length > 0) {
+            console.log(`Выбрано файлов: ${input.files.length}`);
+            
+            for (let i = 0; i < input.files.length; i++) {
+                const file = input.files[i];
+                
+                // Проверяем размер файла (макс 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert(`Файл "${file.name}" слишком большой (макс. 5MB)`);
+                    continue;
                 }
-            } catch (err) {
-                console.error('Ошибка загрузки фото:', err);
-                alert('Не удалось загрузить фото. Попробуйте еще раз.');
+                
+                try {
+                    // Конвертируем в base64
+                    const base64 = await fileToBase64(file);
+                    uploadedPhotos.push(base64);
+                    console.log('✅ Фото добавлено:', base64.substring(0, 50) + '...');
+                } catch (err) {
+                    console.error('❌ Ошибка конвертации фото:', err);
+                    alert('Не удалось обработать фото: ' + file.name);
+                }
             }
+            
+            renderPhotoPreview();
         }
+    };
+    
+    input.onerror = () => {
+        console.error('❌ Ошибка input');
+        alert('Не удалось открыть выбор файлов');
+    };
+    
+    // Добавляем в DOM и кликаем
+    document.body.appendChild(input);
+    input.click();
+    
+    // Удаляем через секунду
+    setTimeout(() => {
+        if (input.parentNode) {
+            input.parentNode.removeChild(input);
+        }
+    }, 1000);
+}
+
+// Вспомогательная функция для конвертации в base64
+function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
+}
 
         function renderPhotoPreview() {
             const container = document.getElementById('photo-preview');
@@ -867,53 +941,60 @@
         }
 
         async function createOrder() {
-            if (!currentUser) return alert('Подождите загрузку');
-            
-            const district = document.getElementById('order-district').value;
-            const categoryId = document.getElementById('order-category').value;
-            const title = document.getElementById('order-title').value.trim();
-            const description = document.getElementById('order-description').value.trim();
-            const budget = document.getElementById('order-budget').value;
+    console.log('📤 Создание заявки...', {
+        district: document.getElementById('order-district').value,
+        categoryId: document.getElementById('order-category').value,
+        photosCount: uploadedPhotos ? uploadedPhotos.length : 0
+    });
+    
+    if (!currentUser) return alert('Подождите загрузку');
+    
+    const district = document.getElementById('order-district').value;
+    const categoryId = document.getElementById('order-category').value;
+    const title = document.getElementById('order-title').value.trim();
+    const description = document.getElementById('order-description').value.trim();
+    const budget = document.getElementById('order-budget').value;
 
-            if (!district) return alert('Выберите район Барнаула');
-            if (!categoryId || !title) return alert('Заполните категорию и заголовок');
+    if (!district) return alert('Выберите район Барнаула');
+    if (!categoryId || !title) return alert('Заполните категорию и заголовок');
 
-            const btn = document.querySelector('#tab-order .btn');
-            btn.textContent = '⏳ Создание...';
-            btn.disabled = true;
+    const btn = document.querySelector('#tab-order .btn');
+    btn.textContent = '⏳ Создание...';
+    btn.disabled = true;
 
-            const { error } = await supabaseClient
-                .from('orders')
-                .insert([{ 
-                    user_id: currentUser.id, 
-                    district: district,
-                    category_id: parseInt(categoryId), 
-                    title, 
-                    description: description || null, 
-                    budget: budget ? parseFloat(budget) : null,
-                    status: 'open',
-                    photos: uploadedPhotos.length > 0 ? uploadedPhotos : null
-                }]);
+    const { error } = await supabaseClient
+        .from('orders')
+        .insert([{ 
+            user_id: currentUser.id, 
+            district: district,
+            category_id: parseInt(categoryId), 
+            title, 
+            description: description || null, 
+            budget: budget ? parseFloat(budget) : null,
+            status: 'open',
+            photos: uploadedPhotos && uploadedPhotos.length > 0 ? uploadedPhotos : null
+        }]);
 
-            if (error) {
-                alert('❌ Ошибка: ' + error.message);
-            } else {
-                alert('✅ Заявка создана!');
-                document.getElementById('order-title').value = '';
-                document.getElementById('order-description').value = '';
-                document.getElementById('order-budget').value = '';
-                document.getElementById('order-category').value = '';
-                document.getElementById('order-district').value = '';
-                uploadedPhotos = [];
-                renderPhotoPreview();
-                await loadOrders();
-                switchTab('home');
-            }
-            
-            btn.textContent = '📤 Создать заявку';
-            btn.disabled = false;
-        }
-
+    if (error) {
+        alert('❌ Ошибка: ' + error.message);
+    } else {
+        alert('✅ Заявка создана!');
+        // Очистка формы
+        document.getElementById('order-title').value = '';
+        document.getElementById('order-description').value = '';
+        document.getElementById('order-budget').value = '';
+        document.getElementById('order-category').value = '';
+        document.getElementById('order-district').value = '';
+        uploadedPhotos = [];
+        renderPhotoPreview();
+        await loadOrders();
+        switchTab('home');
+    }
+    
+    btn.textContent = '📤 Создать заявку';
+    btn.disabled = false;
+}
+        
         async function toggleRole() {
             const newRole = currentUser.role === 'customer' ? 'master' : 'customer';
             const { error } = await supabaseClient
