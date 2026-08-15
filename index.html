@@ -33,6 +33,7 @@
         .btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
         .btn-success { background: #4CAF50; }
         .btn-warning { background: #FF9800; }
+        .btn-danger { background: #f44336; }
         .btn-secondary { background: #757575; }
         .btn-pro { 
             background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
@@ -40,6 +41,9 @@
         }
         .btn-partner {
             background: linear-gradient(135deg, #9C27B0 0%, #673AB7 100%);
+        }
+        .btn-complete {
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
         }
         input, select, textarea { 
             width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ddd; 
@@ -62,6 +66,7 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .loading { text-align: center; color: #888; padding: 30px 20px; }
         .error { background: #ffebee; color: #c62828; padding: 12px; border-radius: 10px; margin: 10px 0; }
+        .success { background: #e8f5e9; color: #2e7d32; padding: 12px; border-radius: 10px; margin: 10px 0; }
         .order-item { 
             border-bottom: 1px solid #f0f0f0; padding-bottom: 12px; margin-bottom: 12px;
         }
@@ -307,12 +312,31 @@
             font-size: 13px;
             opacity: 0.9;
         }
+        
+        .confirmation-banner {
+            background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        .auto-complete-timer {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 8px;
+            border-radius: 8px;
+            margin: 8px 0;
+            font-size: 13px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 
     <div class="header">
-        🛠 Мой Мастер
+         Мой Мастер
         <div class="header-sub">Поиск мастеров в Барнауле</div>
     </div>
 
@@ -320,7 +344,7 @@
     <div id="tab-home" class="tab active">
         <div class="container">
             <div class="card">
-                <h3> Категории услуг</h3>
+                <h3>📋 Категории услуг</h3>
                 <div id="categories-list" class="loading">Загрузка...</div>
             </div>
             <div class="card">
@@ -328,7 +352,7 @@
                 <div class="district-filter" id="district-filter"></div>
             </div>
             <div class="card">
-                <h3>📝 Активные заявки</h3>
+                <h3> Активные заявки</h3>
                 <div id="orders-list" class="loading">Загрузка...</div>
             </div>
         </div>
@@ -378,7 +402,7 @@
     <div id="tab-profile" class="tab">
         <div class="container">
             <div class="card">
-                <h3> Профиль</h3>
+                <h3>👤 Профиль</h3>
                 <div id="profile-info" class="loading">Загрузка...</div>
             </div>
             
@@ -391,10 +415,10 @@
                     <div class="partner-link-box" id="partner-link">Загрузка ссылки...</div>
                     
                     <button class="btn" style="background:white; color:#9C27B0; margin-bottom:10px;" onclick="copyPartnerLink()">
-                         Копировать ссылку
+                        📋 Копировать ссылку
                     </button>
                     <button class="btn" style="background:rgba(255,255,255,0.3); color:white;" onclick="sharePartnerLink()">
-                        📤 Поделиться
+                         Поделиться
                     </button>
                 </div>
                 
@@ -455,7 +479,7 @@
             <span class="nav-icon">💬</span>Отклики
         </div>
         <div class="nav-item" onclick="switchTab('profile')">
-            <span class="nav-icon">👤</span>Профиль
+            <span class="nav-icon"></span>Профиль
         </div>
     </div>
 
@@ -468,7 +492,7 @@
             <div class="modal-features">
                 <div>✅ Безлимитные отклики на заявки</div>
                 <div>⭐ Золотой значок в профиле</div>
-                <div> Приоритетное отображение</div>
+                <div>🚀 Приоритетное отображение</div>
             </div>
             <div style="font-size: 24px; font-weight: bold; color: #0077FF; margin-bottom: 15px;">299 ₽ / месяц</div>
             <button class="btn btn-pro" style="margin-bottom: 10px;" onclick="connectVKPay()">💳 Подключить VK Pay</button>
@@ -507,6 +531,25 @@
         </div>
     </div>
 
+    <!-- Модальное окно отзыва -->
+    <div class="modal-overlay" id="review-modal">
+        <div class="modal-content">
+            <div style="font-size: 40px; margin-bottom: 10px;">⭐</div>
+            <div class="modal-title">Оставить отзыв</div>
+            <div class="modal-text">Оцените работу мастера</div>
+            <div class="rating-stars" id="rating-stars">
+                <span class="star" data-rating="1" onclick="setRating(1)">★</span>
+                <span class="star" data-rating="2" onclick="setRating(2)">★</span>
+                <span class="star" data-rating="3" onclick="setRating(3)">★</span>
+                <span class="star" data-rating="4" onclick="setRating(4)">★</span>
+                <span class="star" data-rating="5" onclick="setRating(5)">★</span>
+            </div>
+            <textarea id="review-comment" rows="3" placeholder="Комментарий (необязательно)" style="margin-bottom: 15px;"></textarea>
+            <button class="btn btn-success" onclick="submitReview()" style="margin-bottom: 10px;">✅ Отправить отзыв</button>
+            <button class="modal-close" onclick="closeReviewModal()">Отмена</button>
+        </div>
+    </div>
+
     <script>
         const SUPABASE_URL = 'https://kmjuddmhvlccrbyyfcce.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttanVkZG1odmxjY3JieXlmY2NlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2Mjc5ODcsImV4cCI6MjEwMjIwMzk4N30.PhJxMFSRlF9tmUuvOLH-JC9Tn-9kAgQ11XEg69eJZ6c';
@@ -516,6 +559,7 @@
         const BARNAUL_DISTRICTS = ['Центральный', 'Железнодорожный', 'Октябрьский', 'Индустриальный', 'Ленинский'];
         const DAILY_RESPONSE_LIMIT = 3;
         const MIN_WITHDRAW = 1000;
+        const AUTO_COMPLETE_DAYS = 3; // Автозавершение через 3 дня
         
         let currentUser = null;
         let categoriesCache = [];
@@ -525,12 +569,15 @@
         let uploadedPhotos = [];
         let partnerStats = { invited: 0, pro: 0, earnings: 0 };
         let appId = '';
+        let selectedRating = 0;
+        let currentReviewOrderId = null;
+        let currentReviewMasterId = null;
 
         console.log('🚀 Запуск...');
 
         // ========== ЗАГРУЗКА ФОТО ==========
         async function uploadPhotos() {
-            console.log('📸 Попытка загрузки фото...');
+            console.log(' Попытка загрузки фото...');
             
             const input = document.createElement('input');
             input.type = 'file';
@@ -604,7 +651,6 @@
             try {
                 await vkBridge.send('VKWebAppInit');
                 
-                // Получаем ID приложения для реферальных ссылок
                 try {
                     const launchParams = await vkBridge.send('VKWebAppGetLaunchParams');
                     if (launchParams.app_id) {
@@ -655,6 +701,9 @@
                     await countTodayResponses();
                 }
                 
+                // Проверяем автозавершение заявок
+                await checkAutoComplete();
+                
                 updateProfileUI();
                 renderDistrictFilters();
                 await loadCategories();
@@ -668,6 +717,39 @@
                 console.error('❌ Ошибка:', err);
                 document.getElementById('profile-info').innerHTML = 
                     `<div class="error">Ошибка: ${err.message}</div>`;
+            }
+        }
+
+        // ========== АВТОЗАВЕРШЕНИЕ ЗАЯВОК ==========
+        async function checkAutoComplete() {
+            if (!currentUser) return;
+            
+            const threeDaysAgo = new Date();
+            threeDaysAgo.setDate(threeDaysAgo.getDate() - AUTO_COMPLETE_DAYS);
+            const threeDaysAgoISO = threeDaysAgo.toISOString();
+            
+            // Находим заявки, которые ждут подтверждения больше 3 дней
+            const { data: oldOrders, error } = await supabaseClient
+                .from('orders')
+                .select('id, awaiting_confirmation, completed_at')
+                .eq('user_id', currentUser.id)
+                .eq('awaiting_confirmation', true)
+                .lt('created_at', threeDaysAgoISO)
+                .is('completed_at', null);
+            
+            if (error || !oldOrders || oldOrders.length === 0) return;
+            
+            console.log(`⏰ Автозавершение ${oldOrders.length} заявок`);
+            
+            for (const order of oldOrders) {
+                await supabaseClient
+                    .from('orders')
+                    .update({ 
+                        status: 'completed', 
+                        completed_at: new Date().toISOString(),
+                        awaiting_confirmation: false
+                    })
+                    .eq('id', order.id);
             }
         }
 
@@ -756,7 +838,7 @@
                 : allOrders.filter(o => o.district === currentDistrictFilter);
 
             if (filteredOrders.length === 0) {
-                container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div>В этом районе заявок пока нет</div>';
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon"></div>В этом районе заявок пока нет</div>';
                 return;
             }
 
@@ -770,6 +852,8 @@
                 const isOwnOrder = currentUser && order.user_id === currentUser.id;
                 
                 let responseBtn = '';
+                
+                // Кнопки для мастера
                 if (currentUser?.role === 'master' && order.status === 'open' && !isOwnOrder) {
                     const isPro = currentUser.subscription_type === 'pro';
                     const limitReached = !isPro && todayResponsesCount >= DAILY_RESPONSE_LIMIT;
@@ -782,13 +866,36 @@
                     } else {
                         responseBtn = `<button class="btn btn-success" onclick="showResponseForm(${order.id})">✋ Откликнуться</button>`;
                     }
-                } else if (isOwnOrder) {
-                    responseBtn = '<div style="color:#888; font-size:13px; margin-top:10px;"> Ваша заявка</div>';
+                } 
+                // Кнопки для заказчика на своих заявках
+                else if (isOwnOrder) {
+                    if (order.awaiting_confirmation) {
+                        // Мастер отметил работу выполненной - ждем подтверждения
+                        const createdAt = new Date(order.created_at);
+                        const autoCompleteDate = new Date(createdAt.getTime() + AUTO_COMPLETE_DAYS * 24 * 60 * 60 * 1000);
+                        const daysLeft = Math.ceil((autoCompleteDate - new Date()) / (1000 * 60 * 60 * 24));
+                        
+                        responseBtn = `
+                            <div class="confirmation-banner">
+                                 Мастер отметил работу выполненной. Подтвердите или отклоните.
+                            </div>
+                            <div class="auto-complete-timer">
+                                 Автоподтверждение через ${daysLeft} дн.
+                            </div>
+                            <button class="btn btn-success" onclick="confirmCompletion(${order.id})" style="margin-bottom:5px;">✅ Подтвердить выполнение</button>
+                            <button class="btn btn-danger" onclick="rejectCompletion(${order.id})">❌ Отклонить</button>
+                        `;
+                    } else if (order.status === 'completed') {
+                        // Заявка завершена - можно оставить отзыв
+                        responseBtn = `<button class="btn btn-warning" onclick="openReviewModal(${order.id}, ${order.assigned_master_id})">⭐ Оставить отзыв</button>`;
+                    } else {
+                        responseBtn = '<div style="color:#888; font-size:13px; margin-top:10px;">📌 Ваша заявка</div>';
+                    }
                 }
                 
                 const districtBadge = order.district ? `<span class="badge badge-district">📍 ${order.district}</span>` : '';
                 
-                // Фотографии с парсингом JSON
+                // Фотографии
                 let photosHtml = '';
                 if (order.photos) {
                     try {
@@ -863,7 +970,7 @@
                 }]);
 
             if (error) {
-                alert('❌ Ошибка: ' + error.message);
+                alert(' Ошибка: ' + error.message);
                 btn.textContent = '✅ Отправить';
                 btn.disabled = false;
             } else {
@@ -896,8 +1003,15 @@
                 }
                 
                 container.innerHTML = data.map(r => {
-                    const statusText = r.status === 'pending' ? ' Ожидает' : 
+                    const statusText = r.status === 'pending' ? '⏳ Ожидает' : 
                                       r.status === 'accepted' ? '✅ Принят' : '❌ Отклонен';
+                    
+                    // Кнопка "Работа выполнена" для принятых откликов
+                    let completeBtn = '';
+                    if (r.status === 'accepted') {
+                        completeBtn = `<button class="btn btn-complete" onclick="completeWork(${r.order_id})" style="margin-top:8px;">✅ Работа выполнена</button>`;
+                    }
+                    
                     return `
                         <div class="response-item">
                             <div style="font-weight:bold; margin-bottom:5px;">Заявка #${r.order_id}</div>
@@ -906,6 +1020,7 @@
                                 <span class="price-tag">${r.price} ₽</span>
                                 <span style="font-size:13px; color:#888;">${statusText}</span>
                             </div>
+                            ${completeBtn}
                         </div>
                     `;
                 }).join('');
@@ -930,7 +1045,7 @@
                     .order('created_at', { ascending: false });
                 
                 if (!responses || responses.length === 0) {
-                    container.innerHTML = '<div class="empty-state"><div class="empty-icon"></div>Нет откликов</div>';
+                    container.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>Нет откликов</div>';
                     return;
                 }
                 
@@ -987,6 +1102,99 @@
             };
         }
 
+        // ========== ЗАВЕРШЕНИЕ РАБОТЫ ==========
+        async function completeWork(orderId) {
+            if (!confirm('Вы уверены, что работа выполнена? Заказчик получит уведомление для подтверждения.')) {
+                return;
+            }
+            
+            const btn = event.target;
+            btn.textContent = '⏳ Отправка...';
+            btn.disabled = true;
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('orders')
+                    .update({ 
+                        awaiting_confirmation: true
+                    })
+                    .eq('id', orderId);
+                
+                if (error) throw error;
+                
+                alert('✅ Заказчик уведомлен! Ожидайте подтверждения.');
+                await loadOrders();
+                await loadResponses();
+                
+            } catch (err) {
+                alert('❌ Ошибка: ' + err.message);
+                btn.textContent = '✅ Работа выполнена';
+                btn.disabled = false;
+            }
+        }
+
+        async function confirmCompletion(orderId) {
+            if (!confirm('Подтвердить выполнение работы? После этого вы сможете оставить отзыв.')) {
+                return;
+            }
+            
+            const btn = event.target;
+            btn.textContent = '⏳ Подтверждение...';
+            btn.disabled = true;
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('orders')
+                    .update({ 
+                        status: 'completed',
+                        completed_at: new Date().toISOString(),
+                        awaiting_confirmation: false
+                    })
+                    .eq('id', orderId);
+                
+                if (error) throw error;
+                
+                alert('✅ Работа подтверждена! Теперь вы можете оставить отзыв.');
+                await loadOrders();
+                await loadResponses();
+                
+            } catch (err) {
+                alert('❌ Ошибка: ' + err.message);
+                btn.textContent = '✅ Подтвердить выполнение';
+                btn.disabled = false;
+            }
+        }
+
+        async function rejectCompletion(orderId) {
+            if (!confirm('Отклонить выполнение? Заявка вернется в статус "В работе".')) {
+                return;
+            }
+            
+            const btn = event.target;
+            btn.textContent = '⏳ Отклонение...';
+            btn.disabled = true;
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('orders')
+                    .update({ 
+                        awaiting_confirmation: false
+                    })
+                    .eq('id', orderId);
+                
+                if (error) throw error;
+                
+                alert(' Выполнение отклонено. Мастер может отметить работу снова.');
+                await loadOrders();
+                await loadResponses();
+                
+            } catch (err) {
+                alert('❌ Ошибка: ' + err.message);
+                btn.textContent = '❌ Отклонить';
+                btn.disabled = false;
+            }
+        }
+
         async function createOrder() {
             if (!currentUser) return alert('Подождите загрузку');
             
@@ -1000,7 +1208,7 @@
             if (!categoryId || !title) return alert('Заполните категорию и заголовок');
 
             const btn = document.querySelector('#tab-order .btn');
-            btn.textContent = '⏳ Создание...';
+            btn.textContent = ' Создание...';
             btn.disabled = true;
 
             const { error } = await supabaseClient
@@ -1031,7 +1239,7 @@
                 switchTab('home');
             }
             
-            btn.textContent = '📤 Создать заявку';
+            btn.textContent = ' Создать заявку';
             btn.disabled = false;
         }
 
@@ -1148,8 +1356,7 @@
             document.getElementById('stat-earnings').textContent = Math.round(partnerStats.earnings) + ' ₽';
             document.getElementById('partner-balance').textContent = Math.round(currentUser.partner_balance || 0) + ' ₽';
             
-            // Генерируем реферальную ссылку
-            const partnerLink = appId ? `https://vk.com/app${appId}?ref=${currentUser.id}` : `https://vk.com/app54718493?ref=${currentUser.id}`;
+            const partnerLink = appId ? `https://vk.com/app${appId}?ref=${currentUser.id}` : `https://vk.com/app?ref=${currentUser.id}`;
             document.getElementById('partner-link').textContent = partnerLink;
             
             const withdrawBtn = document.getElementById('withdraw-btn');
@@ -1236,10 +1443,93 @@
             }
         }
 
+        // ========== ОТЗЫВЫ ==========
+        function openReviewModal(orderId, masterId) {
+            currentReviewOrderId = orderId;
+            currentReviewMasterId = masterId;
+            selectedRating = 0;
+            document.getElementById('review-comment').value = '';
+            updateRatingStars();
+            document.getElementById('review-modal').classList.add('active');
+        }
+
+        function closeReviewModal() {
+            document.getElementById('review-modal').classList.remove('active');
+            currentReviewOrderId = null;
+            currentReviewMasterId = null;
+            selectedRating = 0;
+        }
+
+        function setRating(rating) {
+            selectedRating = rating;
+            updateRatingStars();
+        }
+
+        function updateRatingStars() {
+            const stars = document.querySelectorAll('#rating-stars .star');
+            stars.forEach((star, idx) => {
+                if (idx < selectedRating) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+        }
+
+        async function submitReview() {
+            if (selectedRating === 0) {
+                alert('Пожалуйста, выберите рейтинг');
+                return;
+            }
+            
+            const comment = document.getElementById('review-comment').value.trim();
+            const btn = event.target;
+            btn.textContent = '⏳ Отправка...';
+            btn.disabled = true;
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('reviews')
+                    .insert([{
+                        order_id: currentReviewOrderId,
+                        reviewer_id: currentUser.id,
+                        master_id: currentReviewMasterId,
+                        rating: selectedRating,
+                        comment: comment || null
+                    }]);
+                
+                if (error) throw error;
+                
+                // Обновляем средний рейтинг мастера
+                const { data: reviews } = await supabaseClient
+                    .from('reviews')
+                    .select('rating')
+                    .eq('master_id', currentReviewMasterId);
+                
+                if (reviews && reviews.length > 0) {
+                    const avgRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+                    await supabaseClient
+                        .from('users')
+                        .update({ average_rating: avgRating })
+                        .eq('id', currentReviewMasterId);
+                }
+                
+                alert('✅ Отзыв отправлен!');
+                closeReviewModal();
+                await loadOrders();
+                await loadResponses();
+                
+            } catch (err) {
+                alert('Ошибка: ' + err.message);
+                btn.textContent = '✅ Отправить отзыв';
+                btn.disabled = false;
+            }
+        }
+
         function updateProfileUI() {
             if (!currentUser) return;
             const firstLetter = currentUser.name.charAt(0).toUpperCase();
-            const roleText = currentUser.role === 'customer' ? ' Заказчик' : '👷 Мастер';
+            const roleText = currentUser.role === 'customer' ? '👤 Заказчик' : ' Мастер';
             const switchText = currentUser.role === 'customer' ? 'Стать мастером' : 'Стать заказчиком';
             
             let subscriptionBlock = '';
