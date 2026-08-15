@@ -127,7 +127,8 @@
             margin: 10px 0;
             font-size: 14px;
         }
-          /* Стили для модального окна */
+        
+        /* Модальное окно */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -190,6 +191,110 @@
             font-weight: 600;
             cursor: pointer;
         }
+        
+        /* Фотографии */
+        .photo-upload {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 12px;
+        }
+        .photo-upload:active {
+            border-color: #0077FF;
+            background: #f0f8ff;
+        }
+        .photo-upload-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        .photo-preview {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            margin-top: 10px;
+            padding-bottom: 5px;
+        }
+        .photo-preview img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .order-photos {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            margin: 10px 0;
+            padding-bottom: 5px;
+        }
+        .order-photos img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        /* Рейтинг */
+        .rating-stars {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+            margin: 10px 0;
+        }
+        .star {
+            font-size: 28px;
+            cursor: pointer;
+            color: #ddd;
+            transition: all 0.2s;
+        }
+        .star.active {
+            color: #FFD700;
+        }
+        .star:active {
+            transform: scale(1.2);
+        }
+        .rating-display {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin: 5px 0;
+        }
+        .rating-value {
+            font-weight: bold;
+            color: #FFD700;
+            font-size: 16px;
+        }
+        .review-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .review-author {
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .review-date {
+            font-size: 12px;
+            color: #888;
+        }
+        .review-text {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.4;
+        }
     </style>
 </head>
 <body>
@@ -221,7 +326,7 @@
     <div id="tab-order" class="tab">
         <div class="container">
             <div class="card">
-                <h3>📝 Новая заявка</h3>
+                <h3> Новая заявка</h3>
                 <label style="font-size:13px; color:#666; margin-bottom:5px; display:block;">Район Барнаула</label>
                 <select id="order-district">
                     <option value="">Выберите район</option>
@@ -234,6 +339,14 @@
                 <textarea id="order-description" rows="4" placeholder="Опишите проблему подробнее..."></textarea>
                 <label style="font-size:13px; color:#666; margin-bottom:5px; display:block;">Бюджет (руб)</label>
                 <input type="number" id="order-budget" placeholder="Например: 1500">
+                
+                <label style="font-size:13px; color:#666; margin-bottom:5px; display:block;">Фотографии</label>
+                <div class="photo-upload" onclick="uploadPhotos()">
+                    <div class="photo-upload-icon">📸</div>
+                    <div style="font-size:14px; color:#666;">Нажмите, чтобы добавить фото</div>
+                </div>
+                <div class="photo-preview" id="photo-preview"></div>
+                
                 <button class="btn" onclick="createOrder()">📤 Создать заявку</button>
             </div>
         </div>
@@ -253,8 +366,12 @@
     <div id="tab-profile" class="tab">
         <div class="container">
             <div class="card">
-                <h3>👤 Профиль</h3>
+                <h3> Профиль</h3>
                 <div id="profile-info" class="loading">Загрузка...</div>
+            </div>
+            <div class="card" id="reviews-section" style="display:none;">
+                <h3>⭐ Отзывы</h3>
+                <div id="reviews-list"></div>
             </div>
         </div>
     </div>
@@ -262,16 +379,59 @@
     <!-- НАВИГАЦИЯ -->
     <div class="nav">
         <div class="nav-item active" onclick="switchTab('home')">
-            <span class="nav-icon">🏠</span>Главная
+            <span class="nav-icon"></span>Главная
         </div>
         <div class="nav-item" onclick="switchTab('order')">
             <span class="nav-icon">➕</span>Заявка
         </div>
         <div class="nav-item" onclick="switchTab('responses')">
-            <span class="nav-icon"></span>Отклики
+            <span class="nav-icon">💬</span>Отклики
         </div>
         <div class="nav-item" onclick="switchTab('profile')">
             <span class="nav-icon">👤</span>Профиль
+        </div>
+    </div>
+
+    <!-- Модальное окно покупки Pro -->
+    <div class="modal-overlay" id="pro-modal">
+        <div class="modal-content">
+            <div style="font-size: 40px; margin-bottom: 10px;">⭐</div>
+            <div class="modal-title">Оформить PRO-мастера</div>
+            <div class="modal-text">
+                Получите неограниченные возможности для заработка!
+            </div>
+            <div class="modal-features">
+                <div>✅ Безлимитные отклики на заявки</div>
+                <div>⭐ Золотой значок в профиле</div>
+                <div>🚀 Приоритетное отображение</div>
+                <div>📊 Доступ к статистике</div>
+            </div>
+            <div style="font-size: 24px; font-weight: bold; color: #0077FF; margin-bottom: 15px;">
+                299 ₽ / месяц
+            </div>
+            <button class="btn btn-pro" style="margin-bottom: 10px;" onclick="connectVKPay()">💳 Подключить VK Pay</button>
+            <button class="modal-close" onclick="closeProModal()">Позже</button>
+        </div>
+    </div>
+
+    <!-- Модальное окно отзыва -->
+    <div class="modal-overlay" id="review-modal">
+        <div class="modal-content">
+            <div style="font-size: 40px; margin-bottom: 10px;">⭐</div>
+            <div class="modal-title">Оставить отзыв</div>
+            <div class="modal-text">
+                Оцените работу мастера
+            </div>
+            <div class="rating-stars" id="rating-stars">
+                <span class="star" data-rating="1" onclick="setRating(1)">★</span>
+                <span class="star" data-rating="2" onclick="setRating(2)">★</span>
+                <span class="star" data-rating="3" onclick="setRating(3)">★</span>
+                <span class="star" data-rating="4" onclick="setRating(4)">★</span>
+                <span class="star" data-rating="5" onclick="setRating(5)">★</span>
+            </div>
+            <textarea id="review-comment" rows="3" placeholder="Комментарий (необязательно)" style="margin-bottom: 15px;"></textarea>
+            <button class="btn btn-success" onclick="submitReview()" style="margin-bottom: 10px;">✅ Отправить отзыв</button>
+            <button class="modal-close" onclick="closeReviewModal()">Отмена</button>
         </div>
     </div>
 
@@ -281,14 +441,18 @@
         
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         
-        const BARNaul_DISTRICTS = ['Центральный', 'Железнодорожный', 'Октябрьский', 'Индустриальный', 'Ленинский'];
-        const DAILY_RESPONSE_LIMIT = 3; // Лимит откликов в день для Free
+        const BARNAUL_DISTRICTS = ['Центральный', 'Железнодорожный', 'Октябрьский', 'Индустриальный', 'Ленинский'];
+        const DAILY_RESPONSE_LIMIT = 3;
         
         let currentUser = null;
         let categoriesCache = [];
         let allOrders = [];
         let currentDistrictFilter = 'all';
         let todayResponsesCount = 0;
+        let uploadedPhotos = [];
+        let currentReviewOrderId = null;
+        let currentReviewMasterId = null;
+        let selectedRating = 0;
 
         console.log('🚀 Запуск...');
 
@@ -318,7 +482,8 @@
                             vk_id: vkId, 
                             name: name, 
                             role: 'customer',
-                            subscription_type: 'free'
+                            subscription_type: 'free',
+                            average_rating: 0
                         }])
                         .select()
                         .single();
@@ -329,7 +494,6 @@
 
                 console.log('✅ Пользователь:', currentUser);
                 
-                // Если мастер - считаем отклики за сегодня
                 if (currentUser.role === 'master') {
                     await countTodayResponses();
                 }
@@ -346,7 +510,6 @@
             }
         }
 
-        // Подсчет откликов мастера за сегодня
         async function countTodayResponses() {
             if (!currentUser || currentUser.role !== 'master') return;
             
@@ -365,7 +528,7 @@
                 todayResponsesCount = 0;
             } else {
                 todayResponsesCount = count || 0;
-                console.log(`📊 Откликов сегодня: ${todayResponsesCount}/${DAILY_RESPONSE_LIMIT}`);
+                console.log(` Откликов сегодня: ${todayResponsesCount}/${DAILY_RESPONSE_LIMIT}`);
             }
         }
 
@@ -374,13 +537,13 @@
             const select = document.getElementById('order-district');
             
             let html = `<div class="district-chip active" onclick="filterByDistrict('all', this)">🌆 Все районы</div>`;
-            BARNaul_DISTRICTS.forEach(d => {
+            BARNAUL_DISTRICTS.forEach(d => {
                 html += `<div class="district-chip" onclick="filterByDistrict('${d}', this)">${d}</div>`;
             });
             container.innerHTML = html;
 
             select.innerHTML = '<option value="">Выберите район</option>' + 
-                BARNaul_DISTRICTS.map(d => `<option value="${d}">${d}</option>`).join('');
+                BARNAUL_DISTRICTS.map(d => `<option value="${d}">${d}</option>`).join('');
         }
 
         function filterByDistrict(district, element) {
@@ -449,7 +612,6 @@
                 
                 let responseBtn = '';
                 if (currentUser?.role === 'master' && order.status === 'open' && !isOwnOrder) {
-                    // Проверяем лимит
                     const isPro = currentUser.subscription_type === 'pro';
                     const limitReached = !isPro && todayResponsesCount >= DAILY_RESPONSE_LIMIT;
                     
@@ -459,10 +621,10 @@
                                 ⚠️ Лимит бесплатных откликов исчерпан (${DAILY_RESPONSE_LIMIT}/${DAILY_RESPONSE_LIMIT})
                                 <br><small>Оформите Pro-подписку для безлимита</small>
                             </div>
-                            <button class="btn btn-pro" onclick="buyPro()">⭐ Купить Pro-подписку</button>
+                            <button class="btn btn-pro" onclick="buyPro()">⭐ Оформить Pro за 299 ₽/мес</button>
                         `;
                     } else {
-                        const remaining = isPro ? '∞' : (DAILY_RESPONSE_LIMIT - todayResponsesCount);
+                        const remaining = isPro ? '' : (DAILY_RESPONSE_LIMIT - todayResponsesCount);
                         responseBtn = `
                             <div style="font-size:12px; color:#888; margin-bottom:5px;">
                                 ${isPro ? '⭐ Pro-мастер (безлимит)' : `Осталось откликов сегодня: ${remaining}/${DAILY_RESPONSE_LIMIT}`}
@@ -470,11 +632,20 @@
                             <button class="btn btn-success" onclick="showResponseForm(${order.id})">✋ Откликнуться</button>
                         `;
                     }
+                } else if (isOwnOrder && order.status === 'completed') {
+                    // Кнопка оставить отзыв для завершенных заявок
+                    responseBtn = `<button class="btn btn-warning" onclick="openReviewModal(${order.id}, ${order.assigned_master_id})">⭐ Оставить отзыв</button>`;
                 } else if (isOwnOrder) {
                     responseBtn = '<div style="color:#888; font-size:13px; margin-top:10px;">📌 Ваша заявка</div>';
                 }
                 
                 const districtBadge = order.district ? `<span class="badge badge-district">📍 ${order.district}</span>` : '';
+                
+                // Фотографии
+                let photosHtml = '';
+                if (order.photos && order.photos.length > 0) {
+                    photosHtml = `<div class="order-photos">${order.photos.map(p => `<img src="${p}" onclick="window.open('${p}')">`).join('')}</div>`;
+                }
 
                 return `
                     <div class="order-item">
@@ -483,6 +654,7 @@
                         <span class="badge-status ${statusClass}">${statusText}</span>
                         <div style="font-weight:bold; margin:8px 0 5px;">${order.title}</div>
                         <div style="font-size:14px; color:#666; margin-bottom:8px;">${order.description || 'Нет описания'}</div>
+                        ${photosHtml}
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                             <span style="color:#888; font-size:13px;">ID: ${order.id}</span>
                             <span class="price-tag">${order.budget ? order.budget + ' ₽' : 'Договорная'}</span>
@@ -492,6 +664,36 @@
                     </div>
                 `;
             }).join('');
+        }
+
+        // Загрузка фотографий через VK Bridge
+        async function uploadPhotos() {
+            try {
+                const result = await vkBridge.send('VKWebAppGetImages', { type: 'photo' });
+                if (result.images && result.images.length > 0) {
+                    uploadedPhotos = [...uploadedPhotos, ...result.images.map(img => img.url)];
+                    renderPhotoPreview();
+                }
+            } catch (err) {
+                console.error('Ошибка загрузки фото:', err);
+                alert('Не удалось загрузить фото. Попробуйте еще раз.');
+            }
+        }
+
+        function renderPhotoPreview() {
+            const container = document.getElementById('photo-preview');
+            if (uploadedPhotos.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+            container.innerHTML = uploadedPhotos.map((photo, idx) => `
+                <img src="${photo}" onclick="removePhoto(${idx})" style="cursor:pointer;" title="Нажмите, чтобы удалить">
+            `).join('');
+        }
+
+        function removePhoto(idx) {
+            uploadedPhotos.splice(idx, 1);
+            renderPhotoPreview();
         }
 
         function showResponseForm(orderId) {
@@ -544,10 +746,7 @@
                 console.log('✅ Отклик создан:', data);
                 alert('✅ Отклик отправлен!');
                 cancelResponse(orderId);
-                
-                // Увеличиваем счетчик
                 todayResponsesCount++;
-                
                 await loadOrders();
                 await loadResponses();
                 switchTab('responses');
@@ -561,7 +760,7 @@
             const title = document.getElementById('responses-title');
             
             if (currentUser.role === 'master') {
-                title.textContent = '💼 Мои отклики';
+                title.textContent = ' Мои отклики';
                 const { data, error } = await supabaseClient
                     .from('responses')
                     .select('*')
@@ -596,7 +795,7 @@
                     .eq('user_id', currentUser.id);
                 
                 if (!myOrders || myOrders.length === 0) {
-                    container.innerHTML = '<div class="empty-state"><div class="empty-icon"></div>У вас пока нет заявок</div>';
+                    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div>У вас пока нет заявок</div>';
                     return;
                 }
                 
@@ -689,9 +888,11 @@
                     user_id: currentUser.id, 
                     district: district,
                     category_id: parseInt(categoryId), 
-                    title, description: description || null, 
+                    title, 
+                    description: description || null, 
                     budget: budget ? parseFloat(budget) : null,
-                    status: 'open'
+                    status: 'open',
+                    photos: uploadedPhotos.length > 0 ? uploadedPhotos : null
                 }]);
 
             if (error) {
@@ -703,6 +904,8 @@
                 document.getElementById('order-budget').value = '';
                 document.getElementById('order-category').value = '';
                 document.getElementById('order-district').value = '';
+                uploadedPhotos = [];
+                renderPhotoPreview();
                 await loadOrders();
                 switchTab('home');
             }
@@ -723,7 +926,6 @@
             } else {
                 currentUser.role = newRole;
                 
-                // Если стал мастером - считаем отклики
                 if (newRole === 'master') {
                     await countTodayResponses();
                 } else {
@@ -737,8 +939,7 @@
             }
         }
 
-        // Функция покупки Pro (заглушка)
-         function buyPro() {
+        function buyPro() {
             document.getElementById('pro-modal').classList.add('active');
         }
 
@@ -747,10 +948,127 @@
         }
 
         function connectVKPay() {
-            // Здесь в будущем будет реальный вызов VK Pay
-            // Пока просто показываем уведомление и закрываем окно
             alert('🚧 Оплата через VK Pay будет подключена в следующем обновлении!');
             closeProModal();
+        }
+
+        // Система отзывов
+        function openReviewModal(orderId, masterId) {
+            currentReviewOrderId = orderId;
+            currentReviewMasterId = masterId;
+            selectedRating = 0;
+            document.getElementById('review-comment').value = '';
+            updateRatingStars();
+            document.getElementById('review-modal').classList.add('active');
+        }
+
+        function closeReviewModal() {
+            document.getElementById('review-modal').classList.remove('active');
+            currentReviewOrderId = null;
+            currentReviewMasterId = null;
+            selectedRating = 0;
+        }
+
+        function setRating(rating) {
+            selectedRating = rating;
+            updateRatingStars();
+        }
+
+        function updateRatingStars() {
+            const stars = document.querySelectorAll('#rating-stars .star');
+            stars.forEach((star, idx) => {
+                if (idx < selectedRating) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+        }
+
+        async function submitReview() {
+            if (selectedRating === 0) {
+                alert('Пожалуйста, выберите рейтинг');
+                return;
+            }
+            
+            const comment = document.getElementById('review-comment').value.trim();
+            const btn = event.target;
+            btn.textContent = '⏳ Отправка...';
+            btn.disabled = true;
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('reviews')
+                    .insert([{
+                        order_id: currentReviewOrderId,
+                        reviewer_id: currentUser.id,
+                        master_id: currentReviewMasterId,
+                        rating: selectedRating,
+                        comment: comment || null
+                    }]);
+                
+                if (error) throw error;
+                
+                // Обновляем средний рейтинг мастера
+                const { data: reviews } = await supabaseClient
+                    .from('reviews')
+                    .select('rating')
+                    .eq('master_id', currentReviewMasterId);
+                
+                if (reviews && reviews.length > 0) {
+                    const avgRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+                    await supabaseClient
+                        .from('users')
+                        .update({ average_rating: avgRating })
+                        .eq('id', currentReviewMasterId);
+                }
+                
+                // Завершаем заявку
+                await supabaseClient
+                    .from('orders')
+                    .update({ status: 'completed' })
+                    .eq('id', currentReviewOrderId);
+                
+                alert('✅ Отзыв отправлен!');
+                closeReviewModal();
+                await loadOrders();
+                await loadResponses();
+                
+            } catch (err) {
+                alert('Ошибка: ' + err.message);
+                btn.textContent = '✅ Отправить отзыв';
+                btn.disabled = false;
+            }
+        }
+
+        async function loadMasterReviews(masterId) {
+            const { data: reviews, error } = await supabaseClient
+                .from('reviews')
+                .select('*, users!reviewer_id(name)')
+                .eq('master_id', masterId)
+                .order('created_at', { ascending: false });
+            
+            const container = document.getElementById('reviews-list');
+            
+            if (error || !reviews || reviews.length === 0) {
+                container.innerHTML = '<div style="color:#888; text-align:center; padding:20px;">Пока нет отзывов</div>';
+                return;
+            }
+            
+            container.innerHTML = reviews.map(r => {
+                const date = new Date(r.created_at).toLocaleDateString('ru-RU');
+                const stars = '⭐'.repeat(r.rating);
+                return `
+                    <div class="review-item">
+                        <div class="review-header">
+                            <div class="review-author">${r.users?.name || 'Аноним'}</div>
+                            <div class="review-date">${date}</div>
+                        </div>
+                        <div style="margin-bottom:8px;">${stars}</div>
+                        <div class="review-text">${r.comment || 'Без комментария'}</div>
+                    </div>
+                `;
+            }).join('');
         }
 
         function updateProfileUI() {
@@ -759,7 +1077,6 @@
             const roleText = currentUser.role === 'customer' ? '👤 Заказчик' : '👷 Мастер';
             const switchText = currentUser.role === 'customer' ? 'Стать мастером' : 'Стать заказчиком';
             
-            // Информация о подписке
             let subscriptionBlock = '';
             if (currentUser.role === 'master') {
                 const isPro = currentUser.subscription_type === 'pro';
@@ -785,6 +1102,20 @@
                 }
             }
             
+            // Рейтинг мастера
+            let ratingBlock = '';
+            if (currentUser.role === 'master') {
+                const avgRating = currentUser.average_rating || 0;
+                const stars = avgRating > 0 ? '⭐'.repeat(Math.round(avgRating)) : 'Нет оценок';
+                ratingBlock = `
+                    <div style="background:#f5f5f5; padding:12px; border-radius:10px; margin-top:10px; margin-bottom:10px;">
+                        <div style="color:#888; font-size:13px;">Рейтинг</div>
+                        <div style="font-size:18px; margin-top:4px;">${stars}</div>
+                        <div style="font-size:12px; color:#666;">${avgRating.toFixed(1)} из 5</div>
+                    </div>
+                `;
+            }
+            
             document.getElementById('profile-info').innerHTML = `
                 <div class="profile-avatar ${currentUser.subscription_type === 'pro' ? 'pro' : ''}">
                     ${firstLetter}${currentUser.subscription_type === 'pro' ? '⭐' : ''}
@@ -795,14 +1126,23 @@
                         <div style="color:#888; font-size:13px;">Текущая роль</div>
                         <div style="font-weight:600; margin-top:4px; font-size:16px;">${roleText}</div>
                     </div>
+                    ${ratingBlock}
                     ${subscriptionBlock}
                     <div style="background:#f5f5f5; padding:12px; border-radius:10px; margin-top:10px; margin-bottom:15px;">
                         <div style="color:#888; font-size:13px;">VK ID</div>
                         <div style="font-weight:600; margin-top:4px;">${currentUser.vk_id}</div>
                     </div>
-                    <button class="btn btn-warning" onclick="toggleRole()"> ${switchText}</button>
+                    <button class="btn btn-warning" onclick="toggleRole()">🔄 ${switchText}</button>
                 </div>
             `;
+            
+            // Загружаем отзывы для мастера
+            if (currentUser.role === 'master') {
+                document.getElementById('reviews-section').style.display = 'block';
+                loadMasterReviews(currentUser.id);
+            } else {
+                document.getElementById('reviews-section').style.display = 'none';
+            }
         }
 
         function switchTab(tabName) {
@@ -820,28 +1160,5 @@
 
         initApp();
     </script>
-    
-    <!-- Модальное окно покупки Pro -->
-    <div class="modal-overlay" id="pro-modal">
-        <div class="modal-content">
-            <div style="font-size: 40px; margin-bottom: 10px;">⭐</div>
-            <div class="modal-title">Оформить PRO-мастера</div>
-            <div class="modal-text">
-                Получите неограниченные возможности для заработка!
-            </div>
-            <div class="modal-features">
-                <div>✅ Безлимитные отклики на заявки</div>
-                <div>⭐ Золотой значок в профиле</div>
-                <div>🚀 Приоритетное отображение</div>
-                <div>📊 Доступ к статистике</div>
-            </div>
-            <div style="font-size: 24px; font-weight: bold; color: #0077FF; margin-bottom: 15px;">
-                299 ₽ / месяц
-            </div>
-            <button class="btn btn-pro" style="margin-bottom: 10px;" onclick="connectVKPay()">💳 Подключить VK Pay</button>
-            <button class="modal-close" onclick="closeProModal()">Позже</button>
-        </div>
-    </div>
-
 </body>
 </html>
