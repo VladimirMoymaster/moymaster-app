@@ -1244,7 +1244,8 @@
         // Отправляем на сервер для публикации в группу ВК
         const newOrder = data[0];
         postOrderToServer(newOrder);
-        
+        // Отправляем уведомления мастерам
+        notifyMastersAboutNewOrder(newOrder);
         alert('✅ Заявка создана! Пост в группу ВК публикуется...');
         
         document.getElementById('order-title').value = '';
