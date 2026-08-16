@@ -496,45 +496,7 @@
         </div>
     </div>
 </div>
-    
-<!-- АДМИН-ПАНЕЛЬ -->
-<div id="tab-admin" class="tab">
-    <div class="container">
-        <div class="card">
-            <h3>👨‍💼 Админ-панель</h3>
-            
-            <!-- Статистика -->
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px;">
-                <div class="partner-stat">
-                    <div class="partner-stat-value" id="admin-total-orders">0</div>
-                    <div class="partner-stat-label">Всего заявок</div>
-                </div>
-                <div class="partner-stat">
-                    <div class="partner-stat-value" id="admin-total-users">0</div>
-                    <div class="partner-stat-label">Пользователей</div>
-                </div>
-                <div class="partner-stat">
-                    <div class="partner-stat-value" id="admin-total-masters">0</div>
-                    <div class="partner-stat-label">Мастеров</div>
-                </div>
-                <div class="partner-stat">
-                    <div class="partner-stat-value" id="admin-pending-partners">0</div>
-                    <div class="partner-stat-label">Ожидают партнёрства</div>
-                </div>
-            </div>
-            
-            <!-- Кнопки управления -->
-            <button class="btn" onclick="showAdminSection('orders')" style="margin-bottom: 10px;">📋 Все заявки</button>
-            <button class="btn" onclick="showAdminSection('users')" style="margin-bottom: 10px;">👥 Пользователи</button>
-            <button class="btn" onclick="showAdminSection('partners')" style="margin-bottom: 10px;">🤝 Заявки на партнёрство</button>
-            <button class="btn" onclick="showAdminSection('withdrawals')" style="margin-bottom: 10px;">💳 Заявки на вывод</button>
-        </div>
-        
-        <!-- Контейнер для секций -->
-        <div id="admin-section-content"></div>
-    </div>
-</div>
-    
+
     <!-- НАВИГАЦИЯ -->
     <div class="nav">
         <div class="nav-item active" onclick="switchTab('home')"><span class="nav-icon"></span>Главная</div>
@@ -720,7 +682,6 @@
                 
                 const userData = await vkBridge.send('VKWebAppGetUserInfo');
                 await loadOrCreateUser(userData.id, `${userData.first_name} ${userData.last_name}`.trim());
-                await checkAdmin();  // 🆕 Проверяем админа
             } catch (err) {
                 console.log('⚠️ Тестовый режим:', err.message);
                 await loadOrCreateUser(999999, 'Тестовый Пользователь');
@@ -1877,18 +1838,6 @@ async function activateProSubscription(vkOrderId) {
                 document.getElementById('reviews-section').style.display = 'none';
             }
         }
-        // Показываем кнопку админки только админам
-if (isAdmin) {
-    const nav = document.querySelector('.nav');
-    if (!document.getElementById('nav-admin')) {
-        const adminBtn = document.createElement('div');
-        adminBtn.className = 'nav-item';
-        adminBtn.id = 'nav-admin';
-        adminBtn.innerHTML = '<span class="nav-icon">⚙️</span>Админ';
-        adminBtn.onclick = () => switchTab('admin');
-        nav.appendChild(adminBtn);
-    }
-}
 
        function switchTab(tabName) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -1900,12 +1849,9 @@ if (isAdmin) {
     const idx = tabs.indexOf(tabName);
     if (idx >= 0) navItems[idx].classList.add('active');
     
+    // Загружаем данные для вкладок
     if (tabName === 'responses') loadResponses();
-    if (tabName === 'chat') loadChatOrders();
-    if (tabName === 'admin') {  // 🆕 Добавляем
-        loadAdminStats();
-        showAdminSection('orders');
-    }
+    if (tabName === 'chat') loadChatOrders();  // 🆕 Добавляем загрузку чатов
 }
 
 // Отправка заявки на сервер для публикации в группу ВК
@@ -2193,200 +2139,7 @@ async function sendMessage() {
         await loadMessages();
     }
 }
-     // Переменные для админки
-let isAdmin = false;
-
-// Проверка, является ли пользователь админом
-async function checkAdmin() {
-    if (!currentUser) return false;
-    
-    const { data } = await supabaseClient
-        .from('admins')
-        .select('id')
-        .eq('user_id', currentUser.id)
-        .single();
-    
-    isAdmin = !!data;
-    return isAdmin;
-}
-
-// Загрузка статистики
-async function loadAdminStats() {
-    if (!isAdmin) return;
-    
-    const { count: totalOrders } = await supabaseClient
-        .from('orders')
-        .select('*', { count: 'exact', head: true });
-    
-    const { count: totalUsers } = await supabaseClient
-        .from('users')
-        .select('*', { count: 'exact', head: true });
-    
-    const { count: totalMasters } = await supabaseClient
-        .from('users')
-        .select('*', { count: 'exact', head: true })
-        .eq('role', 'master');
-    
-    const { count: pendingPartners } = await supabaseClient
-        .from('partner_applications')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'pending');
-    
-    document.getElementById('admin-total-orders').textContent = totalOrders || 0;
-    document.getElementById('admin-total-users').textContent = totalUsers || 0;
-    document.getElementById('admin-total-masters').textContent = totalMasters || 0;
-    document.getElementById('admin-pending-partners').textContent = pendingPartners || 0;
-}
-
-// Показ секции админки
-async function showAdminSection(section) {
-    const container = document.getElementById('admin-section-content');
-    
-    if (section === 'orders') {
-        const { data: orders } = await supabaseClient
-            .from('orders')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .limit(50);
-        
-        container.innerHTML = `
-            <div class="card">
-                <h3>📋 Все заявки (${orders?.length || 0})</h3>
-                ${orders?.map(order => `
-                    <div class="order-item">
-                        <div style="font-weight: bold;">${order.title}</div>
-                        <div style="font-size: 13px; color: #888;">
-                            ID: ${order.id} | Район: ${order.district} | Статус: ${order.status}
-                        </div>
-                        <div style="font-size: 14px; margin-top: 5px;">${order.description || 'Нет описания'}</div>
-                    </div>
-                `).join('') || '<div style="color: #888;">Нет заявок</div>'}
-            </div>
-        `;
-    }
-    
-    else if (section === 'users') {
-        const { data: users } = await supabaseClient
-            .from('users')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .limit(50);
-        
-        container.innerHTML = `
-            <div class="card">
-                <h3>👥 Пользователи (${users?.length || 0})</h3>
-                ${users?.map(user => `
-                    <div class="order-item">
-                        <div style="font-weight: bold;">${user.name}</div>
-                        <div style="font-size: 13px; color: #888;">
-                            VK ID: ${user.vk_id} | Роль: ${user.role} | Подписка: ${user.subscription_type}
-                        </div>
-                    </div>
-                `).join('') || '<div style="color: #888;">Нет пользователей</div>'}
-            </div>
-        `;
-    }
-    
-    else if (section === 'partners') {
-        const { data: applications } = await supabaseClient
-            .from('partner_applications')
-            .select('*')
-            .order('created_at', { ascending: false });
-        
-        container.innerHTML = `
-            <div class="card">
-                <h3>🤝 Заявки на партнёрство</h3>
-                ${applications?.map(app => `
-                    <div class="order-item">
-                        <div style="font-weight: bold;">Пользователь #${app.user_id}</div>
-                        <div style="font-size: 13px; color: #888;">VK: ${app.vk_profile}</div>
-                        <div style="font-size: 14px; margin: 5px 0;">${app.description}</div>
-                        <div style="font-size: 12px; color: #888;">Статус: ${app.status}</div>
-                        ${app.status === 'pending' ? `
-                            <button class="btn btn-success" onclick="approvePartner(${app.id}, ${app.user_id})" style="margin-top: 10px; width: auto; padding: 8px 15px;">✅ Одобрить</button>
-                            <button class="btn btn-danger" onclick="rejectPartner(${app.id})" style="margin-top: 10px; width: auto; padding: 8px 15px;">❌ Отклонить</button>
-                        ` : ''}
-                    </div>
-                `).join('') || '<div style="color: #888;">Нет заявок</div>'}
-            </div>
-        `;
-    }
-    
-    else if (section === 'withdrawals') {
-        const { data: withdrawals } = await supabaseClient
-            .from('partner_withdrawals')
-            .select('*')
-            .order('created_at', { ascending: false });
-        
-        container.innerHTML = `
-            <div class="card">
-                <h3>💳 Заявки на вывод средств</h3>
-                ${withdrawals?.map(w => `
-                    <div class="order-item">
-                        <div style="font-weight: bold;">Партнёр #${w.partner_id}</div>
-                        <div style="font-size: 14px; color: #0077FF;">Сумма: ${w.amount} ₽</div>
-                        <div style="font-size: 13px; color: #888;">
-                            Способ: ${w.payment_method} | Реквизиты: ${w.payment_details}
-                        </div>
-                        <div style="font-size: 12px; color: #888;">Статус: ${w.status}</div>
-                        ${w.status === 'pending' ? `
-                            <button class="btn btn-success" onclick="approveWithdrawal(${w.id})" style="margin-top: 10px; width: auto; padding: 8px 15px;">✅ Выплачено</button>
-                        ` : ''}
-                    </div>
-                `).join('') || '<div style="color: #888;">Нет заявок</div>'}
-            </div>
-        `;
-    }
-}
-
-// Одобрение партнёра
-async function approvePartner(applicationId, userId) {
-    if (!confirm('Одобрить заявку на партнёрство?')) return;
-    
-    await supabaseClient
-        .from('partner_applications')
-        .update({ status: 'approved' })
-        .eq('id', applicationId);
-    
-    await supabaseClient
-        .from('users')
-        .update({ is_partner: true })
-        .eq('id', userId);
-    
-    alert('✅ Партнёр одобрен!');
-    showAdminSection('partners');
-    await loadAdminStats();
-}
-
-// Отклонение партнёра
-async function rejectPartner(applicationId) {
-    if (!confirm('Отклонить заявку?')) return;
-    
-    await supabaseClient
-        .from('partner_applications')
-        .update({ status: 'rejected' })
-        .eq('id', applicationId);
-    
-    alert('❌ Заявка отклонена');
-    showAdminSection('partners');
-    await loadAdminStats();
-}
-
-// Одобрение вывода средств
-async function approveWithdrawal(withdrawalId) {
-    if (!confirm('Подтвердить выплату?')) return;
-    
-    await supabaseClient
-        .from('partner_withdrawals')
-        .update({ status: 'completed' })
-        .eq('id', withdrawalId);
-    
-    alert('✅ Выплата подтверждена!');
-    showAdminSection('withdrawals');
-    await loadAdminStats();
-}
-        
+     
         initApp();
     </script>
 </body>
-</html>
