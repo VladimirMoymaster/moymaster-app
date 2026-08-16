@@ -1706,94 +1706,96 @@
         }
 
         async function loadResponses() {
-            if (!currentUser) return;
+    if (!currentUser) return;
 
-            const container = document.getElementById('responses-list');
-            const title = document.getElementById('responses-title');
+    const container = document.getElementById('responses-list');
+    const title = document.getElementById('responses-title');
 
-            if (currentUser.role === 'master') {
-                title.textContent = 'Мои отклики';
-                const { data, error } = await supabaseClient
-                    .from('responses')
-                    .select('*')
-                    .eq('user_id', currentUser.id)
-                    .order('created_at', { ascending: false });
+    if (currentUser.role === 'master') {
+        title.textContent = 'Мои отклики';
+        
+        // ВАЖНО: добавляем orders(awaiting_confirmation), чтобы знать, ждет ли заказчик подтверждения
+        const { data, error } = await supabaseClient
+            .from('responses')
+            .select('*, orders(awaiting_confirmation)')
+            .eq('user_id', currentUser.id)
+            .order('created_at', { ascending: false });
 
-                if (error || !data || data.length === 0) {
-                    container.innerHTML =
-                        `<div class="empty-state"><i class="fas fa-inbox"></i><p>Вы пока не откликались</p></div>`;
-                    return;
-                }
-
-                container.innerHTML = data.map(r => {
-                    const statusText = r.status === 'pending' ? '⏳ Ожидает' :
-                        r.status === 'accepted' ? '✅ Принят' : '❌ Отклонен';
-
-                    let completeBtn = '';
-                    if (r.status === 'accepted') {
-                        completeBtn =
-                            `<button class="btn btn-success btn-sm" onclick="completeWork(${r.order_id})" style="margin-top:8px;" id="complete-btn-${r.order_id}"><i class="fas fa-check-circle"></i> Работа выполнена</button>`;
-                    }
-
-                    return `
-                        <div class="response-item">
-                            <div style="font-weight:600; margin-bottom:4px;">Заявка #${r.order_id}</div>
-                            <div style="font-size:14px; color:var(--text-secondary);">${r.message || 'Без сообщения'}</div>
-                            <div style="display:flex; justify-content:space-between; margin-top:8px; align-items:center;">
-                                <span class="price">${r.price} ₽</span>
-                                <span style="font-size:13px; color:var(--text-muted);">${statusText}</span>
-                            </div>
-                            ${completeBtn}
-                        </div>
-                    `;
-                }).join('');
-            } else {
-                title.textContent = 'Отклики на мои заявки';
-
-                const { data: myOrders } = await supabaseClient
-                    .from('orders')
-                    .select('id, title')
-                    .eq('user_id', currentUser.id);
-
-                if (!myOrders || myOrders.length === 0) {
-                    container.innerHTML =
-                        `<div class="empty-state"><i class="fas fa-file-alt"></i><p>Нет заявок</p></div>`;
-                    return;
-                }
-
-                const orderIds = myOrders.map(o => o.id);
-                const { data: responses } = await supabaseClient
-                    .from('responses')
-                    .select('*')
-                    .in('order_id', orderIds)
-                    .order('created_at', { ascending: false });
-
-                if (!responses || responses.length === 0) {
-                    container.innerHTML =
-                        `<div class="empty-state"><i class="fas fa-clock"></i><p>Нет откликов</p></div>`;
-                    return;
-                }
-
-                container.innerHTML = responses.map(r => {
-                    const order = myOrders.find(o => o.id === r.order_id);
-                    const acceptBtn = r.status === 'pending' ?
-                        `<button class="btn btn-success btn-sm" onclick="acceptResponse(${r.id}, ${r.order_id})"><i class="fas fa-check"></i> Принять</button>` :
-                        '';
-                    return `
-                        <div class="response-item">
-                            <div style="font-size:13px; color:var(--text-muted);">На: ${order?.title || '#' + r.order_id}</div>
-                            <div style="font-size:14px; color:var(--text-secondary); margin:4px 0;">${r.message || 'Без сообщения'}</div>
-                            <div style="display:flex; justify-content:space-between; margin-top:6px; align-items:center;">
-                                <span class="price">${r.price} ₽</span>
-                                <span style="font-size:13px; color:var(--text-muted);">Пользователь #${r.user_id}</span>
-                            </div>
-                            ${acceptBtn}
-                        </div>
-                    `;
-                }).join('');
-            }
+        if (error || !data || data.length === 0) {
+            container.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>Вы пока не откликались</p></div>`;
+            return;
         }
 
+        container.innerHTML = data.map(r => {
+            const statusText = r.status === 'pending' ? '⏳ Ожидает' :
+                              r.status === 'accepted' ? '✅ Принят' : '❌ Отклонен';
+            
+            let completeBtn = '';
+            if (r.status === 'accepted') {
+                // Если заказчик уже получил уведомление, показываем статус, а не кнопку
+                if (r.orders?.awaiting_confirmation) {
+                    completeBtn = `<div style="margin-top:8px; font-size:13px; color:var(--warning); font-weight:600;"><i class="fas fa-clock"></i> Ожидает подтверждения заказчика</div>`;
+                } else {
+                    completeBtn = `<button class="btn btn-success btn-sm" onclick="completeWork(${r.order_id})" style="margin-top:8px;" id="complete-btn-${r.order_id}"><i class="fas fa-check-circle"></i> Работа выполнена</button>`;
+                }
+            }
+            
+            return `
+                <div class="response-item">
+                    <div style="font-weight:600; margin-bottom:4px;">Заявка #${r.order_id}</div>
+                    <div style="font-size:14px; color:var(--text-secondary);">${r.message || 'Без сообщения'}</div>
+                    <div style="display:flex; justify-content:space-between; margin-top:8px; align-items:center;">
+                        <span class="price">${r.price} ₽</span>
+                        <span style="font-size:13px; color:var(--text-muted);">${statusText}</span>
+                    </div>
+                    ${completeBtn}
+                </div>
+            `;
+        }).join('');
+    } else {
+        title.textContent = 'Отклики на мои заявки';
+        
+        const { data: myOrders } = await supabaseClient
+            .from('orders')
+            .select('id, title')
+            .eq('user_id', currentUser.id);
+        
+        if (!myOrders || myOrders.length === 0) {
+            container.innerHTML = `<div class="empty-state"><i class="fas fa-file-alt"></i><p>Нет заявок</p></div>`;
+            return;
+        }
+        
+        const orderIds = myOrders.map(o => o.id);
+        const { data: responses } = await supabaseClient
+            .from('responses')
+            .select('*')
+            .in('order_id', orderIds)
+            .order('created_at', { ascending: false });
+        
+        if (!responses || responses.length === 0) {
+            container.innerHTML = `<div class="empty-state"><i class="fas fa-clock"></i><p>Нет откликов</p></div>`;
+            return;
+        }
+        
+        container.innerHTML = responses.map(r => {
+            const order = myOrders.find(o => o.id === r.order_id);
+            const acceptBtn = r.status === 'pending' ? 
+                `<button class="btn btn-success btn-sm" onclick="acceptResponse(${r.id}, ${r.order_id})"><i class="fas fa-check"></i> Принять</button>` : '';
+            return `
+                <div class="response-item">
+                    <div style="font-size:13px; color:var(--text-muted);">На: ${order?.title || '#' + r.order_id}</div>
+                    <div style="font-size:14px; color:var(--text-secondary); margin:4px 0;">${r.message || 'Без сообщения'}</div>
+                    <div style="display:flex; justify-content:space-between; margin-top:6px; align-items:center;">
+                        <span class="price">${r.price} ₽</span>
+                        <span style="font-size:13px; color:var(--text-muted);">Пользователь #${r.user_id}</span>
+                    </div>
+                    ${acceptBtn}
+                </div>
+            `;
+        }).join('');
+    }
+}
+        
         async function acceptResponse(responseId, orderId) {
             const btn = event.target;
             const originalText = btn.textContent;
@@ -1834,46 +1836,42 @@
         }
 
         async function completeWork(orderId) {
-            console.log('🔍 Завершение работы по заявке:', orderId);
+    console.log('🔍 Завершение работы по заявке:', orderId);
 
-            const btn = event.target;
-            const originalText = btn.textContent;
+    // Ищем кнопку по ID, а не через event.target (это надежнее при наличии иконок)
+    const btn = document.getElementById(`complete-btn-${orderId}`);
+    if (!btn) return;
 
-            if (originalText.includes('Работа выполнена')) {
-                btn.textContent = '⚠️ Точно завершить?';
-                btn.style.background = '#FF9800';
+    const originalHTML = btn.innerHTML;
 
-                setTimeout(() => {
-                    btn.textContent = originalText;
-                    btn.style.background = '';
-                }, 3000);
+    // Защита от двойного клика
+    if (btn.disabled) return;
 
-                return;
-            }
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Отправка...';
+    btn.disabled = true;
 
-            btn.textContent = '⏳ Отправка...';
-            btn.disabled = true;
+    try {
+        const { error } = await supabaseClient
+            .from('orders')
+            .update({ awaiting_confirmation: true })
+            .eq('id', orderId);
 
-            try {
-                const { error } = await supabaseClient
-                    .from('orders')
-                    .update({ awaiting_confirmation: true })
-                    .eq('id', orderId);
+        if (error) throw error;
 
-                if (error) throw error;
+        alert('✅ Заказчик уведомлен! Ожидайте подтверждения.');
+        
+        // Перезагружаем данные, чтобы кнопка изменилась на статус ожидания
+        await loadOrders();
+        await loadResponses();
 
-                console.log('✅ Заказчик уведомлен');
-                alert('✅ Заказчик уведомлен! Ожидайте подтверждения.');
-                await loadOrders();
-                await loadResponses();
+    } catch (err) {
+        console.error('❌ Ошибка:', err);
+        alert('❌ Ошибка: ' + err.message);
+        btn.innerHTML = originalHTML;
+        btn.disabled = false;
+    }
+}
 
-            } catch (err) {
-                console.error('❌ Ошибка:', err);
-                alert('❌ Ошибка: ' + err.message);
-                btn.textContent = originalText;
-                btn.disabled = false;
-            }
-        }
 
         async function confirmCompletion(orderId) {
             console.log('🔍 Подтверждение выполнения заявки:', orderId);
