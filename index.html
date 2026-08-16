@@ -1982,33 +1982,54 @@ async function loadChatOrders() {
     
     const container = document.getElementById('chat-orders-container');
     
-    // Получаем заявки, где есть сообщения
-    const { data: messages } = await supabaseClient
-        .from('messages')
-        .select('order_id')
-        .or(`sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`);
-    
-    if (!messages || messages.length === 0) {
-        container.innerHTML = '<div style="color: #888; padding: 20px; text-align: center;">Нет активных чатов</div>';
-        return;
-    }
-    
-    const orderIds = [...new Set(messages.map(m => m.order_id))];
-    
+    // Получаем ВСЕ заявки пользователя (и как заказчика, и как мастера)
     const { data: orders } = await supabaseClient
         .from('orders')
         .select('*')
-        .in('id', orderIds);
+        .or(`user_id.eq.${currentUser.id},assigned_master_id.eq.${currentUser.id}`)
+        .in('status', ['in_progress', 'completed'])  // Только активные и завершённые
+        .order('created_at', { ascending: false });
     
     if (!orders || orders.length === 0) {
-        container.innerHTML = '<div style="color: #888; padding: 20px; text-align: center;">Нет активных чатов</div>';
+        container.innerHTML = '<div style="color: #888; padding: 20px; text-align: center;">Нет активных заявок</div>';
         return;
     }
     
-    container.innerHTML = orders.map(order => `
-        <div class="order-item" onclick="openChat(${order.id})" style="cursor: pointer;">
+    // Добавляем информацию о собеседнике
+    const ordersWithPartners = await Promise.all(orders.map(async order => {
+        const partnerId = order.user_id === currentUser.id 
+            ? order.assigned_master_id 
+            : order.user_id;
+        
+        if (!partnerId) {
+            return { ...order, partnerName: 'Нет собеседника', hasMessages: false };
+        }
+        
+        const { data: partner } = await supabaseClient
+            .from('users')
+            .select('name')
+            .eq('id', partnerId)
+            .single();
+        
+        // Проверяем, есть ли сообщения
+        const { data: messages } = await supabaseClient
+            .from('messages')
+            .select('id', { count: 'exact', head: true })
+            .eq('order_id', order.id);
+        
+        return { 
+            ...order, 
+            partnerName: partner?.name || 'Пользователь',
+            hasMessages: messages && messages.length > 0
+        };
+    }));
+    
+    container.innerHTML = ordersWithPartners.map(order => `
+        <div class="order-item" onclick="openChat(${order.id})" style="cursor: pointer; border-left: ${order.hasMessages ? '3px solid #0077FF' : '3px solid #ddd'}; padding-left: 12px;">
             <div style="font-weight: bold;">${order.title}</div>
-            <div style="font-size: 13px; color: #888;">Нажмите, чтобы открыть чат</div>
+            <div style="font-size: 13px; color: #888;">
+                ${order.partnerName} ${order.hasMessages ? '💬' : '📝 Нажмите, чтобы написать'}
+            </div>
         </div>
     `).join('');
 }
