@@ -1301,6 +1301,7 @@
         let selectedRating = 0;
         let currentReviewOrderId = null;
         let currentReviewMasterId = null;
+        let ordersWithReviews = new Set();
 
         let currentChatOrderId = null;
         let currentChatPartnerId = null;
@@ -1544,20 +1545,47 @@
         }
 
         async function loadOrders() {
-            const { data, error } = await supabaseClient
-                .from('orders')
-                .select('*')
-                .order('created_at', { ascending: false })
-                .limit(50);
+    const { data, error } = await supabaseClient
+        .from('orders')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(50);
 
-            if (error || !data) {
-                document.getElementById('orders-list').innerHTML = '<div class="error">Ошибка загрузки</div>';
-                return;
-            }
+    if (error || !data) {
+        document.getElementById('orders-list').innerHTML = '<div class="error">Ошибка загрузки</div>';
+        return;
+    }
 
-            allOrders = data;
-            renderOrders();
-        }
+    allOrders = data;
+    
+    // Загружаем информацию о том, для каких заявок уже есть отзывы
+    await loadReviewStatus();
+    
+    renderOrders();
+}
+
+async function loadReviewStatus() {
+    if (!currentUser) return;
+    
+    // Получаем ID завершенных заявок текущего пользователя
+    const userOrderIds = allOrders
+        .filter(o => o.user_id === currentUser.id && o.status === 'completed')
+        .map(o => o.id);
+    
+    if (userOrderIds.length === 0) {
+        ordersWithReviews = new Set();
+        return;
+    }
+    
+    // Проверяем, для каких заявок уже есть отзывы от текущего пользователя
+    const { data: reviews } = await supabaseClient
+        .from('reviews')
+        .select('order_id')
+        .in('order_id', userOrderIds)
+        .eq('reviewer_id', currentUser.id);
+    
+    ordersWithReviews = new Set(reviews?.map(r => r.order_id) || []);
+}
 
         function renderOrders() {
             const container = document.getElementById('orders-list');
@@ -1611,9 +1639,11 @@
                                 <button class="btn btn-danger btn-sm" onclick="rejectCompletion(${order.id})" id="reject-btn-${order.id}"><i class="fas fa-times"></i> Отклонить</button>
                             </div>
                         `;
-                    } else if (order.status === 'completed') {
-                        responseBtn =
-                            `<button class="btn btn-warning" onclick="openReviewModal(${order.id}, ${order.assigned_master_id})"><i class="fas fa-star"></i> Оставить отзыв</button>`;
+                        else if (order.status === 'completed' && !ordersWithReviews.has(order.id)) {
+    responseBtn = `<button class="btn btn-warning" onclick="openReviewModal(${order.id}, ${order.assigned_master_id})"><i class="fas fa-star"></i> Оставить отзыв</button>`;
+} else if (order.status === 'completed' && ordersWithReviews.has(order.id)) {
+    responseBtn = `<div style="font-size:13px; color:var(--success); font-weight:600; margin-top:10px;"><i class="fas fa-check-circle"></i> Отзыв оставлен</div>`;
+}
                     } else {
                         responseBtn =
                             `<div style="font-size:13px; color:var(--text-muted);"><i class="fas fa-tag"></i> Ваша заявка</div>`;
@@ -2419,6 +2449,7 @@
                 }
 
                 alert('✅ Отзыв отправлен!');
+                ordersWithReviews.add(currentReviewOrderId);
                 closeReviewModal();
                 await loadOrders();
                 await loadResponses();
