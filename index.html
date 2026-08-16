@@ -1714,10 +1714,10 @@
     if (currentUser.role === 'master') {
         title.textContent = 'Мои отклики';
         
-        // ВАЖНО: добавляем orders(awaiting_confirmation), чтобы знать, ждет ли заказчик подтверждения
+        // ВАЖНО: добавляем orders(status, awaiting_confirmation), чтобы знать финальный статус
         const { data, error } = await supabaseClient
             .from('responses')
-            .select('*, orders(awaiting_confirmation)')
+            .select('*, orders(status, awaiting_confirmation)')
             .eq('user_id', currentUser.id)
             .order('created_at', { ascending: false });
 
@@ -1731,11 +1731,21 @@
                               r.status === 'accepted' ? '✅ Принят' : '❌ Отклонен';
             
             let completeBtn = '';
+            
             if (r.status === 'accepted') {
-                // Если заказчик уже получил уведомление, показываем статус, а не кнопку
-                if (r.orders?.awaiting_confirmation) {
+                const orderStatus = r.orders?.status;
+                const isAwaiting = r.orders?.awaiting_confirmation;
+
+                // 1. Если заказчик уже подтвердил выполнение
+                if (orderStatus === 'completed') {
+                    completeBtn = `<div style="margin-top:8px; font-size:13px; color:var(--success); font-weight:600;"><i class="fas fa-check-circle"></i> Работа подтверждена заказчиком</div>`;
+                } 
+                // 2. Если мастер нажал "выполнено", но заказчик еще не ответил
+                else if (isAwaiting) {
                     completeBtn = `<div style="margin-top:8px; font-size:13px; color:var(--warning); font-weight:600;"><i class="fas fa-clock"></i> Ожидает подтверждения заказчика</div>`;
-                } else {
+                } 
+                // 3. Если отклик принят, но работа еще не отмечена как выполненная
+                else {
                     completeBtn = `<button class="btn btn-success btn-sm" onclick="completeWork(${r.order_id})" style="margin-top:8px;" id="complete-btn-${r.order_id}"><i class="fas fa-check-circle"></i> Работа выполнена</button>`;
                 }
             }
@@ -1752,7 +1762,9 @@
                 </div>
             `;
         }).join('');
+        
     } else {
+        // Логика для Заказчика (остается без изменений)
         title.textContent = 'Отклики на мои заявки';
         
         const { data: myOrders } = await supabaseClient
