@@ -1853,7 +1853,91 @@ async function postOrderToServer(order) {
         console.error('❌ Ошибка соединения с сервером:', err);
     }
 }
+        // Отправка уведомлений мастерам через сервер
+async function notifyMastersAboutNewOrder(order) {
+    console.log('📢 Отправка уведомлений мастерам о новой заявке...');
+    
+    try {
+        // Находим всех мастеров в этом районе
+        const { data: masters } = await supabaseClient
+            .from('users')
+            .select('vk_id')
+            .eq('role', 'master');
+        
+        if (!masters || masters.length === 0) {
+            console.log('Нет мастеров для уведомления');
+            return;
+        }
+        
+        console.log(`Найдено ${masters.length} мастеров для уведомления`);
+        
+        // Отправляем запрос на сервер
+        const SERVER_URL = 'https://moymaster-server.vercel.app';
+        
+        const response = await fetch(`${SERVER_URL}/api/send-notification`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_ids: masters.map(m => m.vk_id),
+                message: `🔨 Новая заявка в районе ${order.district}!\n\n${order.title}\n💰 Бюджет: ${order.budget || 'Договорная'}\n\nОткликнуться в приложении: https://vk.com/app${appId}`
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            console.log('✅ Уведомления отправлены!');
+        } else {
+            console.error(' Ошибка:', result.error);
+        }
+        
+    } catch (err) {
+        console.error('❌ Ошибка отправки уведомлений:', err);
+    }
+}
 
+        // Отправка уведомлений мастерам через сервер
+async function notifyMastersAboutNewOrder(order) {
+    console.log('📢 Отправка уведомлений мастерам о новой заявке...');
+    
+    try {
+        // Находим всех мастеров в этом районе
+        const { data: masters } = await supabaseClient
+            .from('users')
+            .select('vk_id')
+            .eq('role', 'master');
+        
+        if (!masters || masters.length === 0) {
+            console.log('Нет мастеров для уведомления');
+            return;
+        }
+        
+        console.log(`Найдено ${masters.length} мастеров для уведомления`);
+        
+        // Отправляем запрос на сервер
+        const SERVER_URL = 'https://moymaster-server.vercel.app';
+        
+        const response = await fetch(`${SERVER_URL}/api/send-notification`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_ids: masters.map(m => m.vk_id),
+                message: `🔨 Новая заявка в районе ${order.district}!\n\n${order.title}\n💰 Бюджет: ${order.budget || 'Договорная'}\n\nОткликнуться в приложении: https://vk.com/app${appId}`
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            console.log('✅ Уведомления отправлены!');
+        } else {
+            console.error(' Ошибка:', result.error);
+        }
+        
+    } catch (err) {
+        console.error('❌ Ошибка отправки уведомлений:', err);
+    }
+}
         
         initApp();
     </script>
