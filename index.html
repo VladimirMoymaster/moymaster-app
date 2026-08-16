@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -125,6 +126,16 @@
         box-shadow: 0 4px 15px rgba(159, 122, 234, 0.4);
     }
     
+    .btn-complete {
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        box-shadow: 0 4px 15px rgba(72, 187, 120, 0.4);
+    }
+    
+    .btn-secondary {
+        background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+        box-shadow: 0 4px 15px rgba(160, 174, 192, 0.4);
+    }
+    
     input, select, textarea {
         width: 100%; 
         padding: 14px; 
@@ -155,6 +166,14 @@
         transform: translateX(5px);
     }
     
+    .response-item {
+        background: #f7fafc;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 12px;
+        border-left: 4px solid #48bb78;
+    }
+    
     .status-badge {
         display: inline-block;
         padding: 4px 12px;
@@ -177,6 +196,77 @@
     .status-completed {
         background: #e2e8f0;
         color: #4a5568;
+    }
+    
+    .badge {
+        display: inline-block;
+        padding: 4px 10px;
+        background: #e0e7ff;
+        color: #4c51bf;
+        border-radius: 8px;
+        font-size: 12px;
+        margin-right: 5px;
+        margin-bottom: 5px;
+    }
+    
+    .badge-district {
+        background: #fef5e7;
+        color: #744210;
+    }
+    
+    .price-tag {
+        font-weight: bold;
+        color: #48bb78;
+        font-size: 16px;
+    }
+    
+    .photo-upload {
+        border: 2px dashed #cbd5e0;
+        border-radius: 12px;
+        padding: 30px;
+        text-align: center;
+        cursor: pointer;
+        margin-bottom: 15px;
+        transition: all 0.3s;
+    }
+    
+    .photo-upload:hover {
+        border-color: #667eea;
+        background: #f7fafc;
+    }
+    
+    .photo-preview {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+    
+    .photo-preview img {
+        width: 100%;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+    
+    .photo-preview img:hover {
+        transform: scale(1.05);
+    }
+    
+    .order-photos {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 10px;
+        margin: 10px 0;
+    }
+    
+    .order-photos img {
+        width: 100%;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 8px;
     }
     
     /* Нижняя навигация */
@@ -285,24 +375,242 @@
         color: #718096;
     }
     
-    .photo-preview {
+    .partner-card {
+        background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
+        color: white;
+        border-radius: 20px;
+        padding: 20px;
+        margin-bottom: 15px;
+        text-align: center;
+    }
+    
+    .partner-stats {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        grid-template-columns: repeat(3, 1fr);
         gap: 10px;
         margin-bottom: 15px;
     }
     
-    .photo-preview img {
-        width: 100%;
-        height: 80px;
-        object-fit: cover;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: transform 0.2s;
+    .balance-card {
+        background: white;
+        border-radius: 20px;
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 15px;
     }
     
-    .photo-preview img:hover {
-        transform: scale(1.05);
+    .balance-amount {
+        font-size: 32px;
+        font-weight: bold;
+        color: #48bb78;
+        margin: 10px 0;
+    }
+    
+    .withdraw-info {
+        font-size: 12px;
+        color: #718096;
+    }
+    
+    .partner-link-box {
+        background: rgba(255,255,255,0.2);
+        padding: 10px;
+        border-radius: 8px;
+        margin: 10px 0;
+        font-size: 12px;
+        word-break: break-all;
+    }
+    
+    .subscription-info {
+        background: #f5f5f5;
+        padding: 12px;
+        border-radius: 10px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+    
+    .subscription-info.free {
+        background: #fef5e7;
+    }
+    
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        font-weight: bold;
+        margin: 0 auto 15px;
+        position: relative;
+    }
+    
+    .profile-avatar.pro {
+        border: 3px solid #f6e05e;
+    }
+    
+    .profile-avatar.partner {
+        border: 3px solid #9f7aea;
+    }
+    
+    .limit-warning {
+        background: #fef5e7;
+        color: #744210;
+        padding: 10px;
+        border-radius: 8px;
+        margin: 10px 0;
+        text-align: center;
+        font-size: 13px;
+    }
+    
+    .confirmation-banner {
+        background: #fef5e7;
+        color: #744210;
+        padding: 12px;
+        border-radius: 10px;
+        margin: 10px 0;
+        font-size: 13px;
+        border-left: 4px solid #f6ad55;
+    }
+    
+    .auto-complete-timer {
+        background: #e2e8f0;
+        color: #4a5568;
+        padding: 8px;
+        border-radius: 8px;
+        margin: 10px 0;
+        font-size: 12px;
+        text-align: center;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #718096;
+    }
+    
+    .empty-icon {
+        font-size: 48px;
+        margin-bottom: 10px;
+    }
+    
+    .loading {
+        text-align: center;
+        padding: 20px;
+        color: #718096;
+    }
+    
+    /* Модальные окна */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 2000;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+    
+    .modal-overlay.active {
+        display: flex;
+    }
+    
+    .modal-content {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        max-width: 400px;
+        width: 100%;
+        text-align: center;
+        animation: slideUp 0.3s;
+    }
+    
+    @keyframes slideUp {
+        from { transform: translateY(50px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .modal-title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #2d3748;
+    }
+    
+    .modal-text {
+        color: #718096;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+    
+    .modal-features {
+        text-align: left;
+        margin-bottom: 20px;
+    }
+    
+    .modal-features div {
+        padding: 8px 0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .modal-close {
+        background: #e2e8f0;
+        color: #4a5568;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-top: 10px;
+    }
+    
+    .rating-stars {
+        font-size: 32px;
+        margin: 15px 0;
+    }
+    
+    .rating-stars .star {
+        cursor: pointer;
+        color: #cbd5e0;
+        transition: color 0.2s;
+    }
+    
+    .rating-stars .star.active {
+        color: #f6e05e;
+    }
+    
+    .review-item {
+        background: #f7fafc;
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 10px;
+    }
+    
+    .review-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+    
+    .review-author {
+        font-weight: bold;
+        color: #2d3748;
+    }
+    
+    .review-date {
+        color: #718096;
+        font-size: 12px;
+    }
+    
+    .review-text {
+        color: #4a5568;
+        font-size: 14px;
     }
     
     /* Адаптивность */
@@ -320,22 +628,25 @@
             padding: 15px;
             border-radius: 16px;
         }
+        
+        .partner-stats {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 </head>
 <body>
 
     <div class="header">
-    🔨 Мой Мастер
-    <div class="header-sub">Поиск мастеров в Барнауле</div>
-</div>
-
+        🔨 Мой Мастер
+        <div class="header-sub">Поиск мастеров в Барнауле</div>
+    </div>
 
     <!-- ГЛАВНАЯ -->
     <div id="tab-home" class="tab active">
         <div class="container">
             <div class="card">
-                <h3> Категории услуг</h3>
+                <h3>📋 Категории услуг</h3>
                 <div id="categories-list" class="loading">Загрузка...</div>
             </div>
             <div class="card">
@@ -343,7 +654,7 @@
                 <div class="district-filter" id="district-filter"></div>
             </div>
             <div class="card">
-                <h3>📝 Активные заявки</h3>
+                <h3> Активные заявки</h3>
                 <div id="orders-list" class="loading">Загрузка...</div>
             </div>
         </div>
@@ -367,7 +678,7 @@
                 
                 <label style="font-size:13px; color:#666; margin-bottom:5px; display:block;">Фотографии</label>
                 <div class="photo-upload" onclick="uploadPhotos()">
-                    <div style="font-size:32px; margin-bottom:8px;"></div>
+                    <div style="font-size:32px; margin-bottom:8px;">📷</div>
                     <div style="font-size:14px; color:#666;">Нажмите, чтобы добавить фото</div>
                 </div>
                 <div class="photo-preview" id="photo-preview"></div>
@@ -397,11 +708,11 @@
             
             <div id="partner-section" style="display:none;">
                 <div class="partner-card">
-                    <div style="font-size:24px; margin-bottom:10px;"></div>
+                    <div style="font-size:24px; margin-bottom:10px;">🤝</div>
                     <div style="font-size:18px; font-weight:bold; margin-bottom:10px;">Партнерская программа</div>
                     <div style="font-size:14px; opacity:0.9;">Приглашайте мастеров и получайте 30% с их подписки Pro</div>
                     <div class="partner-link-box" id="partner-link">Загрузка ссылки...</div>
-                    <button class="btn" style="background:white; color:#9C27B0; margin-bottom:10px;" onclick="copyPartnerLink()"> Копировать ссылку</button>
+                    <button class="btn" style="background:white; color:#9C27B0; margin-bottom:10px;" onclick="copyPartnerLink()">📋 Копировать ссылку</button>
                     <button class="btn" style="background:rgba(255,255,255,0.3); color:white;" onclick="sharePartnerLink()">📤 Поделиться</button>
                 </div>
                 <div class="partner-stats">
@@ -419,9 +730,9 @@
             
             <div id="become-partner-section" style="display:none;">
                 <div class="card">
-                    <h3> Стать партнером</h3>
+                    <h3>🤝 Стать партнером</h3>
                     <p style="color:#666; font-size:14px; margin-bottom:15px;">Приглашайте мастеров и получайте <b>30% с каждой Pro-подписки</b>. Пассивный доход от 89 ₽ с каждого мастера в месяц!</p>
-                    <button class="btn btn-partner" onclick="openPartnerApplicationModal()"> Оставить заявку на партнерство</button>
+                    <button class="btn btn-partner" onclick="openPartnerApplicationModal()">📝 Оставить заявку на партнерство</button>
                 </div>
             </div>
             
@@ -433,59 +744,60 @@
     </div>
 
     <!-- ЧАТ -->
-<div id="tab-chat" class="tab">
-    <div class="container" style="padding: 0;">
-        <div class="card" style="margin: 0; border-radius: 0; box-shadow: none;">
-            <div style="padding: 15px; border-bottom: 1px solid #eee;">
-                <h3 style="margin: 0;">💬 Чат</h3>
-                <div id="chat-partner-name" style="font-size: 14px; color: #888; margin-top: 5px;"></div>
-            </div>
-            
-            <!-- Список сообщений -->
-            <div id="messages-container" style="height: 400px; overflow-y: auto; padding: 15px;">
-                <div style="text-align: center; color: #888; padding: 40px;">
-                    Выберите заявку для начала общения
+    <div id="tab-chat" class="tab">
+        <div class="container" style="padding: 0;">
+            <div class="card" style="margin: 0; border-radius: 0; box-shadow: none;">
+                <div style="padding: 15px; border-bottom: 1px solid #eee;">
+                    <h3 style="margin: 0;">💬 Чат</h3>
+                    <div id="chat-partner-name" style="font-size: 14px; color: #888; margin-top: 5px;"></div>
+                </div>
+                
+                <!-- Список сообщений -->
+                <div id="messages-container" style="height: 400px; overflow-y: auto; padding: 15px;">
+                    <div style="text-align: center; color: #888; padding: 40px;">
+                        Выберите заявку для начала общения
+                    </div>
+                </div>
+                
+                <!-- Поле ввода -->
+                <div style="padding: 15px; border-top: 1px solid #eee; display: flex; gap: 10px;">
+                    <input type="text" id="message-input" placeholder="Введите сообщение..." style="flex: 1; margin: 0;">
+                    <button class="btn" style="width: auto; margin: 0;" onclick="sendMessage()">📤</button>
                 </div>
             </div>
             
-            <!-- Поле ввода -->
-            <div style="padding: 15px; border-top: 1px solid #eee; display: flex; gap: 10px;">
-                <input type="text" id="message-input" placeholder="Введите сообщение..." style="flex: 1; margin: 0;">
-                <button class="btn" style="width: auto; margin: 0;" onclick="sendMessage()">📤</button>
+            <!-- Список заявок с чатами -->
+            <div id="chat-orders-list" style="padding: 15px;">
+                <h3>Заявки с активными чатами</h3>
+                <div id="chat-orders-container"></div>
             </div>
         </div>
-        
-        <!-- Список заявок с чатами -->
-        <div id="chat-orders-list" style="padding: 15px;">
-            <h3>Заявки с активными чатами</h3>
-            <div id="chat-orders-container"></div>
-        </div>
     </div>
-</div>
 
     <!-- НАВИГАЦИЯ -->
     <div class="nav">
-    <div class="nav-item active" onclick="switchTab('home')">
-        <span class="nav-icon"></span>
-        <span>Главная</span>
+        <div class="nav-item active" onclick="switchTab('home')">
+            <span class="nav-icon">🏠</span>
+            <span>Главная</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('order')">
+            <span class="nav-icon">➕</span>
+            <span>Заявка</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('responses')">
+            <span class="nav-icon">💼</span>
+            <span>Отклики</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('chat')">
+            <span class="nav-icon">💬</span>
+            <span>Чат</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('profile')">
+            <span class="nav-icon"></span>
+            <span>Профиль</span>
+        </div>
     </div>
-    <div class="nav-item" onclick="switchTab('order')">
-        <span class="nav-icon">➕</span>
-        <span>Заявка</span>
-    </div>
-    <div class="nav-item" onclick="switchTab('responses')">
-        <span class="nav-icon">💼</span>
-        <span>Отклики</span>
-    </div>
-    <div class="nav-item" onclick="switchTab('chat')">
-        <span class="nav-icon">💬</span>
-        <span>Чат</span>
-    </div>
-    <div class="nav-item" onclick="switchTab('profile')">
-        <span class="nav-icon">👤</span>
-        <span>Профиль</span>
-    </div>
-</div>
+
     <!-- Модальные окна -->
     <div class="modal-overlay" id="pro-modal">
         <div class="modal-content">
@@ -497,7 +809,7 @@
                 <div>⭐ Золотой значок в профиле</div>
                 <div>🚀 Приоритетное отображение</div>
             </div>
-            <div style="font-size: 24px; font-weight: bold; color: #0077FF; margin-bottom: 15px;">299 ₽ / месяц</div>
+            <div style="font-size: 24px; font-weight: bold; color: #667eea; margin-bottom: 15px;">299 ₽ / месяц</div>
             <button class="btn btn-pro" style="margin-bottom: 10px;" onclick="connectVKPay()">💳 Подключить VK Pay</button>
             <button class="modal-close" onclick="closeProModal()">Позже</button>
         </div>
@@ -505,7 +817,7 @@
 
     <div class="modal-overlay" id="partner-application-modal">
         <div class="modal-content">
-            <div style="font-size: 40px; margin-bottom: 10px;">🤝</div>
+            <div style="font-size: 40px; margin-bottom: 10px;"></div>
             <div class="modal-title">Заявка на партнерство</div>
             <div class="modal-text">Заполните анкету, и мы рассмотрим вашу заявку в течение 24 часов</div>
             <input type="text" id="partner-vk" placeholder="Ссылка на ваш профиль ВК">
@@ -572,6 +884,11 @@
         let selectedRating = 0;
         let currentReviewOrderId = null;
         let currentReviewMasterId = null;
+        
+        // Переменные для чата
+        let currentChatOrderId = null;
+        let currentChatPartnerId = null;
+        let messagesInterval = null;
 
         console.log('🚀 Запуск...');
 
@@ -657,7 +974,7 @@
                         appId = launchParams.app_id;
                     }
                 } catch (err) {
-                    console.log('Не удалось получить app_id');
+                    console.log('⚠️ Не удалось получить app_id');
                 }
                 
                 const userData = await vkBridge.send('VKWebAppGetUserInfo');
@@ -836,14 +1153,14 @@
                 : allOrders.filter(o => o.district === currentDistrictFilter);
 
             if (filteredOrders.length === 0) {
-                container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div>В этом районе заявок пока нет</div>';
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon"></div>В этом районе заявок пока нет</div>';
                 return;
             }
 
             container.innerHTML = filteredOrders.map(order => {
                 const cat = categoriesCache.find(c => c.id === order.category_id);
                 const statusClass = order.status === 'open' ? 'status-open' : 
-                                   order.status === 'in_progress' ? 'status-progress' : 'status-completed';
+                                   order.status === 'in_progress' ? 'status-in_progress' : 'status-completed';
                 const statusText = order.status === 'open' ? 'Открыта' : 
                                   order.status === 'in_progress' ? 'В работе' : 'Завершена';
                 
@@ -871,7 +1188,7 @@
                         const daysLeft = Math.ceil((autoCompleteDate - new Date()) / (1000 * 60 * 60 * 24));
                         
                         responseBtn = `
-                            <div class="confirmation-banner"> Мастер отметил работу выполненной. Подтвердите или отклоните.</div>
+                            <div class="confirmation-banner">Мастер отметил работу выполненной. Подтвердите или отклоните.</div>
                             <div class="auto-complete-timer">⏰ Автоподтверждение через ${daysLeft} дн.</div>
                             <button class="btn btn-success" onclick="confirmCompletion(${order.id})" style="margin-bottom:5px;" id="confirm-btn-${order.id}">✅ Подтвердить выполнение</button>
                             <button class="btn btn-danger" onclick="rejectCompletion(${order.id})" id="reject-btn-${order.id}">❌ Отклонить</button>
@@ -1003,7 +1320,7 @@
                     `;
                 }).join('');
             } else {
-                title.textContent = ' Отклики на мои заявки';
+                title.textContent = '📋 Отклики на мои заявки';
                 
                 const { data: myOrders } = await supabaseClient
                     .from('orders')
@@ -1085,16 +1402,15 @@
             }
         }
 
-        // ========== ЗАВЕРШЕНИЕ РАБОТЫ (без confirm) ==========
+        // ========== ЗАВЕРШЕНИЕ РАБОТЫ ==========
         async function completeWork(orderId) {
             console.log('🔍 Завершение работы по заявке:', orderId);
             
             const btn = event.target;
             const originalText = btn.textContent;
             
-            // Двухэтапное подтверждение
             if (originalText.includes('Работа выполнена')) {
-                btn.textContent = '️ Точно завершить?';
+                btn.textContent = '⚠️ Точно завершить?';
                 btn.style.background = '#FF9800';
                 
                 setTimeout(() => {
@@ -1122,7 +1438,7 @@
                 await loadResponses();
                 
             } catch (err) {
-                console.error(' Ошибка:', err);
+                console.error('❌ Ошибка:', err);
                 alert('❌ Ошибка: ' + err.message);
                 btn.textContent = originalText;
                 btn.disabled = false;
@@ -1130,14 +1446,13 @@
         }
 
         async function confirmCompletion(orderId) {
-            console.log(' Подтверждение выполнения заявки:', orderId);
+            console.log('🔍 Подтверждение выполнения заявки:', orderId);
             
             const btn = event.target;
             const originalText = btn.textContent;
             
-            // Двухэтапное подтверждение
             if (originalText.includes('Подтвердить')) {
-                btn.textContent = '️ Точно подтвердить?';
+                btn.textContent = '⚠️ Точно подтвердить?';
                 btn.style.background = '#FF9800';
                 
                 setTimeout(() => {
@@ -1183,7 +1498,6 @@
             const btn = event.target;
             const originalText = btn.textContent;
             
-            // Двухэтапное подтверждение
             if (originalText.includes('Отклонить')) {
                 btn.textContent = '⚠️ Точно отклонить?';
                 btn.style.background = '#FF5722';
@@ -1220,60 +1534,58 @@
             }
         }
 
-       async function createOrder() {
-    if (!currentUser) return alert('Подождите загрузку');
-    
-    const district = document.getElementById('order-district').value;
-    const categoryId = document.getElementById('order-category').value;
-    const title = document.getElementById('order-title').value.trim();
-    const description = document.getElementById('order-description').value.trim();
-    const budget = document.getElementById('order-budget').value;
+        async function createOrder() {
+            if (!currentUser) return alert('Подождите загрузку');
+            
+            const district = document.getElementById('order-district').value;
+            const categoryId = document.getElementById('order-category').value;
+            const title = document.getElementById('order-title').value.trim();
+            const description = document.getElementById('order-description').value.trim();
+            const budget = document.getElementById('order-budget').value;
 
-    if (!district) return alert('Выберите район');
-    if (!categoryId || !title) return alert('Заполните категорию и заголовок');
+            if (!district) return alert('Выберите район');
+            if (!categoryId || !title) return alert('Заполните категорию и заголовок');
 
-    const btn = document.querySelector('#tab-order .btn');
-    btn.textContent = '⏳ Создание...';
-    btn.disabled = true;
+            const btn = document.querySelector('#tab-order .btn');
+            btn.textContent = ' Создание...';
+            btn.disabled = true;
 
-    const { data, error } = await supabaseClient
-        .from('orders')
-        .insert([{ 
-            user_id: currentUser.id, 
-            district,
-            category_id: parseInt(categoryId), 
-            title, 
-            description: description || null, 
-            budget: budget ? parseFloat(budget) : null,
-            status: 'open',
-            photos: uploadedPhotos.length > 0 ? uploadedPhotos : null
-        }])
-        .select();
+            const { data, error } = await supabaseClient
+                .from('orders')
+                .insert([{ 
+                    user_id: currentUser.id, 
+                    district,
+                    category_id: parseInt(categoryId), 
+                    title, 
+                    description: description || null, 
+                    budget: budget ? parseFloat(budget) : null,
+                    status: 'open',
+                    photos: uploadedPhotos.length > 0 ? uploadedPhotos : null
+                }])
+                .select();
 
-    if (error) {
-        alert(' Ошибка: ' + error.message);
-    } else {
-        // Отправляем на сервер для публикации в группу ВК
-        const newOrder = data[0];
-        postOrderToServer(newOrder);
-        // Отправляем уведомления мастерам
-        notifyMastersAboutNewOrder(newOrder);
-        alert('✅ Заявка создана! Пост в группу ВК публикуется...');
-        
-        document.getElementById('order-title').value = '';
-        document.getElementById('order-description').value = '';
-        document.getElementById('order-budget').value = '';
-        document.getElementById('order-category').value = '';
-        document.getElementById('order-district').value = '';
-        uploadedPhotos = [];
-        renderPhotoPreview();
-        await loadOrders();
-        switchTab('home');
-    }
-    
-    btn.textContent = '📤 Создать заявку';
-    btn.disabled = false;
-}
+            if (error) {
+                alert('❌ Ошибка: ' + error.message);
+            } else {
+                const newOrder = data[0];
+                postOrderToServer(newOrder);
+                notifyMastersAboutNewOrder(newOrder);
+                alert('✅ Заявка создана! Пост в группу ВК публикуется...');
+                
+                document.getElementById('order-title').value = '';
+                document.getElementById('order-description').value = '';
+                document.getElementById('order-budget').value = '';
+                document.getElementById('order-category').value = '';
+                document.getElementById('order-district').value = '';
+                uploadedPhotos = [];
+                renderPhotoPreview();
+                await loadOrders();
+                switchTab('home');
+            }
+            
+            btn.textContent = ' Создать заявку';
+            btn.disabled = false;
+        }
 
         async function toggleRole() {
             const newRole = currentUser.role === 'customer' ? 'master' : 'customer';
@@ -1283,7 +1595,7 @@
                 .eq('id', currentUser.id);
             
             if (error) {
-                alert('Ошибка: ' + error.message);
+                alert('❌ Ошибка: ' + error.message);
             } else {
                 currentUser.role = newRole;
                 
@@ -1309,142 +1621,133 @@
         }
 
         async function connectVKPay() {
-    if (!currentUser) {
-        alert('Подождите загрузку профиля');
-        return;
-    }
-    
-    if (currentUser.subscription_type === 'pro') {
-        alert('У вас уже активна Pro-подписка!');
-        return;
-    }
-    
-    const btn = event.target;
-    btn.textContent = '⏳ Обработка...';
-    btn.disabled = true;
-    
-    try {
-        console.log('💳 Инициация оплаты через VK Pay...');
-        
-        // Создаем заказ через VK Bridge
-        const orderData = {
-            action: 'pay-to-group',
-            app_id: parseInt(appId),
-            order_id: `order_${currentUser.id}_${Date.now()}`,
-            amount: 29900, // 299.00 ₽ в копейках
-            description: 'Pro-подписка на 1 месяц',
-            currency: 'RUB',
-            test_mode: 1  // Тестовый режим (убрать при продакшене)
-        };
-        
-        console.log('📤 Отправка запроса в VK Pay:', orderData);
-        
-        const result = await vkBridge.send('VKWebAppShowOrderBox', orderData);
-        
-        console.log('✅ Результат оплаты:', result);
-        
-        if (result.status === 'success' || result.status === 'success_new') {
-            // Оплата успешна - активируем Pro
-            await activateProSubscription(result.order_id);
-        } else {
-            alert('Оплата отменена или не завершена');
+            if (!currentUser) {
+                alert('Подождите загрузку профиля');
+                return;
+            }
+            
+            if (currentUser.subscription_type === 'pro') {
+                alert('У вас уже активна Pro-подписка!');
+                return;
+            }
+            
+            const btn = event.target;
+            btn.textContent = ' Обработка...';
+            btn.disabled = true;
+            
+            try {
+                console.log('💳 Инициация оплаты через VK Pay...');
+                
+                const orderData = {
+                    action: 'pay-to-group',
+                    app_id: parseInt(appId),
+                    order_id: `order_${currentUser.id}_${Date.now()}`,
+                    amount: 29900,
+                    description: 'Pro-подписка на 1 месяц',
+                    currency: 'RUB',
+                    test_mode: 1
+                };
+                
+                console.log(' Отправка запроса в VK Pay:', orderData);
+                
+                const result = await vkBridge.send('VKWebAppShowOrderBox', orderData);
+                
+                console.log('✅ Результат оплаты:', result);
+                
+                if (result.status === 'success' || result.status === 'success_new') {
+                    await activateProSubscription(result.order_id);
+                } else {
+                    alert('Оплата отменена или не завершена');
+                }
+                
+            } catch (err) {
+                console.error('❌ Ошибка VK Pay:', err);
+                alert('Ошибка оплаты: ' + err.message);
+            }
+            
+            btn.textContent = ' Подключить VK Pay';
+            btn.disabled = false;
         }
-        
-    } catch (err) {
-        console.error('❌ Ошибка VK Pay:', err);
-        alert('Ошибка оплаты: ' + err.message);
-    }
-    
-    btn.textContent = ' Подключить VK Pay';
-    btn.disabled = false;
-}
 
-async function activateProSubscription(vkOrderId) {
-    console.log(' Активация Pro-подписки...');
-    
-    const proDuration = 30; // дней
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + proDuration);
-    
-    // 1. Обновляем статус пользователя на Pro
-    const { error: userError } = await supabaseClient
-        .from('users')
-        .update({ 
-            subscription_type: 'pro',
-            subscription_expires_at: expiresAt.toISOString()
-        })
-        .eq('id', currentUser.id);
-    
-    if (userError) {
-        console.error('❌ Ошибка обновления пользователя:', userError);
-        throw userError;
-    }
-    
-    // 2. Проверяем, есть ли партнер, который пригласил этого мастера
-    let partnerId = null;
-    let partnerAmount = 0;
-    
-    if (currentUser.invited_by_partner_id) {
-        partnerId = currentUser.invited_by_partner_id;
-        partnerAmount = 299 * 0.30; // 30% от 299 ₽ = 89.7 ₽
-        
-        console.log(`🤝 Начисление партнеру #${partnerId}: ${partnerAmount} ₽`);
-        
-        // 3. Начисляем баланс партнеру
-        const { data: partnerData } = await supabaseClient
-            .from('users')
-            .select('partner_balance')
-            .eq('id', partnerId)
-            .single();
-        
-        if (partnerData) {
-            const newBalance = (partnerData.partner_balance || 0) + partnerAmount;
+        async function activateProSubscription(vkOrderId) {
+            console.log(' Активация Pro-подписки...');
+            
+            const proDuration = 30;
+            const expiresAt = new Date();
+            expiresAt.setDate(expiresAt.getDate() + proDuration);
+            
+            const { error: userError } = await supabaseClient
+                .from('users')
+                .update({ 
+                    subscription_type: 'pro',
+                    subscription_expires_at: expiresAt.toISOString()
+                })
+                .eq('id', currentUser.id);
+            
+            if (userError) {
+                console.error('❌ Ошибка обновления пользователя:', userError);
+                throw userError;
+            }
+            
+            let partnerId = null;
+            let partnerAmount = 0;
+            
+            if (currentUser.invited_by_partner_id) {
+                partnerId = currentUser.invited_by_partner_id;
+                partnerAmount = 299 * 0.30;
+                
+                console.log(`🤝 Начисление партнеру #${partnerId}: ${partnerAmount} ₽`);
+                
+                const { data: partnerData } = await supabaseClient
+                    .from('users')
+                    .select('partner_balance')
+                    .eq('id', partnerId)
+                    .single();
+                
+                if (partnerData) {
+                    const newBalance = (partnerData.partner_balance || 0) + partnerAmount;
+                    
+                    await supabaseClient
+                        .from('users')
+                        .update({ partner_balance: newBalance })
+                        .eq('id', partnerId);
+                    
+                    console.log('✅ Баланс партнера обновлен:', newBalance);
+                }
+                
+                await supabaseClient
+                    .from('partner_earnings')
+                    .insert([{
+                        partner_id: partnerId,
+                        master_id: currentUser.id,
+                        amount: partnerAmount,
+                        source: 'subscription',
+                        description: `Pro-подписка мастера #${currentUser.id}`
+                    }]);
+            }
             
             await supabaseClient
-                .from('users')
-                .update({ partner_balance: newBalance })
-                .eq('id', partnerId);
+                .from('payments')
+                .insert([{
+                    user_id: currentUser.id,
+                    amount: 299,
+                    currency: 'RUB',
+                    status: 'completed',
+                    vk_order_id: vkOrderId,
+                    description: 'Pro-подписка на 1 месяц',
+                    partner_id: partnerId,
+                    partner_amount: partnerAmount,
+                    completed_at: new Date().toISOString()
+                }]);
             
-            console.log('✅ Баланс партнера обновлен:', newBalance);
+            currentUser.subscription_type = 'pro';
+            currentUser.subscription_expires_at = expiresAt.toISOString();
+            
+            alert(`✅ Pro-подписка активирована!\nДействует до: ${expiresAt.toLocaleDateString('ru-RU')}`);
+            
+            updateProfileUI();
+            await loadOrders();
         }
-        
-        // 4. Записываем начисление в earnings
-        await supabaseClient
-            .from('partner_earnings')
-            .insert([{
-                partner_id: partnerId,
-                master_id: currentUser.id,
-                amount: partnerAmount,
-                source: 'subscription',
-                description: `Pro-подписка мастера #${currentUser.id}`
-            }]);
-    }
-    
-    // 5. Записываем платеж в историю
-    await supabaseClient
-        .from('payments')
-        .insert([{
-            user_id: currentUser.id,
-            amount: 299,
-            currency: 'RUB',
-            status: 'completed',
-            vk_order_id: vkOrderId,
-            description: 'Pro-подписка на 1 месяц',
-            partner_id: partnerId,
-            partner_amount: partnerAmount,
-            completed_at: new Date().toISOString()
-        }]);
-    
-    // 6. Обновляем currentUser
-    currentUser.subscription_type = 'pro';
-    currentUser.subscription_expires_at = expiresAt.toISOString();
-    
-    alert(`✅ Pro-подписка активирована!\nДействует до: ${expiresAt.toLocaleDateString('ru-RU')}`);
-    
-    // 7. Обновляем интерфейс
-    updateProfileUI();
-    await loadOrders();
-}
 
         // ========== ПАРТНЕРСКАЯ ПРОГРАММА ==========
         function openPartnerApplicationModal() {
@@ -1465,7 +1768,7 @@ async function activateProSubscription(vkOrderId) {
             }
             
             const btn = event.target;
-            btn.textContent = ' Отправка...';
+            btn.textContent = '📤 Отправка...';
             btn.disabled = true;
             
             const { error } = await supabaseClient
@@ -1478,7 +1781,7 @@ async function activateProSubscription(vkOrderId) {
                 }]);
             
             if (error) {
-                alert('❌ Ошибка: ' + error.message);
+                alert(' Ошибка: ' + error.message);
                 btn.textContent = '📤 Отправить заявку';
                 btn.disabled = false;
             } else {
@@ -1580,7 +1883,7 @@ async function activateProSubscription(vkOrderId) {
             }
             
             const btn = event.target;
-            btn.textContent = ' Отправка...';
+            btn.textContent = '📤 Отправка...';
             btn.disabled = true;
             
             const { error } = await supabaseClient
@@ -1647,7 +1950,7 @@ async function activateProSubscription(vkOrderId) {
             
             const comment = document.getElementById('review-comment').value.trim();
             const btn = event.target;
-            btn.textContent = ' Отправка...';
+            btn.textContent = '📤 Отправка...';
             btn.disabled = true;
             
             try {
@@ -1663,7 +1966,6 @@ async function activateProSubscription(vkOrderId) {
                 
                 if (error) throw error;
                 
-                // Обновляем средний рейтинг мастера
                 const { data: reviews } = await supabaseClient
                     .from('reviews')
                     .select('rating')
@@ -1683,7 +1985,7 @@ async function activateProSubscription(vkOrderId) {
                 await loadResponses();
                 
             } catch (err) {
-                alert('Ошибка: ' + err.message);
+                alert('❌ Ошибка: ' + err.message);
                 btn.textContent = '✅ Отправить отзыв';
                 btn.disabled = false;
             }
@@ -1713,7 +2015,6 @@ async function activateProSubscription(vkOrderId) {
                 return;
             }
             
-            // Получаем имена авторов одним запросом
             const reviewerIds = [...new Set(reviews.map(r => r.reviewer_id))];
             const { data: users } = await supabaseClient
                 .from('users')
@@ -1746,7 +2047,7 @@ async function activateProSubscription(vkOrderId) {
         function updateProfileUI() {
             if (!currentUser) return;
             const firstLetter = currentUser.name.charAt(0).toUpperCase();
-            const roleText = currentUser.role === 'customer' ? ' Заказчик' : '👷 Мастер';
+            const roleText = currentUser.role === 'customer' ? '👤 Заказчик' : '👷 Мастер';
             const switchText = currentUser.role === 'customer' ? 'Стать мастером' : 'Стать заказчиком';
             
             let subscriptionBlock = '';
@@ -1819,307 +2120,249 @@ async function activateProSubscription(vkOrderId) {
             }
         }
 
-       function switchTab(tabName) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.getElementById(`tab-${tabName}`).classList.add('active');
-    
-    const navItems = document.querySelectorAll('.nav-item');
-    const tabs = ['home', 'order', 'responses', 'chat', 'profile'];
-    const idx = tabs.indexOf(tabName);
-    if (idx >= 0) navItems[idx].classList.add('active');
-    
-    // Загружаем данные для вкладок
-    if (tabName === 'responses') loadResponses();
-    if (tabName === 'chat') loadChatOrders();  // 🆕 Добавляем загрузку чатов
-}
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            
+            const navItems = document.querySelectorAll('.nav-item');
+            const tabs = ['home', 'order', 'responses', 'chat', 'profile'];
+            const idx = tabs.indexOf(tabName);
+            if (idx >= 0) navItems[idx].classList.add('active');
+            
+            if (tabName === 'responses') loadResponses();
+            if (tabName === 'chat') loadChatOrders();
+        }
 
-// Отправка заявки на сервер для публикации в группу ВК
-async function postOrderToServer(order) {
-    const SERVER_URL = 'https://moymaster-server.vercel.app';
-    
-    try {
-        console.log('📢 Отправка заявки на сервер:', order);
-        
-        const response = await fetch(`${SERVER_URL}/api/new-order`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                id: order.id,
-                title: order.title,
-                description: order.description,
-                budget: order.budget,
-                district: order.district,
-                category_id: order.category_id,
-                user_id: order.user_id
-            })
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            console.log('✅ Пост опубликован в группе ВК! ID поста:', result.post_id);
-        } else {
-            console.error('❌ Ошибка публикации:', result.error);
+        async function postOrderToServer(order) {
+            const SERVER_URL = 'https://moymaster-server.vercel.app';
+            
+            try {
+                console.log('📢 Отправка заявки на сервер:', order);
+                
+                const response = await fetch(`${SERVER_URL}/api/new-order`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id: order.id,
+                        title: order.title,
+                        description: order.description,
+                        budget: order.budget,
+                        district: order.district,
+                        category_id: order.category_id,
+                        user_id: order.user_id
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    console.log('✅ Пост опубликован в группе ВК! ID поста:', result.post_id);
+                } else {
+                    console.error('❌ Ошибка публикации:', result.error);
+                }
+            } catch (err) {
+                console.error('❌ Ошибка соединения с сервером:', err);
+            }
         }
-    } catch (err) {
-        console.error('❌ Ошибка соединения с сервером:', err);
-    }
-}
-        // Отправка уведомлений мастерам через сервер
-async function notifyMastersAboutNewOrder(order) {
-    console.log('📢 Отправка уведомлений мастерам о новой заявке...');
-    
-    try {
-        // Находим всех мастеров в этом районе
-        const { data: masters } = await supabaseClient
-            .from('users')
-            .select('vk_id')
-            .eq('role', 'master');
-        
-        if (!masters || masters.length === 0) {
-            console.log('Нет мастеров для уведомления');
-            return;
-        }
-        
-        console.log(`Найдено ${masters.length} мастеров для уведомления`);
-        
-        // Отправляем запрос на сервер
-        const SERVER_URL = 'https://moymaster-server.vercel.app';
-        
-        const response = await fetch(`${SERVER_URL}/api/send-notification`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                user_ids: masters.map(m => m.vk_id),
-                message: `🔨 Новая заявка в районе ${order.district}!\n\n${order.title}\n💰 Бюджет: ${order.budget || 'Договорная'}\n\nОткликнуться в приложении: https://vk.com/app${appId}`
-            })
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            console.log('✅ Уведомления отправлены!');
-        } else {
-            console.error(' Ошибка:', result.error);
-        }
-        
-    } catch (err) {
-        console.error('❌ Ошибка отправки уведомлений:', err);
-    }
-}
 
-        // Отправка уведомлений мастерам через сервер
-async function notifyMastersAboutNewOrder(order) {
-    console.log('📢 Отправка уведомлений мастерам о новой заявке...');
-    
-    try {
-        // Находим всех мастеров в этом районе
-        const { data: masters } = await supabaseClient
-            .from('users')
-            .select('vk_id')
-            .eq('role', 'master');
-        
-        if (!masters || masters.length === 0) {
-            console.log('Нет мастеров для уведомления');
-            return;
+        async function notifyMastersAboutNewOrder(order) {
+            console.log('📢 Отправка уведомлений мастерам о новой заявке...');
+            
+            try {
+                const { data: masters } = await supabaseClient
+                    .from('users')
+                    .select('vk_id')
+                    .eq('role', 'master');
+                
+                if (!masters || masters.length === 0) {
+                    console.log('Нет мастеров для уведомления');
+                    return;
+                }
+                
+                console.log(`Найдено ${masters.length} мастеров для уведомления`);
+                
+                const SERVER_URL = 'https://moymaster-server.vercel.app';
+                
+                const response = await fetch(`${SERVER_URL}/api/send-notification`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_ids: masters.map(m => m.vk_id),
+                        message: `🔨 Новая заявка в районе ${order.district}!\n\n${order.title}\n💰 Бюджет: ${order.budget || 'Договорная'}\n\nОткликнуться в приложении: https://vk.com/app${appId}`
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    console.log('✅ Уведомления отправлены!');
+                } else {
+                    console.error('❌ Ошибка:', result.error);
+                }
+                
+            } catch (err) {
+                console.error('❌ Ошибка отправки уведомлений:', err);
+            }
         }
-        
-        console.log(`Найдено ${masters.length} мастеров для уведомления`);
-        
-        // Отправляем запрос на сервер
-        const SERVER_URL = 'https://moymaster-server.vercel.app';
-        
-        const response = await fetch(`${SERVER_URL}/api/send-notification`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                user_ids: masters.map(m => m.vk_id),
-                message: `🔨 Новая заявка в районе ${order.district}!\n\n${order.title}\n💰 Бюджет: ${order.budget || 'Договорная'}\n\nОткликнуться в приложении: https://vk.com/app${appId}`
-            })
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            console.log('✅ Уведомления отправлены!');
-        } else {
-            console.error(' Ошибка:', result.error);
-        }
-        
-    } catch (err) {
-        console.error('❌ Ошибка отправки уведомлений:', err);
-    }
-}
-   // Переменные для чата
-let currentChatOrderId = null;
-let currentChatPartnerId = null;
-let messagesInterval = null;
 
-// Загрузка списка заявок для чата
-async function loadChatOrders() {
-    console.log('🔍 Загрузка списка заявок для чата...');
-    
-    if (!currentUser) {
-        console.log('❌ Пользователь не авторизован');
-        return;
-    }
-    
-    const container = document.getElementById('chat-orders-container');
-    
-    // Получаем ВСЕ заявки пользователя (и как заказчика, и как мастера)
-    const { data: orders } = await supabaseClient
-        .from('orders')
-        .select('*')
-        .or(`user_id.eq.${currentUser.id},assigned_master_id.eq.${currentUser.id}`)
-        .in('status', ['in_progress', 'completed'])  // Только активные и завершённые
-        .order('created_at', { ascending: false });
-    
-    if (!orders || orders.length === 0) {
-        container.innerHTML = '<div style="color: #888; padding: 20px; text-align: center;">Нет активных заявок</div>';
-        return;
-    }
-    
-    // Добавляем информацию о собеседнике
-    const ordersWithPartners = await Promise.all(orders.map(async order => {
-        const partnerId = order.user_id === currentUser.id 
-            ? order.assigned_master_id 
-            : order.user_id;
-        
-        if (!partnerId) {
-            return { ...order, partnerName: 'Нет собеседника', hasMessages: false };
-        }
-        
-        const { data: partner } = await supabaseClient
-            .from('users')
-            .select('name')
-            .eq('id', partnerId)
-            .single();
-        
-        // Проверяем, есть ли сообщения
-        const { data: messages } = await supabaseClient
-            .from('messages')
-            .select('id', { count: 'exact', head: true })
-            .eq('order_id', order.id);
-        
-        return { 
-            ...order, 
-            partnerName: partner?.name || 'Пользователь',
-            hasMessages: messages && messages.length > 0
-        };
-    }));
-    
-    container.innerHTML = ordersWithPartners.map(order => `
-        <div class="order-item" onclick="openChat(${order.id})" style="cursor: pointer; border-left: ${order.hasMessages ? '3px solid #0077FF' : '3px solid #ddd'}; padding-left: 12px;">
-            <div style="font-weight: bold;">${order.title}</div>
-            <div style="font-size: 13px; color: #888;">
-                ${order.partnerName} ${order.hasMessages ? '💬' : '📝 Нажмите, чтобы написать'}
-            </div>
-        </div>
-    `).join('');
-}
-
-// Открытие чата
-async function openChat(orderId) {
-    currentChatOrderId = orderId;
-    
-    const { data: order } = await supabaseClient
-        .from('orders')
-        .select('user_id, assigned_master_id, title')
-        .eq('id', orderId)
-        .single();
-    
-    // Определяем собеседника
-    currentChatPartnerId = order.user_id === currentUser.id 
-        ? order.assigned_master_id 
-        : order.user_id;
-    
-    // Показываем имя собеседника
-    const { data: partner } = await supabaseClient
-        .from('users')
-        .select('name')
-        .eq('id', currentChatPartnerId)
-        .single();
-    
-    document.getElementById('chat-partner-name').textContent = 
-        `С: ${partner?.name || 'Пользователь'} | Заявка: ${order.title}`;
-    
-    // Загружаем сообщения
-    await loadMessages();
-    
-    // Включаем автообновление
-    if (messagesInterval) clearInterval(messagesInterval);
-    messagesInterval = setInterval(loadMessages, 3000); // Обновление каждые 3 секунды
-}
-
-// Загрузка сообщений
-async function loadMessages() {
-    if (!currentChatOrderId) return;
-    
-    const container = document.getElementById('messages-container');
-    
-    const { data: messages } = await supabaseClient
-        .from('messages')
-        .select('*')
-        .eq('order_id', currentChatOrderId)
-        .order('created_at', { ascending: true });
-    
-    if (!messages || messages.length === 0) {
-        container.innerHTML = '<div style="text-align: center; color: #888; padding: 40px;">Нет сообщений</div>';
-        return;
-    }
-    
-    container.innerHTML = messages.map(msg => {
-        const isMe = msg.sender_id === currentUser.id;
-        const time = new Date(msg.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-        
-        return `
-            <div style="display: flex; justify-content: ${isMe ? 'flex-end' : 'flex-start'}; margin-bottom: 10px;">
-                <div style="background: ${isMe ? '#0077FF' : '#f0f2f5'}; 
-                            color: ${isMe ? 'white' : 'black'}; 
-                            padding: 10px 15px; 
-                            border-radius: 15px; 
-                            max-width: 70%;">
-                    <div>${msg.message}</div>
-                    <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">${time}</div>
+        // Загрузка списка заявок для чата
+        async function loadChatOrders() {
+            console.log('🔍 Загрузка списка заявок для чата...');
+            
+            if (!currentUser) {
+                console.log('❌ Пользователь не авторизован');
+                return;
+            }
+            
+            const container = document.getElementById('chat-orders-container');
+            
+            const { data: orders } = await supabaseClient
+                .from('orders')
+                .select('*')
+                .or(`user_id.eq.${currentUser.id},assigned_master_id.eq.${currentUser.id}`)
+                .in('status', ['in_progress', 'completed'])
+                .order('created_at', { ascending: false });
+            
+            if (!orders || orders.length === 0) {
+                container.innerHTML = '<div style="color: #888; padding: 20px; text-align: center;">Нет активных заявок</div>';
+                return;
+            }
+            
+            const ordersWithPartners = await Promise.all(orders.map(async order => {
+                const partnerId = order.user_id === currentUser.id 
+                    ? order.assigned_master_id 
+                    : order.user_id;
+                
+                if (!partnerId) {
+                    return { ...order, partnerName: 'Нет собеседника', hasMessages: false };
+                }
+                
+                const { data: partner } = await supabaseClient
+                    .from('users')
+                    .select('name')
+                    .eq('id', partnerId)
+                    .single();
+                
+                const { data: messages } = await supabaseClient
+                    .from('messages')
+                    .select('id', { count: 'exact', head: true })
+                    .eq('order_id', order.id);
+                
+                return { 
+                    ...order, 
+                    partnerName: partner?.name || 'Пользователь',
+                    hasMessages: messages && messages.length > 0
+                };
+            }));
+            
+            container.innerHTML = ordersWithPartners.map(order => `
+                <div class="order-item" onclick="openChat(${order.id})" style="cursor: pointer; border-left: ${order.hasMessages ? '3px solid #0077FF' : '3px solid #ddd'}; padding-left: 12px;">
+                    <div style="font-weight: bold;">${order.title}</div>
+                    <div style="font-size: 13px; color: #888;">
+                        ${order.partnerName} ${order.hasMessages ? '💬' : '📝 Нажмите, чтобы написать'}
+                    </div>
                 </div>
-            </div>
-        `;
-    }).join('');
-    
-    // Прокрутка вниз
-    container.scrollTop = container.scrollHeight;
-}
+            `).join('');
+        }
 
-// Отправка сообщения
-async function sendMessage() {
-    const input = document.getElementById('message-input');
-    const message = input.value.trim();
-    
-    if (!message || !currentChatOrderId || !currentChatPartnerId) {
-        alert('Введите сообщение');
-        return;
-    }
-    
-    const { error } = await supabaseClient
-        .from('messages')
-        .insert([{
-            order_id: currentChatOrderId,
-            sender_id: currentUser.id,
-            receiver_id: currentChatPartnerId,
-            message: message
-        }]);
-    
-    if (error) {
-        alert('Ошибка отправки: ' + error.message);
-    } else {
-        input.value = '';
-        await loadMessages();
-    }
-}
-     
+        // Открытие чата
+        async function openChat(orderId) {
+            currentChatOrderId = orderId;
+            
+            const { data: order } = await supabaseClient
+                .from('orders')
+                .select('user_id, assigned_master_id, title')
+                .eq('id', orderId)
+                .single();
+            
+            currentChatPartnerId = order.user_id === currentUser.id 
+                ? order.assigned_master_id 
+                : order.user_id;
+            
+            const { data: partner } = await supabaseClient
+                .from('users')
+                .select('name')
+                .eq('id', currentChatPartnerId)
+                .single();
+            
+            document.getElementById('chat-partner-name').textContent = 
+                `С: ${partner?.name || 'Пользователь'} | Заявка: ${order.title}`;
+            
+            await loadMessages();
+            
+            if (messagesInterval) clearInterval(messagesInterval);
+            messagesInterval = setInterval(loadMessages, 3000);
+        }
+
+        // Загрузка сообщений
+        async function loadMessages() {
+            if (!currentChatOrderId) return;
+            
+            const container = document.getElementById('messages-container');
+            
+            const { data: messages } = await supabaseClient
+                .from('messages')
+                .select('*')
+                .eq('order_id', currentChatOrderId)
+                .order('created_at', { ascending: true });
+            
+            if (!messages || messages.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #888; padding: 40px;">Нет сообщений</div>';
+                return;
+            }
+            
+            container.innerHTML = messages.map(msg => {
+                const isMe = msg.sender_id === currentUser.id;
+                const time = new Date(msg.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+                
+                return `
+                    <div style="display: flex; justify-content: ${isMe ? 'flex-end' : 'flex-start'}; margin-bottom: 10px;">
+                        <div style="background: ${isMe ? '#0077FF' : '#f0f2f5'}; 
+                                    color: ${isMe ? 'white' : 'black'}; 
+                                    padding: 10px 15px; 
+                                    border-radius: 15px; 
+                                    max-width: 70%;">
+                            <div>${msg.message}</div>
+                            <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">${time}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Отправка сообщения
+        async function sendMessage() {
+            const input = document.getElementById('message-input');
+            const message = input.value.trim();
+            
+            if (!message || !currentChatOrderId || !currentChatPartnerId) {
+                alert('Введите сообщение');
+                return;
+            }
+            
+            const { error } = await supabaseClient
+                .from('messages')
+                .insert([{
+                    order_id: currentChatOrderId,
+                    sender_id: currentUser.id,
+                    receiver_id: currentChatPartnerId,
+                    message: message
+                }]);
+            
+            if (error) {
+                alert('❌ Ошибка отправки: ' + error.message);
+            } else {
+                input.value = '';
+                await loadMessages();
+            }
+        }
+        
         initApp();
     </script>
 </body>
+</html>
