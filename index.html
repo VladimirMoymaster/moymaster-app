@@ -466,11 +466,43 @@
         </div>
     </div>
 
+    <!-- ЧАТ -->
+<div id="tab-chat" class="tab">
+    <div class="container" style="padding: 0;">
+        <div class="card" style="margin: 0; border-radius: 0; box-shadow: none;">
+            <div style="padding: 15px; border-bottom: 1px solid #eee;">
+                <h3 style="margin: 0;">💬 Чат</h3>
+                <div id="chat-partner-name" style="font-size: 14px; color: #888; margin-top: 5px;"></div>
+            </div>
+            
+            <!-- Список сообщений -->
+            <div id="messages-container" style="height: 400px; overflow-y: auto; padding: 15px;">
+                <div style="text-align: center; color: #888; padding: 40px;">
+                    Выберите заявку для начала общения
+                </div>
+            </div>
+            
+            <!-- Поле ввода -->
+            <div style="padding: 15px; border-top: 1px solid #eee; display: flex; gap: 10px;">
+                <input type="text" id="message-input" placeholder="Введите сообщение..." style="flex: 1; margin: 0;">
+                <button class="btn" style="width: auto; margin: 0;" onclick="sendMessage()">📤</button>
+            </div>
+        </div>
+        
+        <!-- Список заявок с чатами -->
+        <div id="chat-orders-list" style="padding: 15px;">
+            <h3>Заявки с активными чатами</h3>
+            <div id="chat-orders-container"></div>
+        </div>
+    </div>
+</div>
+
     <!-- НАВИГАЦИЯ -->
     <div class="nav">
         <div class="nav-item active" onclick="switchTab('home')"><span class="nav-icon"></span>Главная</div>
         <div class="nav-item" onclick="switchTab('order')"><span class="nav-icon">➕</span>Заявка</div>
         <div class="nav-item" onclick="switchTab('responses')"><span class="nav-icon">💬</span>Отклики</div>
+        <div class="nav-item" onclick="switchTab('chat')"><span class="nav-icon">💭</span>Чат</div>
         <div class="nav-item" onclick="switchTab('profile')"><span class="nav-icon">👤</span>Профиль</div>
     </div>
 
@@ -1939,7 +1971,147 @@ async function notifyMastersAboutNewOrder(order) {
         console.error('❌ Ошибка отправки уведомлений:', err);
     }
 }
+   // Переменные для чата
+let currentChatOrderId = null;
+let currentChatPartnerId = null;
+let messagesInterval = null;
+
+// Загрузка списка заявок для чата
+async function loadChatOrders() {
+    if (!currentUser) return;
+    
+    const container = document.getElementById('chat-orders-container');
+    
+    // Получаем заявки, где есть сообщения
+    const { data: messages } = await supabaseClient
+        .from('messages')
+        .select('order_id')
+        .or(`sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`);
+    
+    if (!messages || messages.length === 0) {
+        container.innerHTML = '<div style="color: #888; padding: 20px; text-align: center;">Нет активных чатов</div>';
+        return;
+    }
+    
+    const orderIds = [...new Set(messages.map(m => m.order_id))];
+    
+    const { data: orders } = await supabaseClient
+        .from('orders')
+        .select('*')
+        .in('id', orderIds);
+    
+    if (!orders || orders.length === 0) {
+        container.innerHTML = '<div style="color: #888; padding: 20px; text-align: center;">Нет активных чатов</div>';
+        return;
+    }
+    
+    container.innerHTML = orders.map(order => `
+        <div class="order-item" onclick="openChat(${order.id})" style="cursor: pointer;">
+            <div style="font-weight: bold;">${order.title}</div>
+            <div style="font-size: 13px; color: #888;">Нажмите, чтобы открыть чат</div>
+        </div>
+    `).join('');
+}
+
+// Открытие чата
+async function openChat(orderId) {
+    currentChatOrderId = orderId;
+    
+    const { data: order } = await supabaseClient
+        .from('orders')
+        .select('user_id, assigned_master_id, title')
+        .eq('id', orderId)
+        .single();
+    
+    // Определяем собеседника
+    currentChatPartnerId = order.user_id === currentUser.id 
+        ? order.assigned_master_id 
+        : order.user_id;
+    
+    // Показываем имя собеседника
+    const { data: partner } = await supabaseClient
+        .from('users')
+        .select('name')
+        .eq('id', currentChatPartnerId)
+        .single();
+    
+    document.getElementById('chat-partner-name').textContent = 
+        `С: ${partner?.name || 'Пользователь'} | Заявка: ${order.title}`;
+    
+    // Загружаем сообщения
+    await loadMessages();
+    
+    // Включаем автообновление
+    if (messagesInterval) clearInterval(messagesInterval);
+    messagesInterval = setInterval(loadMessages, 3000); // Обновление каждые 3 секунды
+}
+
+// Загрузка сообщений
+async function loadMessages() {
+    if (!currentChatOrderId) return;
+    
+    const container = document.getElementById('messages-container');
+    
+    const { data: messages } = await supabaseClient
+        .from('messages')
+        .select('*')
+        .eq('order_id', currentChatOrderId)
+        .order('created_at', { ascending: true });
+    
+    if (!messages || messages.length === 0) {
+        container.innerHTML = '<div style="text-align: center; color: #888; padding: 40px;">Нет сообщений</div>';
+        return;
+    }
+    
+    container.innerHTML = messages.map(msg => {
+        const isMe = msg.sender_id === currentUser.id;
+        const time = new Date(msg.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
         
+        return `
+            <div style="display: flex; justify-content: ${isMe ? 'flex-end' : 'flex-start'}; margin-bottom: 10px;">
+                <div style="background: ${isMe ? '#0077FF' : '#f0f2f5'}; 
+                            color: ${isMe ? 'white' : 'black'}; 
+                            padding: 10px 15px; 
+                            border-radius: 15px; 
+                            max-width: 70%;">
+                    <div>${msg.message}</div>
+                    <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">${time}</div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    // Прокрутка вниз
+    container.scrollTop = container.scrollHeight;
+}
+
+// Отправка сообщения
+async function sendMessage() {
+    const input = document.getElementById('message-input');
+    const message = input.value.trim();
+    
+    if (!message || !currentChatOrderId || !currentChatPartnerId) {
+        alert('Введите сообщение');
+        return;
+    }
+    
+    const { error } = await supabaseClient
+        .from('messages')
+        .insert([{
+            order_id: currentChatOrderId,
+            sender_id: currentUser.id,
+            receiver_id: currentChatPartnerId,
+            message: message
+        }]);
+    
+    if (error) {
+        alert('Ошибка отправки: ' + error.message);
+    } else {
+        input.value = '';
+        await loadMessages();
+    }
+}
+     
         initApp();
     </script>
 </body>
