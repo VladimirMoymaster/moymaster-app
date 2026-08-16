@@ -1588,95 +1588,51 @@ async function loadReviewStatus() {
 }
 
         function renderOrders() {
-            const container = document.getElementById('orders-list');
+    const container = document.getElementById('orders-list');
+    const filteredOrders = currentDistrictFilter === 'all' ? allOrders : allOrders.filter(o => o.district === currentDistrictFilter);
 
-            const filteredOrders = currentDistrictFilter === 'all' ?
-                allOrders :
-                allOrders.filter(o => o.district === currentDistrictFilter);
+    if (filteredOrders.length === 0) {
+        container.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>В этом районе заявок пока нет</p></div>`;
+        return;
+    }
 
-            if (filteredOrders.length === 0) {
-                container.innerHTML =
-                    `<div class="empty-state"><i class="fas fa-inbox"></i><p>В этом районе заявок пока нет</p></div>`;
-                return;
+    container.innerHTML = filteredOrders.map(order => {
+        const cat = categoriesCache.find(c => c.id === order.category_id);
+        const statusClass = order.status === 'open' ? 'open' : order.status === 'in_progress' ? 'in_progress' : 'completed';
+        const statusText = order.status === 'open' ? 'Открыта' : order.status === 'in_progress' ? 'В работе' : 'Завершена';
+        const isOwnOrder = currentUser && order.user_id === currentUser.id;
+        let responseBtn = '';
+
+        if (currentUser?.role === 'master' && order.status === 'open' && !isOwnOrder) {
+            const isPro = currentUser.subscription_type === 'pro';
+            const limitReached = !isPro && todayResponsesCount >= DAILY_RESPONSE_LIMIT;
+            if (limitReached) {
+                responseBtn = `<div class="limit-warning"><i class="fas fa-exclamation-triangle"></i> Лимит исчерпан</div><button class="btn btn-pro" onclick="buyPro()">⭐ Оформить Pro</button>`;
+            } else {
+                responseBtn = `<button class="btn btn-success" onclick="showResponseForm(${order.id})"><i class="fas fa-hand-paper"></i> Откликнуться</button>`;
             }
-
-            container.innerHTML = filteredOrders.map(order => {
-                const cat = categoriesCache.find(c => c.id === order.category_id);
-                const statusClass = order.status === 'open' ? 'open' :
-                    order.status === 'in_progress' ? 'in_progress' : 'completed';
-                const statusText = order.status === 'open' ? 'Открыта' :
-                    order.status === 'in_progress' ? 'В работе' : 'Завершена';
-
-                const isOwnOrder = currentUser && order.user_id === currentUser.id;
-
-                let responseBtn = '';
-
-                if (currentUser?.role === 'master' && order.status === 'open' && !isOwnOrder) {
-                    const isPro = currentUser.subscription_type === 'pro';
-                    const limitReached = !isPro && todayResponsesCount >= DAILY_RESPONSE_LIMIT;
-
-                    if (limitReached) {
-                        responseBtn = `
-                            <div class="limit-warning"><i class="fas fa-exclamation-triangle"></i> Лимит исчерпан</div>
-                            <button class="btn btn-pro" onclick="buyPro()">⭐ Оформить Pro</button>
-                        `;
-                    } else {
-                        responseBtn =
-                            `<button class="btn btn-success" onclick="showResponseForm(${order.id})"><i class="fas fa-hand-paper"></i> Откликнуться</button>`;
-                    }
-                } else if (isOwnOrder) {
-                    if (order.awaiting_confirmation) {
-                        const createdAt = new Date(order.created_at);
-                        const autoCompleteDate = new Date(createdAt.getTime() + AUTO_COMPLETE_DAYS * 24 * 60 * 60 *
-                        1000);
-                        const daysLeft = Math.ceil((autoCompleteDate - new Date()) / (1000 * 60 * 60 * 24));
-
-                        responseBtn = `
-                            <div class="confirmation-banner"><i class="fas fa-info-circle"></i> Мастер отметил работу выполненной</div>
-                            <div class="auto-complete-timer">⏰ Автоподтверждение через ${daysLeft} дн.</div>
-                            <div style="display:flex; gap:8px; margin-top:8px;">
-                                <button class="btn btn-success btn-sm" onclick="confirmCompletion(${order.id})" id="confirm-btn-${order.id}"><i class="fas fa-check"></i> Подтвердить</button>
-                                <button class="btn btn-danger btn-sm" onclick="rejectCompletion(${order.id})" id="reject-btn-${order.id}"><i class="fas fa-times"></i> Отклонить</button>
-                            </div>
-                        `;
-                        else if (order.status === 'completed' && !ordersWithReviews.has(order.id)) {
-    responseBtn = `<button class="btn btn-warning" onclick="openReviewModal(${order.id}, ${order.assigned_master_id})"><i class="fas fa-star"></i> Оставить отзыв</button>`;
-} else if (order.status === 'completed' && ordersWithReviews.has(order.id)) {
-    responseBtn = `<div style="font-size:13px; color:var(--success); font-weight:600; margin-top:10px;"><i class="fas fa-check-circle"></i> Отзыв оставлен</div>`;
-}
-                    } else {
-                        responseBtn =
-                            `<div style="font-size:13px; color:var(--text-muted);"><i class="fas fa-tag"></i> Ваша заявка</div>`;
-                    }
-                }
-
-                let photosHtml = '';
-                if (order.photos && Array.isArray(order.photos) && order.photos.length > 0) {
-                    photosHtml = `<div class="order-photos">${order.photos.map(p => 
-                        `<img src="${p}" onclick="window.open('${p}')">`
-                    ).join('')}</div>`;
-                }
-
-                return `
-                    <div class="order-card">
-                        <div class="order-top">
-                            <span class="badge">${cat?.name || 'Без категории'}</span>
-                            ${order.district ? `<span class="badge badge-district"><i class="fas fa-map-pin"></i> ${order.district}</span>` : ''}
-                            <span class="status-badge ${statusClass}">${statusText}</span>
-                        </div>
-                        <div class="order-title">${order.title}</div>
-                        ${order.description ? `<div class="order-desc">${order.description}</div>` : ''}
-                        ${photosHtml}
-                        <div class="order-footer">
-                            <span class="order-price">${order.budget ? order.budget + ' ₽' : 'Договорная'}</span>
-                            <span class="order-id">ID: ${order.id}</span>
-                        </div>
-                        <div id="response-form-${order.id}"></div>
-                        ${responseBtn}
-                    </div>
-                `;
-            }).join('');
+        } else if (isOwnOrder) {
+            if (order.awaiting_confirmation) {
+                const createdAt = new Date(order.created_at);
+                const daysLeft = Math.ceil((new Date(createdAt.getTime() + AUTO_COMPLETE_DAYS * 24 * 60 * 60 * 1000) - new Date()) / (1000 * 60 * 60 * 24));
+                responseBtn = `<div class="confirmation-banner"><i class="fas fa-info-circle"></i> Мастер отметил работу выполненной</div><div class="auto-complete-timer">⏰ Автоподтверждение через ${daysLeft} дн.</div><div style="display:flex; gap:8px; margin-top:8px;"><button class="btn btn-success btn-sm" onclick="confirmCompletion(${order.id})" id="confirm-btn-${order.id}"><i class="fas fa-check"></i> Подтвердить</button><button class="btn btn-danger btn-sm" onclick="rejectCompletion(${order.id})" id="reject-btn-${order.id}"><i class="fas fa-times"></i> Отклонить</button></div>`;
+            } else if (order.status === 'completed' && !ordersWithReviews.has(order.id)) {
+                responseBtn = `<button class="btn btn-warning" onclick="openReviewModal(${order.id}, ${order.assigned_master_id})"><i class="fas fa-star"></i> Оставить отзыв</button>`;
+            } else if (order.status === 'completed' && ordersWithReviews.has(order.id)) {
+                responseBtn = `<div style="font-size:13px; color:var(--success); font-weight:600; margin-top:10px;"><i class="fas fa-check-circle"></i> Отзыв оставлен</div>`;
+            } else {
+                responseBtn = `<div style="font-size:13px; color:var(--text-muted);"><i class="fas fa-tag"></i> Ваша заявка</div>`;
+            }
         }
+
+        let photosHtml = '';
+        if (order.photos && Array.isArray(order.photos) && order.photos.length > 0) {
+            photosHtml = `<div class="order-photos">${order.photos.map(p => `<img src="${p}" onclick="window.open('${p}')">`).join('')}</div>`;
+        }
+
+        return `<div class="order-card"><div class="order-top"><span class="badge">${cat?.name || 'Без категории'}</span>${order.district ? `<span class="badge badge-district"><i class="fas fa-map-pin"></i> ${order.district}</span>` : ''}<span class="status-badge ${statusClass}">${statusText}</span></div><div class="order-title">${order.title}</div>${order.description ? `<div class="order-desc">${order.description}</div>` : ''}${photosHtml}<div class="order-footer"><span class="order-price">${order.budget ? order.budget + ' ₽' : 'Договорная'}</span><span class="order-id">ID: ${order.id}</span></div><div id="response-form-${order.id}"></div>${responseBtn}</div>`;
+    }).join('');
+}
 
         function showResponseForm(orderId) {
             const formContainer = document.getElementById(`response-form-${orderId}`);
