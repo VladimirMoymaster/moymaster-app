@@ -1278,6 +1278,12 @@
         </div>
     </div>
 
+    <div id="loading-screen" style="position:fixed; top:0; left:0; right:0; bottom:0; background:var(--bg); display:flex; align-items:center; justify-content:center; flex-direction:column; z-index:9999;">
+    <div style="font-size:24px; margin-bottom:20px;">🔨</div>
+    <div style="font-size:18px; color:var(--text); margin-bottom:10px;">Загрузка приложения...</div>
+    <div style="font-size:14px; color:var(--text-muted);">Пожалуйста, подождите</div>
+</div>
+
     <!-- ===== SCRIPTS (unchanged) ===== -->
     <script>
         const SUPABASE_URL = 'https://kmjuddmhvlccrbyyfcce.supabase.co';
@@ -1408,6 +1414,13 @@
         console.log('️ Переход в тестовый режим...');
         await loadOrCreateUser(999999, 'Тестовый Пользователь');
     }
+            // Скрываем экран загрузки
+    setTimeout(() => {
+        const loadingScreen = document.getElementById('loading-screen');
+        if (loadingScreen) {
+            loadingScreen.style.display = 'none';
+        }
+    }, 500);
 }
         async function loadOrCreateUser(vkId, name) {
             try {
