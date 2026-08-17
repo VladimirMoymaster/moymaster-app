@@ -6,6 +6,14 @@
     <title>Мой Мастер</title>
     <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js">
     </script>
+    <script>
+    if (typeof vkBridge === 'undefined') {
+        console.error(' VK Bridge не загрузился!');
+        window.vkBridge = {
+            send: async () => { throw new Error('VK Bridge недоступен'); }
+        };
+    }
+</script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -1385,12 +1393,25 @@
             uploadedPhotos.splice(idx, 1);
             renderPhotoPreview();
         }
-       async function initApp() {
+      async function initApp() {
     console.log('🚀 Запуск приложения...');
     
+    // Скрываем экран загрузки через 3 секунды, даже если что-то пошло не так
+    const hideLoading = setTimeout(() => {
+        const loadingScreen = document.getElementById('loading-screen');
+        if (loadingScreen) loadingScreen.style.display = 'none';
+    }, 3000);
+    
     try {
+        // Пробуем инициализировать VK Bridge с таймаутом
         console.log(' Инициализация VK Bridge...');
-        await vkBridge.send('VKWebAppInit');
+        
+        const initPromise = vkBridge.send('VKWebAppInit');
+        const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Таймаут инициализации')), 5000)
+        );
+        
+        await Promise.race([initPromise, timeoutPromise]);
         console.log('✅ VK Bridge инициализирован');
         
         try {
@@ -1400,7 +1421,7 @@
                 console.log('✅ App ID:', appId);
             }
         } catch (err) {
-            console.log('⚠️ Не удалось получить app_id:', err.message);
+            console.log('⚠️ Не удалось получить app_id');
         }
         
         console.log('👤 Получение данных пользователя...');
@@ -1410,17 +1431,14 @@
         await loadOrCreateUser(userData.id, `${userData.first_name} ${userData.last_name}`.trim());
         
     } catch (err) {
-        console.error(' Ошибка инициализации:', err);
-        console.log('️ Переход в тестовый режим...');
+        console.error('❌ Ошибка инициализации:', err);
+        console.log('⚠️ Переход в тестовый режим...');
         await loadOrCreateUser(999999, 'Тестовый Пользователь');
-    }
-            // Скрываем экран загрузки
-    setTimeout(() => {
+    } finally {
+        clearTimeout(hideLoading);
         const loadingScreen = document.getElementById('loading-screen');
-        if (loadingScreen) {
-            loadingScreen.style.display = 'none';
-        }
-    }, 500);
+        if (loadingScreen) loadingScreen.style.display = 'none';
+    }
 }
         async function loadOrCreateUser(vkId, name) {
             try {
