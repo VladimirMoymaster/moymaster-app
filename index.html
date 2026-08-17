@@ -1,23 +1,21 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Мой Мастер</title>
+    
+    <!-- VK Bridge -->
     <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js">
     </script>
-    <script>
-    if (typeof vkBridge === 'undefined') {
-        console.error(' VK Bridge не загрузился!');
-        window.vkBridge = {
-            send: async () => { throw new Error('VK Bridge недоступен'); }
-        };
-    }
-</script>
+    
+    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
     </script>
+    
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
     <style>
         /* ===== RESET & BASE ===== */
         * {
@@ -61,6 +59,41 @@
             padding-bottom: calc(var(--nav-height) + var(--safe-bottom) + 12px);
             padding-top: 0;
             overflow-x: hidden;
+        }
+
+        /* ===== LOADING SCREEN ===== */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 9999;
+            transition: opacity 0.5s;
+        }
+
+        #loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loader-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         /* ===== APP CONTAINER ===== */
@@ -191,6 +224,7 @@
             color: var(--text-secondary);
             transition: all 0.15s;
             border: 1px solid transparent;
+            cursor: pointer;
         }
 
         .chip.active {
@@ -1000,6 +1034,13 @@
 </head>
 <body>
 
+    <!-- ===== LOADING SCREEN ===== -->
+    <div id="loading-screen">
+        <div class="loader-spinner"></div>
+        <div style="font-size:18px; color:var(--text); margin-bottom:10px;">🔨 Загрузка приложения...</div>
+        <div style="font-size:14px; color:var(--text-muted);">Пожалуйста, подождите</div>
+    </div>
+
     <!-- ===== HEADER ===== -->
     <header class="app-header">
         <div class="app-header-inner">
@@ -1287,14 +1328,57 @@
         </div>
     </div>
 
-    <div id="loading-screen" style="position:fixed; top:0; left:0; right:0; bottom:0; background:var(--bg); display:flex; align-items:center; justify-content:center; flex-direction:column; z-index:9999;">
-    <div style="font-size:24px; margin-bottom:20px;">🔨</div>
-    <div style="font-size:18px; color:var(--text); margin-bottom:10px;">Загрузка приложения...</div>
-    <div style="font-size:14px; color:var(--text-muted);">Пожалуйста, подождите</div>
-</div>
-
-    <!-- ===== SCRIPTS (unchanged) ===== -->
+    <!-- ===== SCRIPTS ===== -->
     <script>
+        // ===== FALLBACK ДЛЯ VK BRIDGE (ПК) =====
+        (function() {
+            if (typeof vkBridge === 'undefined') {
+                console.warn('⚠️ VK Bridge не загружен, создаем fallback для ПК');
+                window.vkBridge = {
+                    send: async function(method, params) {
+                        console.log(`📱 VK Bridge fallback: ${method}`, params || '');
+                        
+                        switch(method) {
+                            case 'VKWebAppInit':
+                                return { status: 'success' };
+                                
+                            case 'VKWebAppGetUserInfo':
+                                return { 
+                                    id: 999999, 
+                                    first_name: 'Тестовый', 
+                                    last_name: 'Пользователь' 
+                                };
+                                
+                            case 'VKWebAppGetLaunchParams':
+                                return { app_id: 'test_app' };
+                                
+                            case 'VKWebAppShare':
+                                alert('📤 Поделиться: ' + params.link);
+                                return { status: 'success' };
+                                
+                            case 'VKWebAppShowOrderBox':
+                                console.log('💳 Тестовый режим оплаты:', params);
+                                if (params.test_mode === 1) {
+                                    alert('💳 Тестовый режим: оплата прошла успешно!');
+                                    return { 
+                                        status: 'success', 
+                                        order_id: `test_order_${Date.now()}` 
+                                    };
+                                }
+                                throw new Error('VK Pay недоступен на ПК');
+                                
+                            default:
+                                throw new Error(`Метод ${method} не поддерживается на ПК`);
+                        }
+                    }
+                };
+                console.log('✅ Fallback для VK Bridge установлен');
+            } else {
+                console.log('✅ VK Bridge обнаружен');
+            }
+        })();
+
+        // ===== КОНСТАНТЫ =====
         const SUPABASE_URL = 'https://kmjuddmhvlccrbyyfcce.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttanVkZG1odmxjY3JieXlmY2NlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2Mjc5ODcsImV4cCI6MjEwMjIwMzk4N30.PhJxMFSRlF9tmUuvOLH-JC9Tn-9kAgQ11XEg69eJZ6c';
 
@@ -1305,6 +1389,7 @@
         const MIN_WITHDRAW = 1000;
         const AUTO_COMPLETE_DAYS = 3;
 
+        // ===== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ =====
         let currentUser = null;
         let categoriesCache = [];
         let allOrders = [];
@@ -1318,13 +1403,69 @@
         let currentReviewOrderId = null;
         let currentReviewMasterId = null;
         let ordersWithReviews = new Set();
-
         let currentChatOrderId = null;
         let currentChatPartnerId = null;
         let messagesInterval = null;
 
-        console.log('🚀 Запуск...');
+        console.log('🚀 Запуск приложения...');
 
+        // ===== ФУНКЦИЯ ИНИЦИАЛИЗАЦИИ =====
+        async function initApp() {
+            console.log('🚀 Инициализация...');
+            console.log('🌐 Окружение:', typeof vkBridge !== 'undefined' ? 'VK Bridge' : 'Без VK');
+            
+            const loadingScreen = document.getElementById('loading-screen');
+            
+            try {
+                console.log('📱 Инициализация VK Bridge...');
+                
+                // Пробуем инициализировать с таймаутом
+                const initPromise = vkBridge.send('VKWebAppInit');
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Таймаут VK Bridge')), 3000)
+                );
+                
+                await Promise.race([initPromise, timeoutPromise]);
+                console.log('✅ VK Bridge инициализирован');
+                
+                // Получаем параметры запуска
+                try {
+                    const launchParams = await vkBridge.send('VKWebAppGetLaunchParams');
+                    if (launchParams?.app_id) {
+                        appId = launchParams.app_id;
+                        console.log('✅ App ID:', appId);
+                    }
+                } catch (err) {
+                    console.warn('⚠️ Не удалось получить app_id:', err.message);
+                }
+                
+                // Получаем данные пользователя
+                console.log('👤 Получение данных пользователя...');
+                const userData = await vkBridge.send('VKWebAppGetUserInfo');
+                console.log('✅ Пользователь:', userData);
+                
+                await loadOrCreateUser(
+                    userData.id, 
+                    `${userData.first_name} ${userData.last_name}`.trim()
+                );
+                
+            } catch (err) {
+                console.error('❌ Ошибка инициализации:', err);
+                console.log('⚠️ Переход в тестовый режим...');
+                await loadOrCreateUser(999999, 'Тестовый Пользователь');
+            } finally {
+                // Скрываем экран загрузки
+                if (loadingScreen) {
+                    loadingScreen.classList.add('hidden');
+                    setTimeout(() => {
+                        loadingScreen.style.display = 'none';
+                    }, 500);
+                }
+                console.log('✅ Загрузка завершена');
+            }
+        }
+
+        // ===== ОСТАЛЬНЫЕ ФУНКЦИИ =====
         async function uploadPhotos() {
             console.log('📸 Попытка загрузки фото...');
 
@@ -1394,53 +1535,7 @@
             uploadedPhotos.splice(idx, 1);
             renderPhotoPreview();
         }
-      async function initApp() {
-    console.log('🚀 Запуск приложения...');
-    
-    // Скрываем экран загрузки через 3 секунды, даже если что-то пошло не так
-    const hideLoading = setTimeout(() => {
-        const loadingScreen = document.getElementById('loading-screen');
-        if (loadingScreen) loadingScreen.style.display = 'none';
-    }, 3000);
-    
-    try {
-        // Пробуем инициализировать VK Bridge с таймаутом
-        console.log(' Инициализация VK Bridge...');
-        
-        const initPromise = vkBridge.send('VKWebAppInit');
-        const timeoutPromise = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Таймаут инициализации')), 5000)
-        );
-        
-        await Promise.race([initPromise, timeoutPromise]);
-        console.log('✅ VK Bridge инициализирован');
-        
-        try {
-            const launchParams = await vkBridge.send('VKWebAppGetLaunchParams');
-            if (launchParams.app_id) {
-                appId = launchParams.app_id;
-                console.log('✅ App ID:', appId);
-            }
-        } catch (err) {
-            console.log('⚠️ Не удалось получить app_id');
-        }
-        
-        console.log('👤 Получение данных пользователя...');
-        const userData = await vkBridge.send('VKWebAppGetUserInfo');
-        console.log('✅ Пользователь:', userData);
-        
-        await loadOrCreateUser(userData.id, `${userData.first_name} ${userData.last_name}`.trim());
-        
-    } catch (err) {
-        console.error('❌ Ошибка инициализации:', err);
-        console.log('⚠️ Переход в тестовый режим...');
-        await loadOrCreateUser(999999, 'Тестовый Пользователь');
-    } finally {
-        clearTimeout(hideLoading);
-        const loadingScreen = document.getElementById('loading-screen');
-        if (loadingScreen) loadingScreen.style.display = 'none';
-    }
-}
+
         async function loadOrCreateUser(vkId, name) {
             try {
                 let { data: users } = await supabaseClient
@@ -1564,139 +1659,144 @@
             element.classList.add('active');
             renderOrders();
         }
-        
+
         function filterByCategory(categoryId, element) {
-    currentCategoryFilter = categoryId;
-    document.querySelectorAll('#categories-list .chip').forEach(c => c.classList.remove('active'));
-    element.classList.add('active');
-    renderOrders();
-}
+            currentCategoryFilter = categoryId;
+            document.querySelectorAll('#categories-list .chip').forEach(c => c.classList.remove('active'));
+            element.classList.add('active');
+            renderOrders();
+        }
+
         async function loadCategories() {
-    const { data, error } = await supabaseClient
-        .from('categories')
-        .select('*')
-        .order('sort_order', { ascending: true });
+            const { data, error } = await supabaseClient
+                .from('categories')
+                .select('*')
+                .order('sort_order', { ascending: true });
 
-    const container = document.getElementById('categories-list');
-    const select = document.getElementById('order-category');
-    
-    if (error || !data) {
-        container.innerHTML = '<div class="error">Ошибка загрузки</div>';
-        return;
-    }
+            const container = document.getElementById('categories-list');
+            const select = document.getElementById('order-category');
 
-    categoriesCache = data;
-    
-    // Добавляем кнопку "Все категории"
-    let html = `<span class="chip active" onclick="filterByCategory('all', this)">Все</span>`;
-    data.forEach(c => {
-        html += `<span class="chip" onclick="filterByCategory(${c.id}, this)">${c.name}</span>`;
-    });
-    container.innerHTML = html;
-    
-    select.innerHTML = '<option value="">Выберите категорию</option>' + 
-        data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-}
-        
+            if (error || !data) {
+                container.innerHTML = '<div class="error">Ошибка загрузки</div>';
+                return;
+            }
+
+            categoriesCache = data;
+
+            let html = `<span class="chip active" onclick="filterByCategory('all', this)">Все</span>`;
+            data.forEach(c => {
+                html += `<span class="chip" onclick="filterByCategory(${c.id}, this)">${c.name}</span>`;
+            });
+            container.innerHTML = html;
+
+            select.innerHTML = '<option value="">Выберите категорию</option>' +
+                data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        }
+
         async function loadOrders() {
-    const { data, error } = await supabaseClient
-        .from('orders')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(50);
+            const { data, error } = await supabaseClient
+                .from('orders')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(50);
 
-    if (error || !data) {
-        document.getElementById('orders-list').innerHTML = '<div class="error">Ошибка загрузки</div>';
-        return;
-    }
-
-    allOrders = data;
-    
-    // Загружаем информацию о том, для каких заявок уже есть отзывы
-    await loadReviewStatus();
-    
-    renderOrders();
-}
-
-async function loadReviewStatus() {
-    if (!currentUser) return;
-    
-    // Получаем ID завершенных заявок текущего пользователя
-    const userOrderIds = allOrders
-        .filter(o => o.user_id === currentUser.id && o.status === 'completed')
-        .map(o => o.id);
-    
-    if (userOrderIds.length === 0) {
-        ordersWithReviews = new Set();
-        return;
-    }
-    
-    // Проверяем, для каких заявок уже есть отзывы от текущего пользователя
-    const { data: reviews } = await supabaseClient
-        .from('reviews')
-        .select('order_id')
-        .in('order_id', userOrderIds)
-        .eq('reviewer_id', currentUser.id);
-    
-    ordersWithReviews = new Set(reviews?.map(r => r.order_id) || []);
-}
-
-       function renderOrders() {
-    const container = document.getElementById('orders-list');
-    
-    // Фильтрация по району И категории
-    let filteredOrders = allOrders;
-    
-    if (currentDistrictFilter !== 'all') {
-        filteredOrders = filteredOrders.filter(o => o.district === currentDistrictFilter);
-    }
-    
-    if (currentCategoryFilter !== 'all') {
-        filteredOrders = filteredOrders.filter(o => o.category_id === currentCategoryFilter);
-    }
-
-    if (filteredOrders.length === 0) {
-        container.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>В этом районе заявок пока нет</p></div>`;
-        return;
-    }
-
-    container.innerHTML = filteredOrders.map(order => {
-        const cat = categoriesCache.find(c => c.id === order.category_id);
-        const statusClass = order.status === 'open' ? 'open' : order.status === 'in_progress' ? 'in_progress' : 'completed';
-        const statusText = order.status === 'open' ? 'Открыта' : order.status === 'in_progress' ? 'В работе' : 'Завершена';
-        const isOwnOrder = currentUser && order.user_id === currentUser.id;
-        let responseBtn = '';
-
-        if (currentUser?.role === 'master' && order.status === 'open' && !isOwnOrder) {
-            const isPro = currentUser.subscription_type === 'pro';
-            const limitReached = !isPro && todayResponsesCount >= DAILY_RESPONSE_LIMIT;
-            if (limitReached) {
-                responseBtn = `<div class="limit-warning"><i class="fas fa-exclamation-triangle"></i> Лимит исчерпан</div><button class="btn btn-pro" onclick="buyPro()">⭐ Оформить Pro</button>`;
-            } else {
-                responseBtn = `<button class="btn btn-success" onclick="showResponseForm(${order.id})"><i class="fas fa-hand-paper"></i> Откликнуться</button>`;
+            if (error || !data) {
+                document.getElementById('orders-list').innerHTML = '<div class="error">Ошибка загрузки</div>';
+                return;
             }
-        } else if (isOwnOrder) {
-            if (order.awaiting_confirmation) {
-                const createdAt = new Date(order.created_at);
-                const daysLeft = Math.ceil((new Date(createdAt.getTime() + AUTO_COMPLETE_DAYS * 24 * 60 * 60 * 1000) - new Date()) / (1000 * 60 * 60 * 24));
-                responseBtn = `<div class="confirmation-banner"><i class="fas fa-info-circle"></i> Мастер отметил работу выполненной</div><div class="auto-complete-timer"> Автоподтверждение через ${daysLeft} дн.</div><div style="display:flex; gap:8px; margin-top:8px;"><button class="btn btn-success btn-sm" onclick="confirmCompletion(${order.id})" id="confirm-btn-${order.id}"><i class="fas fa-check"></i> Подтвердить</button><button class="btn btn-danger btn-sm" onclick="rejectCompletion(${order.id})" id="reject-btn-${order.id}"><i class="fas fa-times"></i> Отклонить</button></div>`;
-            } else if (order.status === 'completed' && !ordersWithReviews.has(order.id)) {
-                responseBtn = `<button class="btn btn-warning" onclick="openReviewModal(${order.id}, ${order.assigned_master_id})"><i class="fas fa-star"></i> Оставить отзыв</button>`;
-            } else if (order.status === 'completed' && ordersWithReviews.has(order.id)) {
-                responseBtn = `<div style="font-size:13px; color:var(--success); font-weight:600; margin-top:10px;"><i class="fas fa-check-circle"></i> Отзыв оставлен</div>`;
-            } else {
-                responseBtn = `<div style="font-size:13px; color:var(--text-muted);"><i class="fas fa-tag"></i> Ваша заявка</div>`;
-            }
+
+            allOrders = data;
+            await loadReviewStatus();
+            renderOrders();
         }
 
-        let photosHtml = '';
-        if (order.photos && Array.isArray(order.photos) && order.photos.length > 0) {
-            photosHtml = `<div class="order-photos">${order.photos.map(p => `<img src="${p}" onclick="window.open('${p}')">`).join('')}</div>`;
+        async function loadReviewStatus() {
+            if (!currentUser) return;
+
+            const userOrderIds = allOrders
+                .filter(o => o.user_id === currentUser.id && o.status === 'completed')
+                .map(o => o.id);
+
+            if (userOrderIds.length === 0) {
+                ordersWithReviews = new Set();
+                return;
+            }
+
+            const { data: reviews } = await supabaseClient
+                .from('reviews')
+                .select('order_id')
+                .in('order_id', userOrderIds)
+                .eq('reviewer_id', currentUser.id);
+
+            ordersWithReviews = new Set(reviews?.map(r => r.order_id) || []);
         }
 
-        return `<div class="order-card"><div class="order-top"><span class="badge">${cat?.name || 'Без категории'}</span>${order.district ? `<span class="badge badge-district"><i class="fas fa-map-pin"></i> ${order.district}</span>` : ''}<span class="status-badge ${statusClass}">${statusText}</span></div><div class="order-title">${order.title}</div>${order.description ? `<div class="order-desc">${order.description}</div>` : ''}${photosHtml}<div class="order-footer"><span class="order-price">${order.budget ? order.budget + ' ₽' : 'Договорная'}</span><span class="order-id">ID: ${order.id}</span></div><div id="response-form-${order.id}"></div>${responseBtn}</div>`;
-    }).join('');
-}
+        function renderOrders() {
+            const container = document.getElementById('orders-list');
+
+            let filteredOrders = allOrders;
+
+            if (currentDistrictFilter !== 'all') {
+                filteredOrders = filteredOrders.filter(o => o.district === currentDistrictFilter);
+            }
+
+            if (currentCategoryFilter !== 'all') {
+                filteredOrders = filteredOrders.filter(o => o.category_id === currentCategoryFilter);
+            }
+
+            if (filteredOrders.length === 0) {
+                container.innerHTML =
+                    `<div class="empty-state"><i class="fas fa-inbox"></i><p>Заявок пока нет</p></div>`;
+                return;
+            }
+
+            container.innerHTML = filteredOrders.map(order => {
+                const cat = categoriesCache.find(c => c.id === order.category_id);
+                const statusClass = order.status === 'open' ? 'open' :
+                    order.status === 'in_progress' ? 'in_progress' : 'completed';
+                const statusText = order.status === 'open' ? 'Открыта' :
+                    order.status === 'in_progress' ? 'В работе' : 'Завершена';
+                const isOwnOrder = currentUser && order.user_id === currentUser.id;
+                let responseBtn = '';
+
+                if (currentUser?.role === 'master' && order.status === 'open' && !isOwnOrder) {
+                    const isPro = currentUser.subscription_type === 'pro';
+                    const limitReached = !isPro && todayResponsesCount >= DAILY_RESPONSE_LIMIT;
+                    if (limitReached) {
+                        responseBtn =
+                            `<div class="limit-warning"><i class="fas fa-exclamation-triangle"></i> Лимит исчерпан</div><button class="btn btn-pro" onclick="buyPro()">⭐ Оформить Pro</button>`;
+                    } else {
+                        responseBtn =
+                            `<button class="btn btn-success" onclick="showResponseForm(${order.id})"><i class="fas fa-hand-paper"></i> Откликнуться</button>`;
+                    }
+                } else if (isOwnOrder) {
+                    if (order.awaiting_confirmation) {
+                        const createdAt = new Date(order.created_at);
+                        const daysLeft = Math.ceil((new Date(createdAt.getTime() + AUTO_COMPLETE_DAYS * 24 * 60 * 60 *
+                            1000) - new Date()) / (1000 * 60 * 60 * 24));
+                        responseBtn =
+                            `<div class="confirmation-banner"><i class="fas fa-info-circle"></i> Мастер отметил работу выполненной</div><div class="auto-complete-timer">⏰ Автоподтверждение через ${daysLeft} дн.</div><div style="display:flex; gap:8px; margin-top:8px;"><button class="btn btn-success btn-sm" onclick="confirmCompletion(${order.id})" id="confirm-btn-${order.id}"><i class="fas fa-check"></i> Подтвердить</button><button class="btn btn-danger btn-sm" onclick="rejectCompletion(${order.id})" id="reject-btn-${order.id}"><i class="fas fa-times"></i> Отклонить</button></div>`;
+                    } else if (order.status === 'completed' && !ordersWithReviews.has(order.id)) {
+                        responseBtn =
+                            `<button class="btn btn-warning" onclick="openReviewModal(${order.id}, ${order.assigned_master_id})"><i class="fas fa-star"></i> Оставить отзыв</button>`;
+                    } else if (order.status === 'completed' && ordersWithReviews.has(order.id)) {
+                        responseBtn =
+                            `<div style="font-size:13px; color:var(--success); font-weight:600; margin-top:10px;"><i class="fas fa-check-circle"></i> Отзыв оставлен</div>`;
+                    } else {
+                        responseBtn =
+                            `<div style="font-size:13px; color:var(--text-muted);"><i class="fas fa-tag"></i> Ваша заявка</div>`;
+                    }
+                }
+
+                let photosHtml = '';
+                if (order.photos && Array.isArray(order.photos) && order.photos.length > 0) {
+                    photosHtml =
+                        `<div class="order-photos">${order.photos.map(p => `<img src="${p}" onclick="window.open('${p}')">`).join('')}</div>`;
+                }
+
+                return `<div class="order-card"><div class="order-top"><span class="badge">${cat?.name || 'Без категории'}</span>${order.district ? `<span class="badge badge-district"><i class="fas fa-map-pin"></i> ${order.district}</span>` : ''}<span class="status-badge ${statusClass}">${statusText}</span></div><div class="order-title">${order.title}</div>${order.description ? `<div class="order-desc">${order.description}</div>` : ''}${photosHtml}<div class="order-footer"><span class="order-price">${order.budget ? order.budget + ' ₽' : 'Договорная'}</span><span class="order-id">ID: ${order.id}</span></div><div id="response-form-${order.id}"></div>${responseBtn}</div>`;
+            }).join('');
+        }
 
         function showResponseForm(orderId) {
             const formContainer = document.getElementById(`response-form-${orderId}`);
@@ -1756,108 +1856,108 @@ async function loadReviewStatus() {
         }
 
         async function loadResponses() {
-    if (!currentUser) return;
+            if (!currentUser) return;
 
-    const container = document.getElementById('responses-list');
-    const title = document.getElementById('responses-title');
+            const container = document.getElementById('responses-list');
+            const title = document.getElementById('responses-title');
 
-    if (currentUser.role === 'master') {
-        title.textContent = 'Мои отклики';
-        
-        // ВАЖНО: добавляем orders(status, awaiting_confirmation), чтобы знать финальный статус
-        const { data, error } = await supabaseClient
-            .from('responses')
-            .select('*, orders(status, awaiting_confirmation)')
-            .eq('user_id', currentUser.id)
-            .order('created_at', { ascending: false });
+            if (currentUser.role === 'master') {
+                title.textContent = 'Мои отклики';
 
-        if (error || !data || data.length === 0) {
-            container.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>Вы пока не откликались</p></div>`;
-            return;
-        }
+                const { data, error } = await supabaseClient
+                    .from('responses')
+                    .select('*, orders(status, awaiting_confirmation)')
+                    .eq('user_id', currentUser.id)
+                    .order('created_at', { ascending: false });
 
-        container.innerHTML = data.map(r => {
-            const statusText = r.status === 'pending' ? '⏳ Ожидает' :
-                              r.status === 'accepted' ? '✅ Принят' : '❌ Отклонен';
-            
-            let completeBtn = '';
-            
-            if (r.status === 'accepted') {
-                const orderStatus = r.orders?.status;
-                const isAwaiting = r.orders?.awaiting_confirmation;
-
-                // 1. Если заказчик уже подтвердил выполнение
-                if (orderStatus === 'completed') {
-                    completeBtn = `<div style="margin-top:8px; font-size:13px; color:var(--success); font-weight:600;"><i class="fas fa-check-circle"></i> Работа подтверждена заказчиком</div>`;
-                } 
-                // 2. Если мастер нажал "выполнено", но заказчик еще не ответил
-                else if (isAwaiting) {
-                    completeBtn = `<div style="margin-top:8px; font-size:13px; color:var(--warning); font-weight:600;"><i class="fas fa-clock"></i> Ожидает подтверждения заказчика</div>`;
-                } 
-                // 3. Если отклик принят, но работа еще не отмечена как выполненная
-                else {
-                    completeBtn = `<button class="btn btn-success btn-sm" onclick="completeWork(${r.order_id})" style="margin-top:8px;" id="complete-btn-${r.order_id}"><i class="fas fa-check-circle"></i> Работа выполнена</button>`;
+                if (error || !data || data.length === 0) {
+                    container.innerHTML =
+                        `<div class="empty-state"><i class="fas fa-inbox"></i><p>Вы пока не откликались</p></div>`;
+                    return;
                 }
+
+                container.innerHTML = data.map(r => {
+                    const statusText = r.status === 'pending' ? '⏳ Ожидает' :
+                        r.status === 'accepted' ? '✅ Принят' : '❌ Отклонен';
+
+                    let completeBtn = '';
+
+                    if (r.status === 'accepted') {
+                        const orderStatus = r.orders?.status;
+                        const isAwaiting = r.orders?.awaiting_confirmation;
+
+                        if (orderStatus === 'completed') {
+                            completeBtn =
+                                `<div style="margin-top:8px; font-size:13px; color:var(--success); font-weight:600;"><i class="fas fa-check-circle"></i> Работа подтверждена</div>`;
+                        } else if (isAwaiting) {
+                            completeBtn =
+                                `<div style="margin-top:8px; font-size:13px; color:var(--warning); font-weight:600;"><i class="fas fa-clock"></i> Ожидает подтверждения</div>`;
+                        } else {
+                            completeBtn =
+                                `<button class="btn btn-success btn-sm" onclick="completeWork(${r.order_id})" style="margin-top:8px;" id="complete-btn-${r.order_id}"><i class="fas fa-check-circle"></i> Работа выполнена</button>`;
+                        }
+                    }
+
+                    return `
+                        <div class="response-item">
+                            <div style="font-weight:600; margin-bottom:4px;">Заявка #${r.order_id}</div>
+                            <div style="font-size:14px; color:var(--text-secondary);">${r.message || 'Без сообщения'}</div>
+                            <div style="display:flex; justify-content:space-between; margin-top:8px; align-items:center;">
+                                <span class="price">${r.price} ₽</span>
+                                <span style="font-size:13px; color:var(--text-muted);">${statusText}</span>
+                            </div>
+                            ${completeBtn}
+                        </div>
+                    `;
+                }).join('');
+
+            } else {
+                title.textContent = 'Отклики на мои заявки';
+
+                const { data: myOrders } = await supabaseClient
+                    .from('orders')
+                    .select('id, title')
+                    .eq('user_id', currentUser.id);
+
+                if (!myOrders || myOrders.length === 0) {
+                    container.innerHTML =
+                        `<div class="empty-state"><i class="fas fa-file-alt"></i><p>Нет заявок</p></div>`;
+                    return;
+                }
+
+                const orderIds = myOrders.map(o => o.id);
+                const { data: responses } = await supabaseClient
+                    .from('responses')
+                    .select('*')
+                    .in('order_id', orderIds)
+                    .order('created_at', { ascending: false });
+
+                if (!responses || responses.length === 0) {
+                    container.innerHTML =
+                        `<div class="empty-state"><i class="fas fa-clock"></i><p>Нет откликов</p></div>`;
+                    return;
+                }
+
+                container.innerHTML = responses.map(r => {
+                    const order = myOrders.find(o => o.id === r.order_id);
+                    const acceptBtn = r.status === 'pending' ?
+                        `<button class="btn btn-success btn-sm" onclick="acceptResponse(${r.id}, ${r.order_id})"><i class="fas fa-check"></i> Принять</button>` :
+                        '';
+                    return `
+                        <div class="response-item">
+                            <div style="font-size:13px; color:var(--text-muted);">На: ${order?.title || '#' + r.order_id}</div>
+                            <div style="font-size:14px; color:var(--text-secondary); margin:4px 0;">${r.message || 'Без сообщения'}</div>
+                            <div style="display:flex; justify-content:space-between; margin-top:6px; align-items:center;">
+                                <span class="price">${r.price} ₽</span>
+                                <span style="font-size:13px; color:var(--text-muted);">Пользователь #${r.user_id}</span>
+                            </div>
+                            ${acceptBtn}
+                        </div>
+                    `;
+                }).join('');
             }
-            
-            return `
-                <div class="response-item">
-                    <div style="font-weight:600; margin-bottom:4px;">Заявка #${r.order_id}</div>
-                    <div style="font-size:14px; color:var(--text-secondary);">${r.message || 'Без сообщения'}</div>
-                    <div style="display:flex; justify-content:space-between; margin-top:8px; align-items:center;">
-                        <span class="price">${r.price} ₽</span>
-                        <span style="font-size:13px; color:var(--text-muted);">${statusText}</span>
-                    </div>
-                    ${completeBtn}
-                </div>
-            `;
-        }).join('');
-        
-    } else {
-        // Логика для Заказчика (остается без изменений)
-        title.textContent = 'Отклики на мои заявки';
-        
-        const { data: myOrders } = await supabaseClient
-            .from('orders')
-            .select('id, title')
-            .eq('user_id', currentUser.id);
-        
-        if (!myOrders || myOrders.length === 0) {
-            container.innerHTML = `<div class="empty-state"><i class="fas fa-file-alt"></i><p>Нет заявок</p></div>`;
-            return;
         }
-        
-        const orderIds = myOrders.map(o => o.id);
-        const { data: responses } = await supabaseClient
-            .from('responses')
-            .select('*')
-            .in('order_id', orderIds)
-            .order('created_at', { ascending: false });
-        
-        if (!responses || responses.length === 0) {
-            container.innerHTML = `<div class="empty-state"><i class="fas fa-clock"></i><p>Нет откликов</p></div>`;
-            return;
-        }
-        
-        container.innerHTML = responses.map(r => {
-            const order = myOrders.find(o => o.id === r.order_id);
-            const acceptBtn = r.status === 'pending' ? 
-                `<button class="btn btn-success btn-sm" onclick="acceptResponse(${r.id}, ${r.order_id})"><i class="fas fa-check"></i> Принять</button>` : '';
-            return `
-                <div class="response-item">
-                    <div style="font-size:13px; color:var(--text-muted);">На: ${order?.title || '#' + r.order_id}</div>
-                    <div style="font-size:14px; color:var(--text-secondary); margin:4px 0;">${r.message || 'Без сообщения'}</div>
-                    <div style="display:flex; justify-content:space-between; margin-top:6px; align-items:center;">
-                        <span class="price">${r.price} ₽</span>
-                        <span style="font-size:13px; color:var(--text-muted);">Пользователь #${r.user_id}</span>
-                    </div>
-                    ${acceptBtn}
-                </div>
-            `;
-        }).join('');
-    }
-}
-        
+
         async function acceptResponse(responseId, orderId) {
             const btn = event.target;
             const originalText = btn.textContent;
@@ -1898,42 +1998,37 @@ async function loadReviewStatus() {
         }
 
         async function completeWork(orderId) {
-    console.log('🔍 Завершение работы по заявке:', orderId);
+            console.log('🔍 Завершение работы по заявке:', orderId);
 
-    // Ищем кнопку по ID, а не через event.target (это надежнее при наличии иконок)
-    const btn = document.getElementById(`complete-btn-${orderId}`);
-    if (!btn) return;
+            const btn = document.getElementById(`complete-btn-${orderId}`);
+            if (!btn) return;
 
-    const originalHTML = btn.innerHTML;
+            const originalHTML = btn.innerHTML;
 
-    // Защита от двойного клика
-    if (btn.disabled) return;
+            if (btn.disabled) return;
 
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Отправка...';
-    btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Отправка...';
+            btn.disabled = true;
 
-    try {
-        const { error } = await supabaseClient
-            .from('orders')
-            .update({ awaiting_confirmation: true })
-            .eq('id', orderId);
+            try {
+                const { error } = await supabaseClient
+                    .from('orders')
+                    .update({ awaiting_confirmation: true })
+                    .eq('id', orderId);
 
-        if (error) throw error;
+                if (error) throw error;
 
-        alert('✅ Заказчик уведомлен! Ожидайте подтверждения.');
-        
-        // Перезагружаем данные, чтобы кнопка изменилась на статус ожидания
-        await loadOrders();
-        await loadResponses();
+                alert('✅ Заказчик уведомлен! Ожидайте подтверждения.');
+                await loadOrders();
+                await loadResponses();
 
-    } catch (err) {
-        console.error('❌ Ошибка:', err);
-        alert('❌ Ошибка: ' + err.message);
-        btn.innerHTML = originalHTML;
-        btn.disabled = false;
-    }
-}
-
+            } catch (err) {
+                console.error('❌ Ошибка:', err);
+                alert('❌ Ошибка: ' + err.message);
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+            }
+        }
 
         async function confirmCompletion(orderId) {
             console.log('🔍 Подтверждение выполнения заявки:', orderId);
@@ -2130,7 +2225,7 @@ async function loadReviewStatus() {
 
                 const orderData = {
                     action: 'pay-to-group',
-                    app_id: parseInt(appId),
+                    app_id: parseInt(appId) || 0,
                     order_id: `order_${currentUser.id}_${Date.now()}`,
                     amount: 29900,
                     description: 'Pro-подписка на 1 месяц',
@@ -2844,24 +2939,23 @@ async function loadReviewStatus() {
                 await loadMessages();
             }
         }
-// Принудительный запуск приложения
-console.log('🔧 Подготовка к запуску...');
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        console.log(' DOM загружен, запускаем initApp...');
-        initApp();
-    });
-} else {
-    console.log('📄 Страница уже загружена, запускаем initApp...');
-    initApp();
-}
+        // ===== ЗАПУСК ПРИЛОЖЕНИЯ =====
+        console.log('🔧 Подготовка к запуску...');
 
-window.addEventListener('load', () => {
-    console.log('🎉 Всё загружено!');
-});
-      
-        initApp();
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                console.log('📄 DOM загружен, запускаем приложение...');
+                initApp();
+            });
+        } else {
+            console.log('📄 Страница уже загружена, запускаем приложение...');
+            initApp();
+        }
+
+        window.addEventListener('load', () => {
+            console.log('🎉 Всё загружено!');
+        });
     </script>
 
 </body>
