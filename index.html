@@ -3,19 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Мой Мастер - Бронирование</title>
-    
-    <!-- VK Bridge -->
+    <title>Мой Мастер</title>
     <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js">
     </script>
-    
-    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
     </script>
-    
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
     <style>
         /* ===== RESET & BASE ===== */
         * {
@@ -147,12 +140,6 @@
             background-clip: text;
         }
 
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
         .header-actions .badge {
             background: var(--primary-light);
             color: var(--primary);
@@ -167,7 +154,6 @@
             display: none;
             animation: fadeUp 0.3s ease;
         }
-
         .tab.active {
             display: block;
         }
@@ -203,7 +189,6 @@
             gap: 8px;
             color: var(--text);
         }
-
         .card-title i {
             color: var(--primary);
         }
@@ -226,7 +211,6 @@
             border: 1px solid transparent;
             cursor: pointer;
         }
-
         .chip.active {
             background: var(--primary);
             color: #fff;
@@ -242,7 +226,6 @@
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
         }
-
         .district-scroll::-webkit-scrollbar {
             display: none;
         }
@@ -260,7 +243,6 @@
             transition: all 0.15s;
             white-space: nowrap;
         }
-
         .district-chip.active {
             background: var(--primary);
             color: #fff;
@@ -277,7 +259,6 @@
             box-shadow: var(--shadow);
             transition: transform 0.15s, box-shadow 0.15s;
         }
-
         .order-card:active {
             transform: scale(0.99);
         }
@@ -298,13 +279,12 @@
             background: var(--bg);
             color: var(--text-secondary);
         }
-
         .order-top .badge-district {
             background: #E8F0FE;
             color: var(--primary);
         }
 
-        .order-top .status-badge {
+        .status-badge {
             font-size: 11px;
             font-weight: 600;
             padding: 2px 10px;
@@ -312,7 +292,6 @@
             text-transform: uppercase;
             letter-spacing: 0.3px;
         }
-
         .status-badge.open {
             background: #DCFCE7;
             color: #166534;
@@ -324,10 +303,6 @@
         .status-badge.completed {
             background: #E5E7EB;
             color: #4B5563;
-        }
-        .status-badge.expired {
-            background: #FEE2E2;
-            color: #991B1B;
         }
 
         .order-title {
@@ -345,16 +320,6 @@
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
-        }
-
-        .order-expired-badge {
-            display: inline-block;
-            background: #FEE2E2;
-            color: #991B1B;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
         }
 
         /* ===== PROGRESS BAR ===== */
@@ -407,12 +372,10 @@
             background: var(--border);
             color: var(--text-muted);
         }
-
         .slots-icons .slot.filled {
             background: var(--primary);
             color: #fff;
         }
-
         .slots-icons .slot.filled-by-me {
             background: var(--success);
             color: #fff;
@@ -426,7 +389,6 @@
             gap: 8px;
             margin-top: 10px;
         }
-
         .booking-options .btn {
             flex: 1;
             min-width: 80px;
@@ -437,19 +399,16 @@
             color: #fff;
             border-color: var(--primary);
         }
-
         .btn-book-pair {
             background: #8B5CF6;
             color: #fff;
             border-color: #8B5CF6;
         }
-
         .btn-book-team {
             background: var(--accent);
             color: #fff;
             border-color: var(--accent);
         }
-
         .btn-book-cancel {
             background: var(--danger);
             color: #fff;
@@ -472,7 +431,6 @@
             font-size: 16px;
             color: var(--primary);
         }
-
         .order-id {
             font-size: 12px;
             color: var(--text-muted);
@@ -484,7 +442,6 @@
             margin: 10px 0 8px;
             flex-wrap: wrap;
         }
-
         .order-photos img {
             width: 72px;
             height: 72px;
@@ -492,11 +449,6 @@
             border-radius: 8px;
             border: 1px solid var(--border);
             cursor: pointer;
-            transition: transform 0.15s;
-        }
-
-        .order-photos img:hover {
-            transform: scale(1.04);
         }
 
         /* ===== BUTTONS ===== */
@@ -512,7 +464,6 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.15s;
-            text-decoration: none;
             width: 100%;
             background: var(--bg);
             color: var(--text);
@@ -522,61 +473,47 @@
         .btn:active {
             transform: scale(0.97);
         }
-
         .btn-primary {
             background: var(--primary);
             color: #fff;
             border-color: var(--primary);
             box-shadow: 0 2px 12px rgba(42, 125, 225, 0.25);
         }
-
-        .btn-primary:active {
-            background: var(--primary-dark);
-        }
-
         .btn-success {
             background: var(--success);
             color: #fff;
             border-color: var(--success);
             box-shadow: 0 2px 12px rgba(34, 197, 94, 0.25);
         }
-
         .btn-warning {
             background: var(--warning);
             color: #fff;
             border-color: var(--warning);
         }
-
         .btn-danger {
             background: var(--danger);
             color: #fff;
             border-color: var(--danger);
         }
-
         .btn-pro {
             background: linear-gradient(135deg, #F59E0B, #D97706);
             color: #fff;
             border-color: #D97706;
         }
-
         .btn-partner {
             background: linear-gradient(135deg, #8B5CF6, #7C3AED);
             color: #fff;
             border-color: #7C3AED;
         }
-
         .btn-secondary {
             background: var(--bg);
             color: var(--text-secondary);
             border-color: var(--border);
         }
-
         .btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-            transform: none !important;
         }
-
         .btn-sm {
             padding: 6px 14px;
             font-size: 13px;
@@ -587,7 +524,6 @@
         .form-group {
             margin-bottom: 12px;
         }
-
         .form-group label {
             display: block;
             font-size: 13px;
@@ -609,13 +545,11 @@
             -webkit-appearance: none;
             appearance: none;
         }
-
         .form-control:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(42, 125, 225, 0.1);
         }
-
         .form-control.error {
             border-color: var(--danger);
             box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
@@ -645,13 +579,8 @@
             gap: 8px;
             border-left: 3px solid var(--warning);
         }
-
         .filter-warning.show {
             display: flex;
-        }
-
-        .filter-warning i {
-            font-size: 16px;
         }
 
         /* ===== PHOTO UPLOAD ===== */
@@ -664,18 +593,15 @@
             transition: all 0.2s;
             background: var(--bg);
         }
-
         .photo-upload:hover {
             border-color: var(--primary);
             background: var(--primary-light);
         }
-
         .photo-upload i {
             font-size: 28px;
             color: var(--text-muted);
             margin-bottom: 4px;
         }
-
         .photo-upload span {
             display: block;
             font-size: 13px;
@@ -688,7 +614,6 @@
             flex-wrap: wrap;
             margin-top: 10px;
         }
-
         .photo-preview img {
             width: 68px;
             height: 68px;
@@ -706,7 +631,6 @@
             margin-bottom: 10px;
             border-left: 3px solid var(--primary);
         }
-
         .response-item .price {
             font-weight: 700;
             color: var(--primary);
@@ -728,11 +652,9 @@
             border: 3px solid var(--card);
             box-shadow: var(--shadow);
         }
-
         .profile-avatar.pro {
             border-color: #F59E0B;
         }
-
         .profile-avatar.partner {
             border-color: #8B5CF6;
         }
@@ -743,7 +665,6 @@
             font-weight: 700;
             margin-bottom: 4px;
         }
-
         .profile-role {
             text-align: center;
             font-size: 14px;
@@ -774,12 +695,10 @@
             text-align: center;
             backdrop-filter: blur(4px);
         }
-
         .partner-stat-value {
             font-size: 22px;
             font-weight: 700;
         }
-
         .partner-stat-label {
             font-size: 11px;
             opacity: 0.8;
@@ -826,7 +745,6 @@
             display: flex;
             margin-bottom: 10px;
         }
-
         .chat-message.me {
             justify-content: flex-end;
         }
@@ -844,7 +762,6 @@
             color: #fff;
             border-bottom-right-radius: 4px;
         }
-
         .chat-message.other .bubble {
             background: var(--card);
             color: var(--text);
@@ -863,12 +780,10 @@
             display: flex;
             gap: 10px;
         }
-
         .chat-input-row .form-control {
             flex: 1;
             margin: 0;
         }
-
         .chat-input-row .btn {
             width: auto;
             padding: 0 18px;
@@ -887,7 +802,6 @@
             justify-content: center;
             padding: 20px;
         }
-
         .modal-overlay.active {
             display: flex;
         }
@@ -920,7 +834,6 @@
             text-align: center;
             margin-bottom: 8px;
         }
-
         .modal-text {
             color: var(--text-secondary);
             text-align: center;
@@ -933,7 +846,6 @@
             text-align: left;
             margin-bottom: 16px;
         }
-
         .modal-features div {
             padding: 6px 0;
             border-bottom: 1px solid var(--border);
@@ -961,13 +873,11 @@
             font-size: 32px;
             margin: 10px 0 14px;
         }
-
         .rating-stars .star {
             cursor: pointer;
             color: #D1D5DB;
             transition: color 0.15s;
         }
-
         .rating-stars .star.active {
             color: #F59E0B;
         }
@@ -979,7 +889,6 @@
             border-radius: var(--radius-sm);
             margin-bottom: 10px;
         }
-
         .review-header {
             display: flex;
             justify-content: space-between;
@@ -987,7 +896,6 @@
             color: var(--text-secondary);
             margin-bottom: 4px;
         }
-
         .review-stars {
             color: #F59E0B;
             letter-spacing: 1px;
@@ -1026,26 +934,19 @@
             min-width: 48px;
             color: var(--text-muted);
         }
-
         .nav-item i {
             font-size: 22px;
-            transition: color 0.15s;
         }
-
         .nav-item span {
             font-size: 10px;
             font-weight: 500;
-            letter-spacing: 0.2px;
         }
-
         .nav-item.active {
             color: var(--primary);
         }
-
         .nav-item.active i {
             color: var(--primary);
         }
-
         .nav-item:active {
             transform: scale(0.92);
         }
@@ -1056,7 +957,6 @@
             padding: 32px 16px;
             color: var(--text-muted);
         }
-
         .empty-state i {
             font-size: 40px;
             margin-bottom: 10px;
@@ -1064,34 +964,6 @@
         }
 
         /* ===== UTILITY ===== */
-        .text-center {
-            text-align: center;
-        }
-        .mt-8 {
-            margin-top: 8px;
-        }
-        .mt-12 {
-            margin-top: 12px;
-        }
-        .gap-8 {
-            gap: 8px;
-        }
-        .flex {
-            display: flex;
-        }
-        .flex-col {
-            flex-direction: column;
-        }
-        .items-center {
-            align-items: center;
-        }
-        .justify-between {
-            justify-content: space-between;
-        }
-        .w-full {
-            width: 100%;
-        }
-
         .limit-warning {
             background: #FEF3C7;
             color: #92400E;
@@ -1126,7 +998,6 @@
             border-radius: var(--radius-sm);
             margin: 8px 0;
         }
-
         .subscription-info.free {
             background: #FEF3C7;
         }
@@ -1144,7 +1015,6 @@
             border-radius: var(--radius-sm);
             border-left: 3px solid var(--danger);
         }
-
         .success {
             background: #DCFCE7;
             color: #166534;
@@ -1153,7 +1023,6 @@
             border-left: 3px solid var(--success);
         }
 
-        /* ===== RESPONSIVE TWEAKS ===== */
         @media (max-width: 400px) {
             .app-logo {
                 font-size: 17px;
@@ -1200,7 +1069,7 @@
     <!-- ===== APP CONTENT ===== -->
     <div class="app-container">
 
-        <!-- ===== TAB: HOME ===== -->
+        <!-- TAB: HOME -->
         <div id="tab-home" class="tab active">
             <div class="card">
                 <div class="card-title"><i class="fas fa-tags"></i> Категории</div>
@@ -1218,7 +1087,7 @@
             </div>
         </div>
 
-        <!-- ===== TAB: ORDER ===== -->
+        <!-- TAB: ORDER -->
         <div id="tab-order" class="tab">
             <div class="card">
                 <div class="card-title"><i class="fas fa-plus-circle"></i> Новая заявка</div>
@@ -1242,7 +1111,7 @@
                     <input type="text" id="order-title" class="form-control" placeholder="Например: Нужно 5 человек для переезда">
                     <div class="filter-warning" id="title-filter-warning">
                         <i class="fas fa-exclamation-triangle"></i>
-                        <span>Обнаружена нецензурная лексика. Пожалуйста, исправьте текст.</span>
+                        <span>Обнаружена нецензурная лексика</span>
                     </div>
                 </div>
 
@@ -1251,7 +1120,7 @@
                     <textarea id="order-description" class="form-control" rows="3" placeholder="Опишите задачу подробнее..."></textarea>
                     <div class="filter-warning" id="desc-filter-warning">
                         <i class="fas fa-exclamation-triangle"></i>
-                        <span>Обнаружена нецензурная лексика. Пожалуйста, исправьте текст.</span>
+                        <span>Обнаружена нецензурная лексика</span>
                     </div>
                 </div>
 
@@ -1278,7 +1147,7 @@
             </div>
         </div>
 
-        <!-- ===== TAB: RESPONSES ===== -->
+        <!-- TAB: RESPONSES -->
         <div id="tab-responses" class="tab">
             <div class="card">
                 <div class="card-title"><i class="fas fa-briefcase"></i> <span id="responses-title">Мои бронирования</span></div>
@@ -1286,7 +1155,7 @@
             </div>
         </div>
 
-        <!-- ===== TAB: PROFILE ===== -->
+        <!-- TAB: PROFILE -->
         <div id="tab-profile" class="tab">
             <div class="card">
                 <div class="card-title"><i class="fas fa-user-circle"></i> Профиль</div>
@@ -1309,16 +1178,16 @@
 
                 <div class="partner-stats" style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:12px;">
                     <div class="partner-stat" style="background:var(--bg); border-radius:var(--radius-sm); padding:12px; text-align:center;">
-                        <div class="partner-stat-value" id="stat-invited" style="font-size:22px; font-weight:700; color:var(--text);">0</div>
-                        <div class="partner-stat-label" style="font-size:12px; color:var(--text-muted);">Приглашено</div>
+                        <div class="partner-stat-value" id="stat-invited">0</div>
+                        <div class="partner-stat-label">Приглашено</div>
                     </div>
                     <div class="partner-stat" style="background:var(--bg); border-radius:var(--radius-sm); padding:12px; text-align:center;">
-                        <div class="partner-stat-value" id="stat-pro" style="font-size:22px; font-weight:700; color:var(--text);">0</div>
-                        <div class="partner-stat-label" style="font-size:12px; color:var(--text-muted);">Pro мастеров</div>
+                        <div class="partner-stat-value" id="stat-pro">0</div>
+                        <div class="partner-stat-label">Pro мастеров</div>
                     </div>
                     <div class="partner-stat" style="background:var(--bg); border-radius:var(--radius-sm); padding:12px; text-align:center;">
-                        <div class="partner-stat-value" id="stat-earnings" style="font-size:22px; font-weight:700; color:var(--text);">0 ₽</div>
-                        <div class="partner-stat-label" style="font-size:12px; color:var(--text-muted);">Заработано</div>
+                        <div class="partner-stat-value" id="stat-earnings">0 ₽</div>
+                        <div class="partner-stat-label">Заработано</div>
                     </div>
                 </div>
 
@@ -1333,7 +1202,7 @@
             <div id="become-partner-section" style="display:none;">
                 <div class="card">
                     <div class="card-title"><i class="fas fa-handshake"></i> Стать партнером</div>
-                    <p style="color:var(--text-secondary); font-size:14px; margin-bottom:14px;">Приглашайте мастеров и получайте <b>30% с каждой Pro-подписки</b>. Пассивный доход от 89 ₽ с каждого мастера в месяц!</p>
+                    <p style="color:var(--text-secondary); font-size:14px; margin-bottom:14px;">Приглашайте мастеров и получайте <b>30% с каждой Pro-подписки</b>.</p>
                     <button class="btn btn-partner" onclick="openPartnerApplicationModal()"><i class="fas fa-pen"></i> Оставить заявку</button>
                 </div>
             </div>
@@ -1344,7 +1213,7 @@
             </div>
         </div>
 
-        <!-- ===== TAB: CHAT ===== -->
+        <!-- TAB: CHAT -->
         <div id="tab-chat" class="tab">
             <div class="card" style="border-radius:0; margin:0 -16px; border-left:0; border-right:0; box-shadow:none;">
                 <div style="padding-bottom:12px; border-bottom:1px solid var(--border);">
@@ -1365,7 +1234,7 @@
                 </div>
                 <div class="filter-warning" id="chat-filter-warning">
                     <i class="fas fa-exclamation-triangle"></i>
-                    <span>Обнаружена нецензурная лексика. Пожалуйста, исправьте текст.</span>
+                    <span>Обнаружена нецензурная лексика</span>
                 </div>
             </div>
 
@@ -1435,7 +1304,7 @@
                 <textarea id="partner-description" class="form-control" rows="3" placeholder="Опишите ваши каналы привлечения..."></textarea>
                 <div class="filter-warning" id="partner-filter-warning">
                     <i class="fas fa-exclamation-triangle"></i>
-                    <span>Обнаружена нецензурная лексика. Пожалуйста, исправьте текст.</span>
+                    <span>Обнаружена нецензурная лексика</span>
                 </div>
             </div>
             <button class="btn btn-partner" onclick="submitPartnerApplication()"><i class="fas fa-paper-plane"></i> Отправить заявку</button>
@@ -1488,7 +1357,7 @@
                 <textarea id="review-comment" class="form-control" rows="3" placeholder="Ваш отзыв..."></textarea>
                 <div class="filter-warning" id="review-filter-warning">
                     <i class="fas fa-exclamation-triangle"></i>
-                    <span>Обнаружена нецензурная лексика. Пожалуйста, исправьте текст.</span>
+                    <span>Обнаружена нецензурная лексика</span>
                 </div>
             </div>
             <button class="btn btn-success" onclick="submitReview()"><i class="fas fa-check-circle"></i> Отправить отзыв</button>
@@ -1535,9 +1404,9 @@
                 filtered = filtered.replace(/\*\*\*+/g, '***');
             }
 
-            return { 
-                filtered: filtered, 
-                found: found, 
+            return {
+                filtered: filtered,
+                found: found,
                 cleaned: found ? filtered : text,
                 hasOnlyBadWords: found && filtered.replace(/\s/g, '').replace(/\*/g, '').trim() === ''
             };
@@ -1548,26 +1417,31 @@
             return result.cleaned;
         }
 
-        // ===== FALLBACK ДЛЯ VK BRIDGE (ПК) =====
+        // ===== FALLBACK ДЛЯ VK BRIDGE =====
         (function() {
             if (typeof vkBridge === 'undefined') {
                 console.warn('⚠️ VK Bridge не загружен, создаем fallback для ПК');
                 window.vkBridge = {
                     send: async function(method, params) {
                         console.log(`📱 VK Bridge fallback: ${method}`, params || '');
-                        switch(method) {
-                            case 'VKWebAppInit': return { status: 'success' };
-                            case 'VKWebAppGetUserInfo': return { id: 999999, first_name: 'Тестовый', last_name: 'Пользователь' };
-                            case 'VKWebAppGetLaunchParams': return { app_id: 'test_app' };
-                            case 'VKWebAppShare': alert('📤 Поделиться: ' + params.link); return { status: 'success' };
-                            case 'VKWebAppShowOrderBox': {
+                        switch (method) {
+                            case 'VKWebAppInit':
+                                return { status: 'success' };
+                            case 'VKWebAppGetUserInfo':
+                                return { id: 999999, first_name: 'Тестовый', last_name: 'Пользователь' };
+                            case 'VKWebAppGetLaunchParams':
+                                return { app_id: 'test_app' };
+                            case 'VKWebAppShare':
+                                alert('📤 Поделиться: ' + params.link);
+                                return { status: 'success' };
+                            case 'VKWebAppShowOrderBox':
                                 if (params.test_mode === 1) {
                                     alert('💳 Тестовый режим: оплата прошла успешно!');
                                     return { status: 'success', order_id: `test_order_${Date.now()}` };
                                 }
                                 throw new Error('VK Pay недоступен на ПК');
-                            }
-                            default: throw new Error(`Метод ${method} не поддерживается на ПК`);
+                            default:
+                                throw new Error(`Метод ${method} не поддерживается на ПК`);
                         }
                     }
                 };
@@ -1613,19 +1487,19 @@
         async function initApp() {
             console.log('🚀 Инициализация...');
             const loadingScreen = document.getElementById('loading-screen');
-            
+
             try {
                 await Promise.race([
                     vkBridge.send('VKWebAppInit'),
                     new Promise((_, reject) => setTimeout(() => reject(new Error('Таймаут VK Bridge')), 3000))
                 ]);
                 console.log('✅ VK Bridge инициализирован');
-                
+
                 try {
                     const launchParams = await vkBridge.send('VKWebAppGetLaunchParams');
                     if (launchParams?.app_id) appId = launchParams.app_id;
                 } catch (err) { console.warn('⚠️ Не удалось получить app_id:', err.message); }
-                
+
                 const userData = await vkBridge.send('VKWebAppGetUserInfo');
                 await loadOrCreateUser(userData.id, `${userData.first_name} ${userData.last_name}`.trim());
             } catch (err) {
@@ -1685,7 +1559,8 @@
             ).join('');
         }
 
-        function removePhoto(idx) { uploadedPhotos.splice(idx, 1); renderPhotoPreview(); }
+        function removePhoto(idx) { uploadedPhotos.splice(idx, 1);
+            renderPhotoPreview(); }
 
         // ===== ЗАГРУЗКА ПОЛЬЗОВАТЕЛЯ =====
         async function loadOrCreateUser(vkId, name) {
@@ -1710,7 +1585,7 @@
                 console.log('✅ Пользователь:', currentUser);
                 if (currentUser.role === 'master') await countTodayResponses();
                 await checkAutoComplete();
-                await autoDeleteExpiredOrders(); // Новая функция
+                await autoDeleteExpiredOrders();
                 updateProfileUI();
                 renderDistrictFilters();
                 await loadCategories();
@@ -1723,16 +1598,14 @@
             }
         }
 
-        // ===== АВТОУДАЛЕНИЕ СТАРЫХ ЗАЯВОК (НОВАЯ ФУНКЦИЯ) =====
+        // ===== АВТОУДАЛЕНИЕ СТАРЫХ ЗАЯВОК =====
         async function autoDeleteExpiredOrders() {
             console.log('🗑️ Проверка старых заявок...');
-            
             const threeDaysAgo = new Date();
             threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
             const threeDaysAgoISO = threeDaysAgo.toISOString();
 
             try {
-                // Находим старые открытые заявки
                 const { data: expiredOrders, error } = await supabaseClient
                     .from('orders')
                     .select('id, title, user_id, status')
@@ -1743,48 +1616,26 @@
                     console.error('❌ Ошибка поиска старых заявок:', error);
                     return;
                 }
-
                 if (!expiredOrders || expiredOrders.length === 0) {
                     console.log('✅ Старых заявок не найдено');
                     return;
                 }
 
                 console.log(`🗑️ Найдено ${expiredOrders.length} старых заявок для удаления`);
-
-                // Удаляем каждую старую заявку
                 for (const order of expiredOrders) {
                     try {
-                        // Сначала удаляем связанные бронирования
-                        await supabaseClient
-                            .from('bookings')
-                            .delete()
-                            .eq('order_id', order.id);
-
-                        // Удаляем связанные сообщения
-                        await supabaseClient
-                            .from('messages')
-                            .delete()
-                            .eq('order_id', order.id);
-
-                        // Удаляем саму заявку
-                        await supabaseClient
-                            .from('orders')
-                            .delete()
-                            .eq('id', order.id);
-
+                        await supabaseClient.from('bookings').delete().eq('order_id', order.id);
+                        await supabaseClient.from('messages').delete().eq('order_id', order.id);
+                        await supabaseClient.from('orders').delete().eq('id', order.id);
                         console.log(`✅ Удалена заявка #${order.id}: "${order.title}"`);
                     } catch (err) {
                         console.error(`❌ Ошибка удаления заявки #${order.id}:`, err);
                     }
                 }
-
-                // Обновляем список заявок
                 await loadOrders();
-                
                 if (expiredOrders.length > 0) {
                     alert(`🗑️ Автоматически удалено ${expiredOrders.length} старых заявок (старше 3 дней)`);
                 }
-
             } catch (err) {
                 console.error('❌ Ошибка автоудаления:', err);
             }
@@ -1830,12 +1681,14 @@
         function renderDistrictFilters() {
             const container = document.getElementById('district-filter');
             const select = document.getElementById('order-district');
-            let html = `<div class="district-chip active" onclick="filterByDistrict('all', this)"><i class="fas fa-globe"></i> Все</div>`;
+            let html =
+                `<div class="district-chip active" onclick="filterByDistrict('all', this)"><i class="fas fa-globe"></i> Все</div>`;
             BARNAUL_DISTRICTS.forEach(d => {
                 html += `<div class="district-chip" onclick="filterByDistrict('${d}', this)">${d}</div>`;
             });
             container.innerHTML = html;
-            select.innerHTML = '<option value="">Выберите район</option>' + BARNAUL_DISTRICTS.map(d => `<option value="${d}">${d}</option>`).join('');
+            select.innerHTML = '<option value="">Выберите район</option>' + BARNAUL_DISTRICTS.map(d =>
+                `<option value="${d}">${d}</option>`).join('');
         }
 
         function filterByDistrict(district, element) {
@@ -1873,7 +1726,8 @@
                 html += `<span class="chip" onclick="filterByCategory(${c.id}, this)">${c.name}</span>`;
             });
             container.innerHTML = html;
-            select.innerHTML = '<option value="">Выберите категорию</option>' + data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            select.innerHTML = '<option value="">Выберите категорию</option>' + data.map(c =>
+                `<option value="${c.id}">${c.name}</option>`).join('');
         }
 
         // ===== ЗАГРУЗКА ЗАЯВОК =====
@@ -1924,18 +1778,23 @@
         function renderOrders() {
             const container = document.getElementById('orders-list');
             let filteredOrders = allOrders;
-            if (currentDistrictFilter !== 'all') filteredOrders = filteredOrders.filter(o => o.district === currentDistrictFilter);
-            if (currentCategoryFilter !== 'all') filteredOrders = filteredOrders.filter(o => o.category_id === currentCategoryFilter);
+            if (currentDistrictFilter !== 'all') filteredOrders = filteredOrders.filter(o => o.district ===
+                currentDistrictFilter);
+            if (currentCategoryFilter !== 'all') filteredOrders = filteredOrders.filter(o => o.category_id ===
+                currentCategoryFilter);
 
             if (filteredOrders.length === 0) {
-                container.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>Заявок пока нет</p></div>`;
+                container.innerHTML =
+                    `<div class="empty-state"><i class="fas fa-inbox"></i><p>Заявок пока нет</p></div>`;
                 return;
             }
 
             container.innerHTML = filteredOrders.map(order => {
                 const cat = categoriesCache.find(c => c.id === order.category_id);
-                const statusClass = order.status === 'open' ? 'open' : order.status === 'in_progress' ? 'in_progress' : order.status === 'expired' ? 'expired' : 'completed';
-                const statusText = order.status === 'open' ? 'Открыта' : order.status === 'in_progress' ? 'В работе' : order.status === 'expired' ? 'Просрочена' : 'Завершена';
+                const statusClass = order.status === 'open' ? 'open' : order.status === 'in_progress' ?
+                    'in_progress' : 'completed';
+                const statusText = order.status === 'open' ? 'Открыта' : order.status === 'in_progress' ?
+                    'В работе' : 'Завершена';
                 const isOwnOrder = currentUser && order.user_id === currentUser.id;
                 const totalSlots = order.slots || 1;
                 const takenSlots = order.taken_slots || 0;
@@ -1959,18 +1818,11 @@
                 `;
 
                 let responseBtn = '';
-                
-                // Проверка на просроченность
-                const createdDate = new Date(order.created_at);
-                const now = new Date();
-                const daysDiff = (now - createdDate) / (1000 * 60 * 60 * 24);
-                const isExpired = daysDiff > 3 && order.status === 'open';
 
-                if (isExpired) {
-                    responseBtn = `<div style="font-size:13px; color:var(--danger); font-weight:600; margin-top:10px;">⏰ Заявка просрочена и будет удалена</div>`;
-                } else if (currentUser?.role === 'master' && order.status === 'open' && !isOwnOrder) {
+                if (currentUser?.role === 'master' && order.status === 'open' && !isOwnOrder) {
                     if (isFullyBooked) {
-                        responseBtn = `<div style="font-size:13px; color:var(--success); font-weight:600; margin-top:10px;">✅ Все места заняты! Заявка переходит в работу...</div>`;
+                        responseBtn =
+                            `<div style="font-size:13px; color:var(--success); font-weight:600; margin-top:10px;">✅ Все места заняты!</div>`;
                     } else if (hasMyBooking) {
                         responseBtn = `
                             <div style="font-size:13px; color:var(--text-secondary); margin-top:8px;">Вы забронировали ${mySlots} место(а)</div>
@@ -1987,7 +1839,8 @@
                     }
                 } else if (isOwnOrder) {
                     if (order.awaiting_confirmation) {
-                        const daysLeft = Math.ceil((new Date(new Date(order.created_at).getTime() + AUTO_COMPLETE_DAYS * 24 * 60 * 60 * 1000) - new Date()) / (1000 * 60 * 60 * 24));
+                        const daysLeft = Math.ceil((new Date(new Date(order.created_at).getTime() + AUTO_COMPLETE_DAYS *
+                            24 * 60 * 60 * 1000) - new Date()) / (1000 * 60 * 60 * 24));
                         responseBtn = `
                             <div class="confirmation-banner"><i class="fas fa-info-circle"></i> Мастер отметил работу выполненной</div>
                             <div class="auto-complete-timer">⏰ Автоподтверждение через ${daysLeft} дн.</div>
@@ -1997,20 +1850,23 @@
                             </div>
                         `;
                     } else if (order.status === 'completed' && !ordersWithReviews.has(order.id)) {
-                        responseBtn = `<button class="btn btn-warning" onclick="openReviewModal(${order.id}, ${order.assigned_master_id})"><i class="fas fa-star"></i> Оставить отзыв</button>`;
+                        responseBtn =
+                            `<button class="btn btn-warning" onclick="openReviewModal(${order.id}, ${order.assigned_master_id})"><i class="fas fa-star"></i> Оставить отзыв</button>`;
                     } else if (order.status === 'completed' && ordersWithReviews.has(order.id)) {
-                        responseBtn = `<div style="font-size:13px; color:var(--success); font-weight:600; margin-top:10px;"><i class="fas fa-check-circle"></i> Отзыв оставлен</div>`;
+                        responseBtn =
+                            `<div style="font-size:13px; color:var(--success); font-weight:600; margin-top:10px;"><i class="fas fa-check-circle"></i> Отзыв оставлен</div>`;
                     } else {
-                        responseBtn = `<div style="font-size:13px; color:var(--text-muted);"><i class="fas fa-tag"></i> Ваша заявка</div>`;
+                        responseBtn =
+                            `<div style="font-size:13px; color:var(--text-muted);"><i class="fas fa-tag"></i> Ваша заявка</div>`;
                     }
                 }
 
                 let photosHtml = '';
                 if (order.photos && Array.isArray(order.photos) && order.photos.length > 0) {
-                    photosHtml = `<div class="order-photos">${order.photos.map(p => `<img src="${p}" onclick="window.open('${p}')">`).join('')}</div>`;
+                    photosHtml =
+                        `<div class="order-photos">${order.photos.map(p => `<img src="${p}" onclick="window.open('${p}')">`).join('')}</div>`;
                 }
 
-                // Добавляем информацию о времени создания
                 const timeAgo = getTimeAgo(new Date(order.created_at));
 
                 return `<div class="order-card">
@@ -2019,7 +1875,6 @@
                         ${order.district ? `<span class="badge badge-district"><i class="fas fa-map-pin"></i> ${order.district}</span>` : ''}
                         <span class="status-badge ${statusClass}">${statusText}</span>
                         ${isFullyBooked ? '<span class="badge" style="background:#DCFCE7; color:#166534;">✅ Набрано</span>' : ''}
-                        ${isExpired ? '<span class="order-expired-badge">⏰ Просрочена</span>' : ''}
                     </div>
                     <div class="order-title">${order.title}</div>
                     ${order.description ? `<div class="order-desc">${order.description}</div>` : ''}
@@ -2035,7 +1890,6 @@
             }).join('');
         }
 
-        // ===== ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ ДЛЯ ВРЕМЕНИ =====
         function getTimeAgo(date) {
             const now = new Date();
             const diffMs = now - date;
@@ -2049,10 +1903,18 @@
             return `${diffDays} дн. назад`;
         }
 
-        // ===== БРОНИРОВАНИЕ МЕСТ =====
+        // ===== БРОНИРОВАНИЕ МЕСТ (ИСПРАВЛЕНО) =====
         async function bookSlots(orderId, slots) {
-            if (!currentUser) return alert('Авторизуйтесь');
-            if (currentUser.role !== 'master') return alert('Только мастера могут бронировать');
+            console.log('🔍 bookSlots вызвана', { orderId, slots });
+
+            if (!currentUser) {
+                alert('Авторизуйтесь');
+                return;
+            }
+            if (currentUser.role !== 'master') {
+                alert('Только мастера могут бронировать');
+                return;
+            }
 
             const btn = event.target;
             const originalText = btn.innerHTML;
@@ -2060,11 +1922,18 @@
             btn.disabled = true;
 
             try {
-                const { data: order } = await supabaseClient
+                // Проверяем заявку
+                const { data: order, error: orderError } = await supabaseClient
                     .from('orders')
                     .select('taken_slots, slots, status')
                     .eq('id', orderId)
                     .single();
+
+                if (orderError) {
+                    console.error('❌ Ошибка получения заявки:', orderError);
+                    alert('❌ Ошибка: ' + orderError.message);
+                    return;
+                }
 
                 if (!order || order.status !== 'open') {
                     alert('❌ Заявка уже закрыта или в работе');
@@ -2077,26 +1946,59 @@
                     return;
                 }
 
+                // Создаём бронирование
+                const bookingData = {
+                    order_id: orderId,
+                    master_id: currentUser.id,
+                    slots: slots,
+                    status: 'active'
+                };
+                console.log('📤 Создание бронирования:', bookingData);
+
                 const { error: bookingError } = await supabaseClient
                     .from('bookings')
-                    .insert([{ order_id: orderId, master_id: currentUser.id, slots: slots, status: 'active' }]);
+                    .insert([bookingData]);
 
-                if (bookingError) throw bookingError;
+                if (bookingError) {
+                    console.error('❌ Ошибка создания бронирования:', bookingError);
+                    if (bookingError.message && bookingError.message.includes('row-level security')) {
+                        alert('❌ Ошибка прав доступа (RLS). Выполните SQL-запрос для отключения RLS:\n\n' +
+                            'ALTER TABLE bookings DISABLE ROW LEVEL SECURITY;\n' +
+                            'ALTER TABLE orders DISABLE ROW LEVEL SECURITY;');
+                    } else {
+                        alert('❌ Ошибка бронирования: ' + bookingError.message);
+                    }
+                    return;
+                }
 
+                // Обновляем занятые места
                 const newTaken = (order.taken_slots || 0) + slots;
-                await supabaseClient
+                const { error: updateError } = await supabaseClient
                     .from('orders')
-                    .update({ taken_slots: newTaken, status: newTaken >= (order.slots || 1) ? 'in_progress' : 'open' })
+                    .update({
+                        taken_slots: newTaken,
+                        status: newTaken >= (order.slots || 1) ? 'in_progress' : 'open'
+                    })
                     .eq('id', orderId);
 
-                alert(newTaken >= (order.slots || 1) ? '✅ Все места заняты! Заявка перешла в работу.' : `✅ Вы забронировали ${slots} место(а). Осталось ${(order.slots || 1) - newTaken} мест.`);
+                if (updateError) {
+                    console.error('❌ Ошибка обновления заявки:', updateError);
+                    alert('❌ Ошибка: ' + updateError.message);
+                    return;
+                }
+
+                if (newTaken >= (order.slots || 1)) {
+                    alert('✅ Все места заняты! Заявка перешла в работу.');
+                } else {
+                    alert(`✅ Вы забронировали ${slots} место(а). Осталось ${(order.slots || 1) - newTaken} мест.`);
+                }
 
                 await loadMyBookings();
                 await loadOrders();
                 await loadResponses();
 
             } catch (err) {
-                console.error('❌ Ошибка:', err);
+                console.error('❌ Исключение:', err);
                 alert('❌ Ошибка: ' + err.message);
             } finally {
                 btn.innerHTML = originalText;
@@ -2168,7 +2070,8 @@
                     .order('created_at', { ascending: false });
 
                 if (error || !data || data.length === 0) {
-                    container.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>Вы пока не бронировали места</p></div>`;
+                    container.innerHTML =
+                        `<div class="empty-state"><i class="fas fa-inbox"></i><p>Вы пока не бронировали места</p></div>`;
                     return;
                 }
 
@@ -2196,7 +2099,8 @@
                     .select('id, title, slots, taken_slots')
                     .eq('user_id', currentUser.id);
                 if (!myOrders || myOrders.length === 0) {
-                    container.innerHTML = `<div class="empty-state"><i class="fas fa-file-alt"></i><p>У вас нет заявок</p></div>`;
+                    container.innerHTML =
+                        `<div class="empty-state"><i class="fas fa-file-alt"></i><p>У вас нет заявок</p></div>`;
                     return;
                 }
                 const orderIds = myOrders.map(o => o.id);
@@ -2206,7 +2110,8 @@
                     .in('order_id', orderIds)
                     .order('created_at', { ascending: false });
                 if (!bookings || bookings.length === 0) {
-                    container.innerHTML = `<div class="empty-state"><i class="fas fa-clock"></i><p>На ваши заявки пока нет бронирований</p></div>`;
+                    container.innerHTML =
+                        `<div class="empty-state"><i class="fas fa-clock"></i><p>На ваши заявки пока нет бронирований</p></div>`;
                     return;
                 }
                 container.innerHTML = bookings.map(b => {
@@ -2227,12 +2132,16 @@
             }
         }
 
-        // ===== СОЗДАНИЕ ЗАЯВКИ =====
+        // ===== СОЗДАНИЕ ЗАЯВКИ (ИСПРАВЛЕННАЯ) =====
         async function createOrder() {
+            console.log('🔍 createOrder вызвана');
+
             if (!currentUser) {
+                console.error('❌ currentUser = null');
                 alert('Подождите загрузку');
                 return;
             }
+            console.log('✅ currentUser:', currentUser);
 
             const district = document.getElementById('order-district').value;
             const categoryId = document.getElementById('order-category').value;
@@ -2241,18 +2150,11 @@
             const slots = parseInt(document.getElementById('order-slots').value) || 1;
             const budget = document.getElementById('order-budget').value;
 
-            if (!district) {
-                alert('Выберите район');
-                return;
-            }
-            if (!categoryId || !title) {
-                alert('Заполните категорию и заголовок');
-                return;
-            }
-            if (slots < 1) {
-                alert('Минимум 1 место');
-                return;
-            }
+            console.log('📝 Данные формы:', { district, categoryId, title, description, slots, budget });
+
+            if (!district) { alert('Выберите район'); return; }
+            if (!categoryId || !title) { alert('Заполните категорию и заголовок'); return; }
+            if (slots < 1) { alert('Минимум 1 место'); return; }
 
             // Проверка на мат
             const titleCheck = filterBadWords(title);
@@ -2264,7 +2166,6 @@
                 alert('⚠️ В заголовке обнаружена нецензурная лексика. Пожалуйста, исправьте текст.');
                 return;
             }
-
             if (descCheck.found) {
                 document.getElementById('desc-filter-warning').classList.add('show');
                 document.getElementById('order-description').classList.add('error');
@@ -2272,7 +2173,6 @@
                 return;
             }
 
-            // Очищаем текст
             title = sanitizeText(title);
             description = sanitizeText(description);
 
@@ -2281,52 +2181,47 @@
             btn.disabled = true;
 
             try {
-                console.log('📝 Создание заявки:', { district, categoryId, title, description, slots, budget });
+                const orderData = {
+                    user_id: currentUser.id,
+                    district: district,
+                    category_id: parseInt(categoryId),
+                    title: title,
+                    description: description || null,
+                    slots: slots,
+                    taken_slots: 0,
+                    budget: budget ? parseFloat(budget) : null,
+                    status: 'open',
+                    photos: uploadedPhotos.length > 0 ? uploadedPhotos : null
+                };
+                console.log('📤 Отправка в Supabase:', orderData);
 
                 const { data, error } = await supabaseClient
                     .from('orders')
-                    .insert([{
-                        user_id: currentUser.id,
-                        district: district,
-                        category_id: parseInt(categoryId),
-                        title: title,
-                        description: description || null,
-                        slots: slots,
-                        taken_slots: 0,
-                        budget: budget ? parseFloat(budget) : null,
-                        status: 'open',
-                        photos: uploadedPhotos.length > 0 ? uploadedPhotos : null
-                    }])
+                    .insert([orderData])
                     .select();
 
                 if (error) {
                     console.error('❌ Ошибка Supabase:', error);
-                    alert('❌ Ошибка создания: ' + error.message);
+                    if (error.message && error.message.includes('column') && error.message.includes('does not exist')) {
+                        alert('❌ Ошибка: в таблице orders отсутствуют необходимые столбцы.\n\n' +
+                            'Выполните в SQL-редакторе Supabase:\n\n' +
+                            'ALTER TABLE orders ADD COLUMN slots INTEGER DEFAULT 1;\n' +
+                            'ALTER TABLE orders ADD COLUMN taken_slots INTEGER DEFAULT 0;\n' +
+                            'ALTER TABLE orders ADD COLUMN photos JSONB;\n\n' +
+                            'После этого повторите попытку.');
+                    } else {
+                        alert('❌ Ошибка создания: ' + error.message);
+                    }
                     return;
                 }
 
                 if (!data || data.length === 0) {
-                    alert('❌ Ошибка: заявка не создана');
+                    console.error('❌ Данные не возвращены');
+                    alert('❌ Заявка не создана (пустой ответ)');
                     return;
                 }
 
-                const newOrder = data[0];
-                console.log('✅ Заявка создана:', newOrder);
-                
-                // Отправка на сервер (если есть)
-                try {
-                    await postOrderToServer(newOrder);
-                } catch (err) {
-                    console.warn('⚠️ Ошибка отправки на сервер:', err);
-                }
-
-                // Уведомления мастерам
-                try {
-                    await notifyMastersAboutNewOrder(newOrder);
-                } catch (err) {
-                    console.warn('⚠️ Ошибка уведомлений:', err);
-                }
-
+                console.log('✅ Заявка создана:', data[0]);
                 alert('✅ Заявка создана! Ожидайте мастеров.');
 
                 // Очистка формы
@@ -2342,13 +2237,13 @@
                 document.getElementById('desc-filter-warning').classList.remove('show');
                 document.getElementById('order-title').classList.remove('error');
                 document.getElementById('order-description').classList.remove('error');
-                
+
                 await loadOrders();
                 switchTab('home');
 
             } catch (err) {
-                console.error('❌ Критическая ошибка:', err);
-                alert('❌ Ошибка: ' + err.message);
+                console.error('❌ Исключение:', err);
+                alert('❌ Критическая ошибка: ' + err.message);
             } finally {
                 btn.innerHTML = '<i class="fas fa-paper-plane"></i> Создать заявку';
                 btn.disabled = false;
@@ -2362,7 +2257,8 @@
             if (originalText.includes('Подтвердить')) {
                 btn.textContent = '⚠️ Точно подтвердить?';
                 btn.style.background = '#FF9800';
-                setTimeout(() => { btn.textContent = originalText; btn.style.background = ''; }, 3000);
+                setTimeout(() => { btn.textContent = originalText;
+                    btn.style.background = ''; }, 3000);
                 return;
             }
             btn.textContent = '⏳ Подтверждение...';
@@ -2388,7 +2284,8 @@
             if (originalText.includes('Отклонить')) {
                 btn.textContent = '⚠️ Точно отклонить?';
                 btn.style.background = '#FF5722';
-                setTimeout(() => { btn.textContent = originalText; btn.style.background = ''; }, 3000);
+                setTimeout(() => { btn.textContent = originalText;
+                    btn.style.background = ''; }, 3000);
                 return;
             }
             btn.textContent = '⏳ Отклонение...';
@@ -2431,6 +2328,7 @@
 
         // ===== PRO-ПОДПИСКА =====
         function buyPro() { document.getElementById('pro-modal').classList.add('active'); }
+
         function closeProModal() { document.getElementById('pro-modal').classList.remove('active'); }
 
         async function connectVKPay() {
@@ -2469,7 +2367,7 @@
                 .from('users')
                 .update({ subscription_type: 'pro', subscription_expires_at: expiresAt.toISOString() })
                 .eq('id', currentUser.id);
-            
+
             if (currentUser.invited_by_partner_id) {
                 const partnerAmount = 299 * 0.30;
                 const { data: partnerData } = await supabaseClient
@@ -2484,7 +2382,7 @@
                         .eq('id', currentUser.invited_by_partner_id);
                 }
             }
-            
+
             currentUser.subscription_type = 'pro';
             alert(`✅ Pro-подписка активирована! Действует до: ${expiresAt.toLocaleDateString('ru-RU')}`);
             updateProfileUI();
@@ -2492,14 +2390,17 @@
         }
 
         // ===== ПАРТНЕРСКАЯ ПРОГРАММА =====
-        function openPartnerApplicationModal() { document.getElementById('partner-application-modal').classList.add('active'); }
-        function closePartnerApplicationModal() { document.getElementById('partner-application-modal').classList.remove('active'); }
+        function openPartnerApplicationModal() { document.getElementById('partner-application-modal').classList.add(
+            'active'); }
+
+        function closePartnerApplicationModal() { document.getElementById('partner-application-modal').classList.remove(
+                'active'); }
 
         async function submitPartnerApplication() {
             const vk = document.getElementById('partner-vk').value.trim();
             let description = document.getElementById('partner-description').value.trim();
             if (!vk || !description) { alert('Заполните все поля'); return; }
-            
+
             const descCheck = filterBadWords(description);
             if (descCheck.found) {
                 document.getElementById('partner-filter-warning').classList.add('show');
@@ -2546,15 +2447,17 @@
                     .select('amount')
                     .eq('partner_id', currentUser.id);
                 const totalEarnings = earnings ? earnings.reduce((sum, e) => sum + parseFloat(e.amount), 0) : 0;
-                
+
                 document.getElementById('stat-invited').textContent = invitedCount || 0;
                 document.getElementById('stat-pro').textContent = proCount || 0;
                 document.getElementById('stat-earnings').textContent = Math.round(totalEarnings) + ' ₽';
-                document.getElementById('partner-balance').textContent = Math.round(currentUser.partner_balance || 0) + ' ₽';
-                
-                const partnerLink = appId ? `https://vk.com/app${appId}?ref=${currentUser.id}` : `https://vk.com/app?ref=${currentUser.id}`;
+                document.getElementById('partner-balance').textContent = Math.round(currentUser.partner_balance || 0) +
+                    ' ₽';
+
+                const partnerLink = appId ? `https://vk.com/app${appId}?ref=${currentUser.id}` :
+                    `https://vk.com/app?ref=${currentUser.id}`;
                 document.getElementById('partner-link').textContent = partnerLink;
-                
+
                 const withdrawBtn = document.getElementById('withdraw-btn');
                 if (currentUser.partner_balance < MIN_WITHDRAW) {
                     withdrawBtn.disabled = true;
@@ -2565,7 +2468,8 @@
 
         function copyPartnerLink() {
             const link = document.getElementById('partner-link').textContent;
-            navigator.clipboard.writeText(link).then(() => alert('✅ Ссылка скопирована!')).catch(() => alert('Не удалось скопировать'));
+            navigator.clipboard.writeText(link).then(() => alert('✅ Ссылка скопирована!')).catch(() => alert(
+                'Не удалось скопировать'));
         }
 
         async function sharePartnerLink() {
@@ -2590,13 +2494,14 @@
             if (!amount || amount < MIN_WITHDRAW) { alert(`Минимальная сумма: ${MIN_WITHDRAW} ₽`); return; }
             if (!method || !details) { alert('Заполните все поля'); return; }
             if (amount > currentUser.partner_balance) { alert('Недостаточно средств'); return; }
-            
+
             const btn = event.target;
             btn.textContent = '📤 Отправка...';
             btn.disabled = true;
             const { error } = await supabaseClient
                 .from('partner_withdrawals')
-                .insert([{ partner_id: currentUser.id, amount: amount, payment_method: method, payment_details: details, status: 'pending' }]);
+                .insert([{ partner_id: currentUser.id, amount: amount, payment_method: method, payment_details: details,
+                    status: 'pending' }]);
             if (error) {
                 alert('❌ Ошибка: ' + error.message);
                 btn.textContent = '✅ Запросить вывод';
@@ -2627,7 +2532,8 @@
             selectedRating = 0;
         }
 
-        function setRating(rating) { selectedRating = rating; updateRatingStars(); }
+        function setRating(rating) { selectedRating = rating;
+            updateRatingStars(); }
 
         function updateRatingStars() {
             document.querySelectorAll('#rating-stars .star').forEach((star, idx) => {
@@ -2638,7 +2544,7 @@
         async function submitReview() {
             if (selectedRating === 0) { alert('Пожалуйста, выберите рейтинг'); return; }
             let comment = document.getElementById('review-comment').value.trim();
-            
+
             if (comment) {
                 const commentCheck = filterBadWords(comment);
                 if (commentCheck.found) {
@@ -2658,8 +2564,9 @@
             try {
                 await supabaseClient
                     .from('reviews')
-                    .insert([{ order_id: currentReviewOrderId, reviewer_id: currentUser.id, master_id: currentReviewMasterId, rating: selectedRating, comment: comment || null }]);
-                
+                    .insert([{ order_id: currentReviewOrderId, reviewer_id: currentUser.id,
+                        master_id: currentReviewMasterId, rating: selectedRating, comment: comment || null }]);
+
                 const { data: reviews } = await supabaseClient
                     .from('reviews')
                     .select('rating')
@@ -2671,7 +2578,7 @@
                         .update({ average_rating: avgRating })
                         .eq('id', currentReviewMasterId);
                 }
-                
+
                 alert('✅ Отзыв отправлен!');
                 ordersWithReviews.add(currentReviewOrderId);
                 closeReviewModal();
@@ -2696,7 +2603,8 @@
                     .order('created_at', { ascending: false });
                 if (error) throw error;
                 if (!reviews || reviews.length === 0) {
-                    container.innerHTML = '<div style="color:var(--text-muted); text-align:center; padding:20px;">Пока нет отзывов</div>';
+                    container.innerHTML =
+                        '<div style="color:var(--text-muted); text-align:center; padding:20px;">Пока нет отзывов</div>';
                     return;
                 }
                 const reviewerIds = [...new Set(reviews.map(r => r.reviewer_id))];
@@ -2706,7 +2614,7 @@
                     .in('id', reviewerIds);
                 const usersMap = {};
                 if (users) users.forEach(u => usersMap[u.id] = u.name);
-                
+
                 container.innerHTML = reviews.map(r => `
                     <div class="review-item">
                         <div class="review-header"><span>${usersMap[r.reviewer_id] || 'Аноним'}</span><span>${new Date(r.created_at).toLocaleDateString('ru-RU')}</span></div>
@@ -2716,7 +2624,8 @@
                 `).join('');
             } catch (err) {
                 console.error('Ошибка загрузки отзывов:', err);
-                container.innerHTML = '<div style="color:var(--text-muted); text-align:center; padding:20px;">Ошибка загрузки отзывов</div>';
+                container.innerHTML =
+                    '<div style="color:var(--text-muted); text-align:center; padding:20px;">Ошибка загрузки отзывов</div>';
             }
         }
 
@@ -2731,7 +2640,8 @@
             if (currentUser.role === 'master') {
                 const isPro = currentUser.subscription_type === 'pro';
                 if (isPro) {
-                    subscriptionBlock = `<div class="subscription-info"><div style="font-size:13px; color:var(--text-muted);">Текущий тариф</div><div style="font-weight:700; color:#F59E0B; font-size:18px;">⭐ PRO-мастер</div></div>`;
+                    subscriptionBlock =
+                        `<div class="subscription-info"><div style="font-size:13px; color:var(--text-muted);">Текущий тариф</div><div style="font-weight:700; color:#F59E0B; font-size:18px;">⭐ PRO-мастер</div></div>`;
                 } else {
                     subscriptionBlock = `
                         <div class="subscription-info free">
@@ -2748,7 +2658,8 @@
             if (currentUser.role === 'master') {
                 const avgRating = currentUser.average_rating || 0;
                 const stars = avgRating > 0 ? '⭐'.repeat(Math.round(avgRating)) : 'Нет оценок';
-                ratingBlock = `<div style="background:var(--bg); padding:12px; border-radius:var(--radius-sm); margin-top:8px;"><div style="color:var(--text-muted); font-size:13px;">Рейтинг</div><div style="font-size:18px; margin-top:4px;">${stars}</div></div>`;
+                ratingBlock =
+                    `<div style="background:var(--bg); padding:12px; border-radius:var(--radius-sm); margin-top:8px;"><div style="color:var(--text-muted); font-size:13px;">Рейтинг</div><div style="font-size:18px; margin-top:4px;">${stars}</div></div>`;
             }
 
             document.getElementById('profile-info').innerHTML = `
@@ -2768,7 +2679,7 @@
 
             document.getElementById('partner-section').style.display = currentUser.is_partner ? 'block' : 'none';
             document.getElementById('become-partner-section').style.display = currentUser.is_partner ? 'none' : 'block';
-            
+
             if (currentUser.role === 'master') {
                 document.getElementById('reviews-section').style.display = 'block';
                 loadMasterReviews(currentUser.id);
@@ -2782,12 +2693,12 @@
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(`tab-${tabName}`).classList.add('active');
-            
+
             const navItems = document.querySelectorAll('.nav-item');
             ['home', 'order', 'responses', 'chat', 'profile'].forEach((t, idx) => {
                 if (t === tabName) navItems[idx].classList.add('active');
             });
-            
+
             if (tabName === 'responses') loadResponses();
             if (tabName === 'chat') loadChatOrders();
         }
@@ -2805,18 +2716,22 @@
                     .in('status', ['in_progress', 'completed'])
                     .order('created_at', { ascending: false });
                 if (!orders || orders.length === 0) {
-                    container.innerHTML = '<div class="empty-state"><i class="fas fa-comments"></i><p>Нет активных заявок</p></div>';
+                    container.innerHTML =
+                        '<div class="empty-state"><i class="fas fa-comments"></i><p>Нет активных заявок</p></div>';
                     return;
                 }
                 const ordersWithPartners = await Promise.all(orders.map(async order => {
-                    const partnerId = order.user_id === currentUser.id ? order.assigned_master_id : order.user_id;
+                    const partnerId = order.user_id === currentUser.id ? order.assigned_master_id : order
+                        .user_id;
                     if (!partnerId) return { ...order, partnerName: 'Нет собеседника', hasMessages: false };
-                    const { data: partner } = await supabaseClient.from('users').select('name').eq('id', partnerId).single();
+                    const { data: partner } = await supabaseClient.from('users').select('name').eq('id',
+                        partnerId).single();
                     const { data: messages } = await supabaseClient
                         .from('messages')
                         .select('id', { count: 'exact', head: true })
                         .eq('order_id', order.id);
-                    return { ...order, partnerName: partner?.name || 'Пользователь', hasMessages: messages && messages.length > 0 };
+                    return { ...order, partnerName: partner?.name || 'Пользователь',
+                    hasMessages: messages && messages.length > 0 };
                 }));
                 container.innerHTML = ordersWithPartners.map(order => `
                     <div class="order-card" onclick="openChat(${order.id})" style="cursor:pointer;">
@@ -2839,12 +2754,15 @@
                     .eq('id', orderId)
                     .single();
                 currentChatPartnerId = order.user_id === currentUser.id ? order.assigned_master_id : order.user_id;
-                const { data: partner } = await supabaseClient.from('users').select('name').eq('id', currentChatPartnerId).single();
-                document.getElementById('chat-partner-name').textContent = `С: ${partner?.name || 'Пользователь'} | ${order.title}`;
+                const { data: partner } = await supabaseClient.from('users').select('name').eq('id',
+                    currentChatPartnerId).single();
+                document.getElementById('chat-partner-name').textContent =
+                    `С: ${partner?.name || 'Пользователь'} | ${order.title}`;
                 await loadMessages();
                 if (messagesInterval) clearInterval(messagesInterval);
                 messagesInterval = setInterval(loadMessages, 3000);
-            } catch (err) { console.error('Ошибка открытия чата:', err); alert('Не удалось открыть чат'); }
+            } catch (err) { console.error('Ошибка открытия чата:', err);
+                alert('Не удалось открыть чат'); }
         }
 
         async function loadMessages() {
@@ -2858,12 +2776,14 @@
                     .eq('order_id', currentChatOrderId)
                     .order('created_at', { ascending: true });
                 if (!messages || messages.length === 0) {
-                    container.innerHTML = `<div class="empty-state"><i class="fas fa-comment-dots"></i><p>Нет сообщений</p></div>`;
+                    container.innerHTML =
+                        `<div class="empty-state"><i class="fas fa-comment-dots"></i><p>Нет сообщений</p></div>`;
                     return;
                 }
                 container.innerHTML = messages.map(msg => {
                     const isMe = msg.sender_id === currentUser.id;
-                    const time = new Date(msg.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+                    const time = new Date(msg.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit',
+                        minute: '2-digit' });
                     return `<div class="chat-message ${isMe ? 'me' : 'other'}">
                         <div class="bubble">${msg.message}<span class="time">${time}</span></div>
                     </div>`;
@@ -2877,7 +2797,7 @@
             const input = document.getElementById('message-input');
             let message = input.value.trim();
             if (!message || !currentChatOrderId || !currentChatPartnerId) { alert('Введите сообщение'); return; }
-            
+
             const msgCheck = filterBadWords(message);
             if (msgCheck.found) {
                 document.getElementById('chat-filter-warning').classList.add('show');
@@ -2891,9 +2811,10 @@
 
             const { error } = await supabaseClient
                 .from('messages')
-                .insert([{ order_id: currentChatOrderId, sender_id: currentUser.id, receiver_id: currentChatPartnerId, message: message }]);
-            if (error) { alert('❌ Ошибка отправки: ' + error.message); } 
-            else { input.value = ''; await loadMessages(); }
+                .insert([{ order_id: currentChatOrderId, sender_id: currentUser.id, receiver_id: currentChatPartnerId,
+                    message: message }]);
+            if (error) { alert('❌ Ошибка отправки: ' + error.message); } else { input.value = '';
+                await loadMessages(); }
         }
 
         // ===== ОТПРАВКА НА СЕРВЕР =====
@@ -2902,7 +2823,9 @@
                 await fetch('https://moymaster-server.vercel.app/api/new-order', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: order.id, title: order.title, description: order.description, budget: order.budget, district: order.district, category_id: order.category_id, user_id: order.user_id })
+                    body: JSON.stringify({ id: order.id, title: order.title, description: order.description,
+                        budget: order.budget, district: order.district, category_id: order.category_id,
+                        user_id: order.user_id })
                 });
             } catch (err) { console.error('Ошибка отправки на сервер:', err); }
         }
@@ -2925,7 +2848,8 @@
         // ===== ЗАПУСК =====
         console.log('🔧 Подготовка к запуску...');
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => { console.log('📄 DOM загружен, запускаем приложение...'); initApp(); });
+            document.addEventListener('DOMContentLoaded', () => { console.log('📄 DOM загружен, запускаем приложение...');
+                initApp(); });
         } else {
             console.log('📄 Страница уже загружена, запускаем приложение...');
             initApp();
