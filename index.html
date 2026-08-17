@@ -2843,6 +2843,22 @@ async function loadReviewStatus() {
                 await loadMessages();
             }
         }
+// Принудительный запуск приложения
+console.log('🔧 Подготовка к запуску...');
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log(' DOM загружен, запускаем initApp...');
+        initApp();
+    });
+} else {
+    console.log('📄 Страница уже загружена, запускаем initApp...');
+    initApp();
+}
+
+window.addEventListener('load', () => {
+    console.log('🎉 Всё загружено!');
+});
 
         initApp();
     </script>
