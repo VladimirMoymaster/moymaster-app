@@ -1294,6 +1294,7 @@
         let categoriesCache = [];
         let allOrders = [];
         let currentDistrictFilter = 'all';
+        let currentCategoryFilter = 'all';
         let todayResponsesCount = 0;
         let uploadedPhotos = [];
         let partnerStats = { invited: 0, pro: 0, earnings: 0 };
@@ -1523,27 +1524,40 @@
             element.classList.add('active');
             renderOrders();
         }
-
+        
+        function filterByCategory(categoryId, element) {
+    currentCategoryFilter = categoryId;
+    document.querySelectorAll('#categories-list .chip').forEach(c => c.classList.remove('active'));
+    element.classList.add('active');
+    renderOrders();
+}
         async function loadCategories() {
-            const { data, error } = await supabaseClient
-                .from('categories')
-                .select('*')
-                .order('sort_order', { ascending: true });
+    const { data, error } = await supabaseClient
+        .from('categories')
+        .select('*')
+        .order('sort_order', { ascending: true });
 
-            const container = document.getElementById('categories-list');
-            const select = document.getElementById('order-category');
+    const container = document.getElementById('categories-list');
+    const select = document.getElementById('order-category');
+    
+    if (error || !data) {
+        container.innerHTML = '<div class="error">Ошибка загрузки</div>';
+        return;
+    }
 
-            if (error || !data) {
-                container.innerHTML = '<div class="error">Ошибка загрузки</div>';
-                return;
-            }
-
-            categoriesCache = data;
-            container.innerHTML = data.map(c => `<span class="chip">${c.name}</span>`).join(' ');
-            select.innerHTML = '<option value="">Выберите категорию</option>' +
-                data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-        }
-
+    categoriesCache = data;
+    
+    // Добавляем кнопку "Все категории"
+    let html = `<span class="chip active" onclick="filterByCategory('all', this)">Все</span>`;
+    data.forEach(c => {
+        html += `<span class="chip" onclick="filterByCategory(${c.id}, this)">${c.name}</span>`;
+    });
+    container.innerHTML = html;
+    
+    select.innerHTML = '<option value="">Выберите категорию</option>' + 
+        data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+}
+        
         async function loadOrders() {
     const { data, error } = await supabaseClient
         .from('orders')
@@ -1587,9 +1601,19 @@ async function loadReviewStatus() {
     ordersWithReviews = new Set(reviews?.map(r => r.order_id) || []);
 }
 
-        function renderOrders() {
+       function renderOrders() {
     const container = document.getElementById('orders-list');
-    const filteredOrders = currentDistrictFilter === 'all' ? allOrders : allOrders.filter(o => o.district === currentDistrictFilter);
+    
+    // Фильтрация по району И категории
+    let filteredOrders = allOrders;
+    
+    if (currentDistrictFilter !== 'all') {
+        filteredOrders = filteredOrders.filter(o => o.district === currentDistrictFilter);
+    }
+    
+    if (currentCategoryFilter !== 'all') {
+        filteredOrders = filteredOrders.filter(o => o.category_id === currentCategoryFilter);
+    }
 
     if (filteredOrders.length === 0) {
         container.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>В этом районе заявок пока нет</p></div>`;
@@ -1615,7 +1639,7 @@ async function loadReviewStatus() {
             if (order.awaiting_confirmation) {
                 const createdAt = new Date(order.created_at);
                 const daysLeft = Math.ceil((new Date(createdAt.getTime() + AUTO_COMPLETE_DAYS * 24 * 60 * 60 * 1000) - new Date()) / (1000 * 60 * 60 * 24));
-                responseBtn = `<div class="confirmation-banner"><i class="fas fa-info-circle"></i> Мастер отметил работу выполненной</div><div class="auto-complete-timer">⏰ Автоподтверждение через ${daysLeft} дн.</div><div style="display:flex; gap:8px; margin-top:8px;"><button class="btn btn-success btn-sm" onclick="confirmCompletion(${order.id})" id="confirm-btn-${order.id}"><i class="fas fa-check"></i> Подтвердить</button><button class="btn btn-danger btn-sm" onclick="rejectCompletion(${order.id})" id="reject-btn-${order.id}"><i class="fas fa-times"></i> Отклонить</button></div>`;
+                responseBtn = `<div class="confirmation-banner"><i class="fas fa-info-circle"></i> Мастер отметил работу выполненной</div><div class="auto-complete-timer"> Автоподтверждение через ${daysLeft} дн.</div><div style="display:flex; gap:8px; margin-top:8px;"><button class="btn btn-success btn-sm" onclick="confirmCompletion(${order.id})" id="confirm-btn-${order.id}"><i class="fas fa-check"></i> Подтвердить</button><button class="btn btn-danger btn-sm" onclick="rejectCompletion(${order.id})" id="reject-btn-${order.id}"><i class="fas fa-times"></i> Отклонить</button></div>`;
             } else if (order.status === 'completed' && !ordersWithReviews.has(order.id)) {
                 responseBtn = `<button class="btn btn-warning" onclick="openReviewModal(${order.id}, ${order.assigned_master_id})"><i class="fas fa-star"></i> Оставить отзыв</button>`;
             } else if (order.status === 'completed' && ordersWithReviews.has(order.id)) {
