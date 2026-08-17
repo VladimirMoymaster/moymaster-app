@@ -1486,22 +1486,17 @@
     <script>
         // ===== ФИЛЬТР НЕЦЕНЗУРНОЙ ЛЕКСИКИ =====
         const BAD_WORDS = [
-            // Основные матерные слова
             'мат', 'бля', 'сука', 'хуй', 'пизда', 'ебать', 'ёбать', 'ебал', 'ебало', 'еблан',
             'хрен', 'хер', 'мудак', 'козел', 'сукин', 'блять', 'блядь', 'пиздец', 'хуйня',
             'ебаный', 'ёбаный', 'нахуй', 'похуй', 'заебал', 'заебало', 'выебон', 'проебал',
             'уебан', 'долбоеб', 'даун', 'лох', 'тупой', 'идиот', 'дебил', 'кретин', 'урод',
             'гандон', 'пидор', 'петух', 'шалава', 'шлюха', 'блуд', 'распут',
-            // Вариации с заменой букв
             'xуй', 'xep', 'пiзда', 'бляд', 'cyka', 'eбaть', 'ёбaть',
-            // Сокращения
             'хз', 'пздц', 'нх', 'пх', 'збс'
         ];
 
-        // Список исключений (слова, которые нельзя блокировать)
         const EXCEPTIONS = [
-            'математика', 'матч', 'матка', 'материк', 'материал', 'материнский',
-            'пиздатый' // в значении "крутой"
+            'математика', 'матч', 'матка', 'материк', 'материал', 'материнский'
         ];
 
         function filterBadWords(text) {
@@ -1513,22 +1508,16 @@
             let found = false;
             const lowerText = text.toLowerCase();
 
-            // Проверяем каждое плохое слово
             BAD_WORDS.forEach(word => {
-                // Проверяем, является ли слово исключением
                 const isException = EXCEPTIONS.some(ex => lowerText.includes(ex.toLowerCase()));
-                
                 if (!isException && lowerText.includes(word.toLowerCase())) {
                     found = true;
-                    // Создаем regex для замены с учетом регистра
                     const regex = new RegExp(word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
                     filtered = filtered.replace(regex, '***');
                 }
             });
 
-            // Если нашли мат, заменяем на звёздочки
             if (found) {
-                // Дополнительная очистка: убираем возможные остатки
                 filtered = filtered.replace(/\*\*\*+/g, '***');
             }
 
@@ -1538,26 +1527,6 @@
                 cleaned: found ? filtered : text,
                 hasOnlyBadWords: found && filtered.replace(/\s/g, '').replace(/\*/g, '').trim() === ''
             };
-        }
-
-        function validateTextField(inputId, warningId, maxLength = 500) {
-            const input = document.getElementById(inputId);
-            const warning = document.getElementById(warningId);
-            
-            if (!input) return true;
-            
-            const text = input.value;
-            const result = filterBadWords(text);
-            
-            if (result.found) {
-                warning.classList.add('show');
-                input.classList.add('error');
-                return false;
-            } else {
-                warning.classList.remove('show');
-                input.classList.remove('error');
-                return true;
-            }
         }
 
         function sanitizeText(text) {
@@ -1572,38 +1541,19 @@
                 window.vkBridge = {
                     send: async function(method, params) {
                         console.log(`📱 VK Bridge fallback: ${method}`, params || '');
-                        
                         switch(method) {
-                            case 'VKWebAppInit':
-                                return { status: 'success' };
-                                
-                            case 'VKWebAppGetUserInfo':
-                                return { 
-                                    id: 999999, 
-                                    first_name: 'Тестовый', 
-                                    last_name: 'Пользователь' 
-                                };
-                                
-                            case 'VKWebAppGetLaunchParams':
-                                return { app_id: 'test_app' };
-                                
-                            case 'VKWebAppShare':
-                                alert('📤 Поделиться: ' + params.link);
-                                return { status: 'success' };
-                                
-                            case 'VKWebAppShowOrderBox':
-                                console.log('💳 Тестовый режим оплаты:', params);
+                            case 'VKWebAppInit': return { status: 'success' };
+                            case 'VKWebAppGetUserInfo': return { id: 999999, first_name: 'Тестовый', last_name: 'Пользователь' };
+                            case 'VKWebAppGetLaunchParams': return { app_id: 'test_app' };
+                            case 'VKWebAppShare': alert('📤 Поделиться: ' + params.link); return { status: 'success' };
+                            case 'VKWebAppShowOrderBox': {
                                 if (params.test_mode === 1) {
                                     alert('💳 Тестовый режим: оплата прошла успешно!');
-                                    return { 
-                                        status: 'success', 
-                                        order_id: `test_order_${Date.now()}` 
-                                    };
+                                    return { status: 'success', order_id: `test_order_${Date.now()}` };
                                 }
                                 throw new Error('VK Pay недоступен на ПК');
-                                
-                            default:
-                                throw new Error(`Метод ${method} не поддерживается на ПК`);
+                            }
+                            default: throw new Error(`Метод ${method} не поддерживается на ПК`);
                         }
                     }
                 };
@@ -1648,40 +1598,22 @@
         // ===== ФУНКЦИЯ ИНИЦИАЛИЗАЦИИ =====
         async function initApp() {
             console.log('🚀 Инициализация...');
-            console.log('🌐 Окружение:', typeof vkBridge !== 'undefined' ? 'VK Bridge' : 'Без VK');
-            
             const loadingScreen = document.getElementById('loading-screen');
             
             try {
-                console.log('📱 Инициализация VK Bridge...');
-                
-                const initPromise = vkBridge.send('VKWebAppInit');
-                const timeoutPromise = new Promise((_, reject) => 
-                    setTimeout(() => reject(new Error('Таймаут VK Bridge')), 3000)
-                );
-                
-                await Promise.race([initPromise, timeoutPromise]);
+                await Promise.race([
+                    vkBridge.send('VKWebAppInit'),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('Таймаут VK Bridge')), 3000))
+                ]);
                 console.log('✅ VK Bridge инициализирован');
                 
                 try {
                     const launchParams = await vkBridge.send('VKWebAppGetLaunchParams');
-                    if (launchParams?.app_id) {
-                        appId = launchParams.app_id;
-                        console.log('✅ App ID:', appId);
-                    }
-                } catch (err) {
-                    console.warn('⚠️ Не удалось получить app_id:', err.message);
-                }
+                    if (launchParams?.app_id) appId = launchParams.app_id;
+                } catch (err) { console.warn('⚠️ Не удалось получить app_id:', err.message); }
                 
-                console.log('👤 Получение данных пользователя...');
                 const userData = await vkBridge.send('VKWebAppGetUserInfo');
-                console.log('✅ Пользователь:', userData);
-                
-                await loadOrCreateUser(
-                    userData.id, 
-                    `${userData.first_name} ${userData.last_name}`.trim()
-                );
-                
+                await loadOrCreateUser(userData.id, `${userData.first_name} ${userData.last_name}`.trim());
             } catch (err) {
                 console.error('❌ Ошибка инициализации:', err);
                 console.log('⚠️ Переход в тестовый режим...');
@@ -1689,9 +1621,7 @@
             } finally {
                 if (loadingScreen) {
                     loadingScreen.classList.add('hidden');
-                    setTimeout(() => {
-                        loadingScreen.style.display = 'none';
-                    }, 500);
+                    setTimeout(() => loadingScreen.style.display = 'none', 500);
                 }
                 console.log('✅ Загрузка завершена');
             }
@@ -1699,74 +1629,49 @@
 
         // ===== ФУНКЦИИ РАБОТЫ С ФОТО =====
         async function uploadPhotos() {
-            console.log('📸 Попытка загрузки фото...');
-
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = 'image/*';
             input.multiple = true;
             input.style.display = 'none';
-
             input.onchange = async () => {
                 if (input.files && input.files.length > 0) {
-                    console.log(`Выбрано файлов: ${input.files.length}`);
-
                     for (let i = 0; i < input.files.length; i++) {
                         const file = input.files[i];
-
                         if (file.size > 5 * 1024 * 1024) {
                             alert(`Файл "${file.name}" слишком большой (макс. 5MB)`);
                             continue;
                         }
-
                         try {
-                            const base64 = await fileToBase64(file);
+                            const base64 = await new Promise((resolve, reject) => {
+                                const reader = new FileReader();
+                                reader.readAsDataURL(file);
+                                reader.onload = () => resolve(reader.result);
+                                reader.onerror = reject;
+                            });
                             uploadedPhotos.push(base64);
-                            console.log('✅ Фото добавлено');
                         } catch (err) {
                             console.error('❌ Ошибка:', err);
                             alert('Не удалось обработать фото');
                         }
                     }
-
                     renderPhotoPreview();
                 }
             };
-
             document.body.appendChild(input);
             input.click();
-
-            setTimeout(() => {
-                if (input.parentNode) {
-                    input.parentNode.removeChild(input);
-                }
-            }, 1000);
-        }
-
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
+            setTimeout(() => { if (input.parentNode) input.parentNode.removeChild(input); }, 1000);
         }
 
         function renderPhotoPreview() {
             const container = document.getElementById('photo-preview');
-            if (uploadedPhotos.length === 0) {
-                container.innerHTML = '';
-                return;
-            }
+            if (uploadedPhotos.length === 0) { container.innerHTML = ''; return; }
             container.innerHTML = uploadedPhotos.map((photo, idx) =>
                 `<img src="${photo}" onclick="removePhoto(${idx})" title="Нажмите, чтобы удалить">`
             ).join('');
         }
 
-        function removePhoto(idx) {
-            uploadedPhotos.splice(idx, 1);
-            renderPhotoPreview();
-        }
+        function removePhoto(idx) { uploadedPhotos.splice(idx, 1); renderPhotoPreview(); }
 
         // ===== ЗАГРУЗКА ПОЛЬЗОВАТЕЛЯ =====
         async function loadOrCreateUser(vkId, name) {
@@ -1780,15 +1685,7 @@
                 if (!users) {
                     const { data: newUser } = await supabaseClient
                         .from('users')
-                        .insert([{
-                            vk_id: vkId,
-                            name: name,
-                            role: 'customer',
-                            subscription_type: 'free',
-                            average_rating: 0,
-                            is_partner: false,
-                            partner_balance: 0
-                        }])
+                        .insert([{ vk_id: vkId, name: name, role: 'customer', subscription_type: 'free', average_rating: 0, is_partner: false, partner_balance: 0 }])
                         .select()
                         .single();
                     currentUser = newUser;
@@ -1797,32 +1694,22 @@
                 }
 
                 console.log('✅ Пользователь:', currentUser);
-
-                if (currentUser.role === 'master') {
-                    await countTodayResponses();
-                }
-
+                if (currentUser.role === 'master') await countTodayResponses();
                 await checkAutoComplete();
-
                 updateProfileUI();
                 renderDistrictFilters();
                 await loadCategories();
                 await loadOrders();
                 await loadResponses();
-
-                if (currentUser.is_partner) {
-                    await loadPartnerStats();
-                }
+                if (currentUser.is_partner) await loadPartnerStats();
             } catch (err) {
                 console.error('❌ Ошибка:', err);
-                document.getElementById('profile-info').innerHTML =
-                    `<div class="error">Ошибка: ${err.message}</div>`;
+                document.getElementById('profile-info').innerHTML = `<div class="error">Ошибка: ${err.message}</div>`;
             }
         }
 
         async function checkAutoComplete() {
             if (!currentUser) return;
-
             const threeDaysAgo = new Date();
             threeDaysAgo.setDate(threeDaysAgo.getDate() - AUTO_COMPLETE_DAYS);
             const threeDaysAgoISO = threeDaysAgo.toISOString();
@@ -1836,55 +1723,36 @@
                 .is('completed_at', null);
 
             if (error || !oldOrders || oldOrders.length === 0) return;
-
-            console.log(`⏰ Автозавершение ${oldOrders.length} заявок`);
-
             for (const order of oldOrders) {
                 await supabaseClient
                     .from('orders')
-                    .update({
-                        status: 'completed',
-                        completed_at: new Date().toISOString(),
-                        awaiting_confirmation: false
-                    })
+                    .update({ status: 'completed', completed_at: new Date().toISOString(), awaiting_confirmation: false })
                     .eq('id', order.id);
             }
         }
 
         async function countTodayResponses() {
             if (!currentUser || currentUser.role !== 'master') return;
-
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-            const todayISO = today.toISOString();
-
             const { count, error } = await supabaseClient
                 .from('bookings')
                 .select('*', { count: 'exact', head: true })
                 .eq('master_id', currentUser.id)
-                .gte('created_at', todayISO);
-
-            if (error) {
-                todayResponsesCount = 0;
-            } else {
-                todayResponsesCount = count || 0;
-            }
+                .gte('created_at', today.toISOString());
+            todayResponsesCount = error ? 0 : (count || 0);
         }
 
         // ===== ФИЛЬТРЫ =====
         function renderDistrictFilters() {
             const container = document.getElementById('district-filter');
             const select = document.getElementById('order-district');
-
-            let html =
-                `<div class="district-chip active" onclick="filterByDistrict('all', this)"><i class="fas fa-globe"></i> Все</div>`;
+            let html = `<div class="district-chip active" onclick="filterByDistrict('all', this)"><i class="fas fa-globe"></i> Все</div>`;
             BARNAUL_DISTRICTS.forEach(d => {
                 html += `<div class="district-chip" onclick="filterByDistrict('${d}', this)">${d}</div>`;
             });
             container.innerHTML = html;
-
-            select.innerHTML = '<option value="">Выберите район</option>' +
-                BARNAUL_DISTRICTS.map(d => `<option value="${d}">${d}</option>`).join('');
+            select.innerHTML = '<option value="">Выберите район</option>' + BARNAUL_DISTRICTS.map(d => `<option value="${d}">${d}</option>`).join('');
         }
 
         function filterByDistrict(district, element) {
@@ -1917,15 +1785,12 @@
             }
 
             categoriesCache = data;
-
             let html = `<span class="chip active" onclick="filterByCategory('all', this)">Все</span>`;
             data.forEach(c => {
                 html += `<span class="chip" onclick="filterByCategory(${c.id}, this)">${c.name}</span>`;
             });
             container.innerHTML = html;
-
-            select.innerHTML = '<option value="">Выберите категорию</option>' +
-                data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            select.innerHTML = '<option value="">Выберите категорию</option>' + data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
         }
 
         // ===== ЗАГРУЗКА ЗАЯВОК =====
@@ -1942,7 +1807,6 @@
             }
 
             allOrders = data;
-            
             await loadMyBookings();
             await loadReviewStatus();
             renderOrders();
@@ -1950,69 +1814,46 @@
 
         async function loadMyBookings() {
             if (!currentUser || currentUser.role !== 'master') return;
-            
             const { data, error } = await supabaseClient
                 .from('bookings')
                 .select('order_id, slots')
                 .eq('master_id', currentUser.id);
-            
             if (error) return;
-            
             myBookings = new Map();
-            data.forEach(b => {
-                myBookings.set(b.order_id, { slots: b.slots });
-            });
+            data.forEach(b => myBookings.set(b.order_id, { slots: b.slots }));
         }
 
         async function loadReviewStatus() {
             if (!currentUser) return;
-
             const userOrderIds = allOrders
                 .filter(o => o.user_id === currentUser.id && o.status === 'completed')
                 .map(o => o.id);
-
-            if (userOrderIds.length === 0) {
-                ordersWithReviews = new Set();
-                return;
-            }
-
+            if (userOrderIds.length === 0) { ordersWithReviews = new Set(); return; }
             const { data: reviews } = await supabaseClient
                 .from('reviews')
                 .select('order_id')
                 .in('order_id', userOrderIds)
                 .eq('reviewer_id', currentUser.id);
-
             ordersWithReviews = new Set(reviews?.map(r => r.order_id) || []);
         }
 
         // ===== ОТОБРАЖЕНИЕ ЗАЯВОК =====
         function renderOrders() {
             const container = document.getElementById('orders-list');
-
             let filteredOrders = allOrders;
-
-            if (currentDistrictFilter !== 'all') {
-                filteredOrders = filteredOrders.filter(o => o.district === currentDistrictFilter);
-            }
-
-            if (currentCategoryFilter !== 'all') {
-                filteredOrders = filteredOrders.filter(o => o.category_id === currentCategoryFilter);
-            }
+            if (currentDistrictFilter !== 'all') filteredOrders = filteredOrders.filter(o => o.district === currentDistrictFilter);
+            if (currentCategoryFilter !== 'all') filteredOrders = filteredOrders.filter(o => o.category_id === currentCategoryFilter);
 
             if (filteredOrders.length === 0) {
-                container.innerHTML =
-                    `<div class="empty-state"><i class="fas fa-inbox"></i><p>Заявок пока нет</p></div>`;
+                container.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>Заявок пока нет</p></div>`;
                 return;
             }
 
             container.innerHTML = filteredOrders.map(order => {
                 const cat = categoriesCache.find(c => c.id === order.category_id);
-                const statusClass = order.status === 'open' ? 'open' :
-                    order.status === 'in_progress' ? 'in_progress' : 'completed';
-                const statusText = order.status === 'open' ? 'Открыта' :
-                    order.status === 'in_progress' ? 'В работе' : 'Завершена';
+                const statusClass = order.status === 'open' ? 'open' : order.status === 'in_progress' ? 'in_progress' : 'completed';
+                const statusText = order.status === 'open' ? 'Открыта' : order.status === 'in_progress' ? 'В работе' : 'Завершена';
                 const isOwnOrder = currentUser && order.user_id === currentUser.id;
-                
                 const totalSlots = order.slots || 1;
                 const takenSlots = order.taken_slots || 0;
                 const freeSlots = totalSlots - takenSlots;
@@ -2020,103 +1861,61 @@
                 const myBooking = myBookings.get(order.id);
                 const hasMyBooking = myBooking !== undefined;
                 const mySlots = hasMyBooking ? myBooking.slots : 0;
-                
-                let responseBtn = '';
-                let progressHtml = '';
 
                 const percent = Math.round((takenSlots / totalSlots) * 100);
-                progressHtml = `
+                const progressHtml = `
                     <div class="slots-progress">
-                        <div class="slots-header">
-                            <span>👥 Занято ${takenSlots} из ${totalSlots} мест</span>
-                            <span>${percent}%</span>
-                        </div>
-                        <div class="slots-bar">
-                            <div class="slots-bar-fill" style="width: ${percent}%;"></div>
-                        </div>
-                        <div class="slots-icons">
-                            ${Array.from({ length: totalSlots }, (_, i) => {
-                                const isFilled = i < takenSlots;
-                                const isMine = hasMyBooking && i < takenSlots && i >= takenSlots - mySlots;
-                                return `<div class="slot ${isFilled ? (isMine ? 'filled-by-me' : 'filled') : ''}">
-                                    ${isFilled ? '👤' : '⬜'}
-                                </div>`;
-                            }).join('')}
-                        </div>
+                        <div class="slots-header"><span>👥 Занято ${takenSlots} из ${totalSlots} мест</span><span>${percent}%</span></div>
+                        <div class="slots-bar"><div class="slots-bar-fill" style="width: ${percent}%;"></div></div>
+                        <div class="slots-icons">${Array.from({ length: totalSlots }, (_, i) => {
+                            const isFilled = i < takenSlots;
+                            const isMine = hasMyBooking && i < takenSlots && i >= takenSlots - mySlots;
+                            return `<div class="slot ${isFilled ? (isMine ? 'filled-by-me' : 'filled') : ''}">${isFilled ? '👤' : '⬜'}</div>`;
+                        }).join('')}</div>
                     </div>
                 `;
 
+                let responseBtn = '';
                 if (currentUser?.role === 'master' && order.status === 'open' && !isOwnOrder) {
                     if (isFullyBooked) {
-                        responseBtn = `<div style="font-size:13px; color:var(--success); font-weight:600; margin-top:10px;">
-                            ✅ Все места заняты! Заявка переходит в работу...
-                        </div>`;
+                        responseBtn = `<div style="font-size:13px; color:var(--success); font-weight:600; margin-top:10px;">✅ Все места заняты! Заявка переходит в работу...</div>`;
                     } else if (hasMyBooking) {
                         responseBtn = `
-                            <div style="font-size:13px; color:var(--text-secondary); margin-top:8px;">
-                                Вы забронировали ${mySlots} место(а)
-                            </div>
-                            <button class="btn btn-danger btn-sm" onclick="cancelBooking(${order.id})" style="margin-top:6px;">
-                                <i class="fas fa-times"></i> Отменить бронь
-                            </button>
+                            <div style="font-size:13px; color:var(--text-secondary); margin-top:8px;">Вы забронировали ${mySlots} место(а)</div>
+                            <button class="btn btn-danger btn-sm" onclick="cancelBooking(${order.id})" style="margin-top:6px;"><i class="fas fa-times"></i> Отменить бронь</button>
                         `;
                     } else {
-                        const canBookSingle = freeSlots >= 1;
-                        const canBookPair = freeSlots >= 2;
-                        const canBookTeam = freeSlots === totalSlots;
-                        
                         responseBtn = `
                             <div class="booking-options">
-                                ${canBookSingle ? `<button class="btn btn-book-single btn-sm" onclick="bookSlots(${order.id}, 1)">
-                                    <i class="fas fa-user"></i> 1 место
-                                </button>` : ''}
-                                ${canBookPair ? `<button class="btn btn-book-pair btn-sm" onclick="bookSlots(${order.id}, 2)">
-                                    <i class="fas fa-user-plus"></i> 2 места
-                                </button>` : ''}
-                                ${canBookTeam ? `<button class="btn btn-book-team btn-sm" onclick="bookSlots(${order.id}, ${freeSlots})">
-                                    <i class="fas fa-users"></i> Всю бригаду
-                                </button>` : ''}
+                                ${freeSlots >= 1 ? `<button class="btn btn-book-single btn-sm" onclick="bookSlots(${order.id}, 1)"><i class="fas fa-user"></i> 1 место</button>` : ''}
+                                ${freeSlots >= 2 ? `<button class="btn btn-book-pair btn-sm" onclick="bookSlots(${order.id}, 2)"><i class="fas fa-user-plus"></i> 2 места</button>` : ''}
+                                ${freeSlots === totalSlots ? `<button class="btn btn-book-team btn-sm" onclick="bookSlots(${order.id}, ${freeSlots})"><i class="fas fa-users"></i> Всю бригаду</button>` : ''}
                             </div>
                         `;
                     }
                 } else if (isOwnOrder) {
                     if (order.awaiting_confirmation) {
-                        const createdAt = new Date(order.created_at);
-                        const daysLeft = Math.ceil((new Date(createdAt.getTime() + AUTO_COMPLETE_DAYS * 24 * 60 * 60 *
-                            1000) - new Date()) / (1000 * 60 * 60 * 24));
-                        responseBtn =
-                            `<div class="confirmation-banner"><i class="fas fa-info-circle"></i> Мастер отметил работу выполненной</div>
+                        const daysLeft = Math.ceil((new Date(new Date(order.created_at).getTime() + AUTO_COMPLETE_DAYS * 24 * 60 * 60 * 1000) - new Date()) / (1000 * 60 * 60 * 24));
+                        responseBtn = `
+                            <div class="confirmation-banner"><i class="fas fa-info-circle"></i> Мастер отметил работу выполненной</div>
                             <div class="auto-complete-timer">⏰ Автоподтверждение через ${daysLeft} дн.</div>
                             <div style="display:flex; gap:8px; margin-top:8px;">
-                                <button class="btn btn-success btn-sm" onclick="confirmCompletion(${order.id})" id="confirm-btn-${order.id}">
-                                    <i class="fas fa-check"></i> Подтвердить
-                                </button>
-                                <button class="btn btn-danger btn-sm" onclick="rejectCompletion(${order.id})" id="reject-btn-${order.id}">
-                                    <i class="fas fa-times"></i> Отклонить
-                                </button>
-                            </div>`;
+                                <button class="btn btn-success btn-sm" onclick="confirmCompletion(${order.id})" id="confirm-btn-${order.id}"><i class="fas fa-check"></i> Подтвердить</button>
+                                <button class="btn btn-danger btn-sm" onclick="rejectCompletion(${order.id})" id="reject-btn-${order.id}"><i class="fas fa-times"></i> Отклонить</button>
+                            </div>
+                        `;
                     } else if (order.status === 'completed' && !ordersWithReviews.has(order.id)) {
-                        responseBtn =
-                            `<button class="btn btn-warning" onclick="openReviewModal(${order.id}, ${order.assigned_master_id})">
-                                <i class="fas fa-star"></i> Оставить отзыв
-                            </button>`;
+                        responseBtn = `<button class="btn btn-warning" onclick="openReviewModal(${order.id}, ${order.assigned_master_id})"><i class="fas fa-star"></i> Оставить отзыв</button>`;
                     } else if (order.status === 'completed' && ordersWithReviews.has(order.id)) {
-                        responseBtn =
-                            `<div style="font-size:13px; color:var(--success); font-weight:600; margin-top:10px;">
-                                <i class="fas fa-check-circle"></i> Отзыв оставлен
-                            </div>`;
+                        responseBtn = `<div style="font-size:13px; color:var(--success); font-weight:600; margin-top:10px;"><i class="fas fa-check-circle"></i> Отзыв оставлен</div>`;
                     } else {
-                        responseBtn =
-                            `<div style="font-size:13px; color:var(--text-muted);">
-                                <i class="fas fa-tag"></i> Ваша заявка
-                            </div>`;
+                        responseBtn = `<div style="font-size:13px; color:var(--text-muted);"><i class="fas fa-tag"></i> Ваша заявка</div>`;
                     }
                 }
 
                 let photosHtml = '';
                 if (order.photos && Array.isArray(order.photos) && order.photos.length > 0) {
-                    photosHtml =
-                        `<div class="order-photos">${order.photos.map(p => `<img src="${p}" onclick="window.open('${p}')">`).join('')}</div>`;
+                    photosHtml = `<div class="order-photos">${order.photos.map(p => `<img src="${p}" onclick="window.open('${p}')">`).join('')}</div>`;
                 }
 
                 return `<div class="order-card">
@@ -2169,31 +1968,17 @@
 
                 const { error: bookingError } = await supabaseClient
                     .from('bookings')
-                    .insert([{
-                        order_id: orderId,
-                        master_id: currentUser.id,
-                        slots: slots,
-                        status: 'active'
-                    }]);
+                    .insert([{ order_id: orderId, master_id: currentUser.id, slots: slots, status: 'active' }]);
 
                 if (bookingError) throw bookingError;
 
                 const newTaken = (order.taken_slots || 0) + slots;
-                const { error: updateError } = await supabaseClient
+                await supabaseClient
                     .from('orders')
-                    .update({ 
-                        taken_slots: newTaken,
-                        status: newTaken >= (order.slots || 1) ? 'in_progress' : 'open'
-                    })
+                    .update({ taken_slots: newTaken, status: newTaken >= (order.slots || 1) ? 'in_progress' : 'open' })
                     .eq('id', orderId);
 
-                if (updateError) throw updateError;
-
-                if (newTaken >= (order.slots || 1)) {
-                    alert('✅ Все места заняты! Заявка перешла в работу.');
-                } else {
-                    alert(`✅ Вы забронировали ${slots} место(а). Осталось ${(order.slots || 1) - newTaken} мест.`);
-                }
+                alert(newTaken >= (order.slots || 1) ? '✅ Все места заняты! Заявка перешла в работу.' : `✅ Вы забронировали ${slots} место(а). Осталось ${(order.slots || 1) - newTaken} мест.`);
 
                 await loadMyBookings();
                 await loadOrders();
@@ -2225,17 +2010,9 @@
                     .eq('master_id', currentUser.id)
                     .single();
 
-                if (!booking) {
-                    alert('❌ Бронирование не найдено');
-                    return;
-                }
+                if (!booking) { alert('❌ Бронирование не найдено'); return; }
 
-                const { error: deleteError } = await supabaseClient
-                    .from('bookings')
-                    .delete()
-                    .eq('id', booking.id);
-
-                if (deleteError) throw deleteError;
+                await supabaseClient.from('bookings').delete().eq('id', booking.id);
 
                 const { data: order } = await supabaseClient
                     .from('orders')
@@ -2247,10 +2024,7 @@
                     const newTaken = Math.max(0, (order.taken_slots || 0) - booking.slots);
                     await supabaseClient
                         .from('orders')
-                        .update({ 
-                            taken_slots: newTaken,
-                            status: 'open'
-                        })
+                        .update({ taken_slots: newTaken, status: 'open' })
                         .eq('id', orderId);
                 }
 
@@ -2268,16 +2042,14 @@
             }
         }
 
-        // ===== ЗАГРУЗКА БРОНИРОВАНИЙ ДЛЯ ПРОФИЛЯ =====
+        // ===== ЗАГРУЗКА БРОНИРОВАНИЙ =====
         async function loadResponses() {
             if (!currentUser) return;
-
             const container = document.getElementById('responses-list');
             const title = document.getElementById('responses-title');
 
             if (currentUser.role === 'master') {
                 title.textContent = 'Мои бронирования';
-                
                 const { data, error } = await supabaseClient
                     .from('bookings')
                     .select('*, orders(title, status, slots, taken_slots, user_id)')
@@ -2285,8 +2057,7 @@
                     .order('created_at', { ascending: false });
 
                 if (error || !data || data.length === 0) {
-                    container.innerHTML =
-                        `<div class="empty-state"><i class="fas fa-inbox"></i><p>Вы пока не бронировали места</p></div>`;
+                    container.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>Вы пока не бронировали места</p></div>`;
                     return;
                 }
 
@@ -2295,69 +2066,49 @@
                     const totalSlots = order?.slots || 1;
                     const takenSlots = order?.taken_slots || 0;
                     const isFull = takenSlots >= totalSlots;
-                    
                     return `
                         <div class="response-item">
                             <div style="font-weight:600; margin-bottom:4px;">${order?.title || 'Заявка #' + b.order_id}</div>
-                            <div style="font-size:14px; color:var(--text-secondary);">
-                                Забронировано: ${b.slots} место(а) из ${totalSlots}
-                            </div>
+                            <div style="font-size:14px; color:var(--text-secondary);">Забронировано: ${b.slots} место(а) из ${totalSlots}</div>
                             <div style="display:flex; justify-content:space-between; margin-top:8px; align-items:center;">
-                                <span style="font-size:13px; color:var(--text-muted);">
-                                    ${isFull ? '✅ Все места заняты' : `🔄 Осталось ${totalSlots - takenSlots} мест`}
-                                </span>
+                                <span style="font-size:13px; color:var(--text-muted);">${isFull ? '✅ Все места заняты' : `🔄 Осталось ${totalSlots - takenSlots} мест`}</span>
                                 <span style="font-size:13px; color:var(--text-muted);">Статус: ${order?.status === 'open' ? 'Открыта' : order?.status === 'in_progress' ? 'В работе' : 'Завершена'}</span>
                             </div>
-                            ${order?.status === 'open' ? `<button class="btn btn-danger btn-sm" onclick="cancelBooking(${b.order_id})" style="margin-top:8px;">
-                                <i class="fas fa-times"></i> Отменить бронь
-                            </button>` : ''}
+                            ${order?.status === 'open' ? `<button class="btn btn-danger btn-sm" onclick="cancelBooking(${b.order_id})" style="margin-top:8px;"><i class="fas fa-times"></i> Отменить бронь</button>` : ''}
                         </div>
                     `;
                 }).join('');
-                
             } else {
                 title.textContent = 'Бронирования на мои заявки';
-                
                 const { data: myOrders } = await supabaseClient
                     .from('orders')
                     .select('id, title, slots, taken_slots')
                     .eq('user_id', currentUser.id);
-                
                 if (!myOrders || myOrders.length === 0) {
-                    container.innerHTML =
-                        `<div class="empty-state"><i class="fas fa-file-alt"></i><p>У вас нет заявок</p></div>`;
+                    container.innerHTML = `<div class="empty-state"><i class="fas fa-file-alt"></i><p>У вас нет заявок</p></div>`;
                     return;
                 }
-                
                 const orderIds = myOrders.map(o => o.id);
                 const { data: bookings } = await supabaseClient
                     .from('bookings')
                     .select('*, users(name)')
                     .in('order_id', orderIds)
                     .order('created_at', { ascending: false });
-                
                 if (!bookings || bookings.length === 0) {
-                    container.innerHTML =
-                        `<div class="empty-state"><i class="fas fa-clock"></i><p>На ваши заявки пока нет бронирований</p></div>`;
+                    container.innerHTML = `<div class="empty-state"><i class="fas fa-clock"></i><p>На ваши заявки пока нет бронирований</p></div>`;
                     return;
                 }
-                
                 container.innerHTML = bookings.map(b => {
                     const order = myOrders.find(o => o.id === b.order_id);
                     const totalSlots = order?.slots || 1;
                     const takenSlots = order?.taken_slots || 0;
-                    
                     return `
                         <div class="response-item">
                             <div style="font-size:13px; color:var(--text-muted);">Заявка: ${order?.title || '#' + b.order_id}</div>
                             <div style="font-weight:600; margin:4px 0;">${b.users?.name || 'Мастер'}</div>
-                            <div style="font-size:14px; color:var(--text-secondary);">
-                                Забронировал: ${b.slots} место(а) из ${totalSlots}
-                            </div>
+                            <div style="font-size:14px; color:var(--text-secondary);">Забронировал: ${b.slots} место(а) из ${totalSlots}</div>
                             <div style="display:flex; justify-content:space-between; margin-top:6px; align-items:center;">
-                                <span style="font-size:13px; color:var(--text-muted);">
-                                    ${takenSlots >= totalSlots ? '✅ Заполнено' : `🔄 Осталось ${totalSlots - takenSlots}`}
-                                </span>
+                                <span style="font-size:13px; color:var(--text-muted);">${takenSlots >= totalSlots ? '✅ Заполнено' : `🔄 Осталось ${totalSlots - takenSlots}`}</span>
                             </div>
                         </div>
                     `;
@@ -2365,7 +2116,7 @@
             }
         }
 
-        // ===== СОЗДАНИЕ ЗАЯВКИ С ФИЛЬТРАЦИЕЙ =====
+        // ===== СОЗДАНИЕ ЗАЯВКИ =====
         async function createOrder() {
             if (!currentUser) return alert('Подождите загрузку');
 
@@ -2376,12 +2127,10 @@
             const slots = parseInt(document.getElementById('order-slots').value) || 1;
             const budget = document.getElementById('order-budget').value;
 
-            // Валидация полей
             if (!district) return alert('Выберите район');
             if (!categoryId || !title) return alert('Заполните категорию и заголовок');
             if (slots < 1) return alert('Минимум 1 место');
 
-            // Проверка на мат
             const titleCheck = filterBadWords(title);
             const descCheck = filterBadWords(description);
 
@@ -2399,7 +2148,6 @@
                 return;
             }
 
-            // Очищаем текст от мата (на всякий случай)
             title = sanitizeText(title);
             description = sanitizeText(description);
 
@@ -2439,13 +2187,10 @@
                 document.getElementById('order-district').value = '';
                 uploadedPhotos = [];
                 renderPhotoPreview();
-                
-                // Скрываем предупреждения
                 document.getElementById('title-filter-warning').classList.remove('show');
                 document.getElementById('desc-filter-warning').classList.remove('show');
                 document.getElementById('order-title').classList.remove('error');
                 document.getElementById('order-description').classList.remove('error');
-                
                 await loadOrders();
                 switchTab('home');
             }
@@ -2456,46 +2201,25 @@
 
         // ===== ПОДТВЕРЖДЕНИЕ ВЫПОЛНЕНИЯ =====
         async function confirmCompletion(orderId) {
-            console.log('🔍 Подтверждение выполнения заявки:', orderId);
-
             const btn = event.target;
             const originalText = btn.textContent;
-
             if (originalText.includes('Подтвердить')) {
                 btn.textContent = '⚠️ Точно подтвердить?';
                 btn.style.background = '#FF9800';
-
-                setTimeout(() => {
-                    btn.textContent = originalText;
-                    btn.style.background = '';
-                }, 3000);
-
+                setTimeout(() => { btn.textContent = originalText; btn.style.background = ''; }, 3000);
                 return;
             }
-
             btn.textContent = '⏳ Подтверждение...';
             btn.disabled = true;
-
             try {
-                const { data, error } = await supabaseClient
+                await supabaseClient
                     .from('orders')
-                    .update({
-                        status: 'completed',
-                        completed_at: new Date().toISOString(),
-                        awaiting_confirmation: false
-                    })
-                    .eq('id', orderId)
-                    .select();
-
-                if (error) throw error;
-
-                console.log('✅ Заявка обновлена:', data);
+                    .update({ status: 'completed', completed_at: new Date().toISOString(), awaiting_confirmation: false })
+                    .eq('id', orderId);
                 alert('✅ Работа подтверждена! Теперь вы можете оставить отзыв.');
                 await loadOrders();
                 await loadResponses();
-
             } catch (err) {
-                console.error('❌ Ошибка:', err);
                 alert('❌ Ошибка: ' + err.message);
                 btn.textContent = originalText;
                 btn.disabled = false;
@@ -2503,142 +2227,262 @@
         }
 
         async function rejectCompletion(orderId) {
-            console.log('🔍 Отклонение выполнения заявки:', orderId);
-
             const btn = event.target;
             const originalText = btn.textContent;
-
             if (originalText.includes('Отклонить')) {
                 btn.textContent = '⚠️ Точно отклонить?';
                 btn.style.background = '#FF5722';
-
-                setTimeout(() => {
-                    btn.textContent = originalText;
-                    btn.style.background = '';
-                }, 3000);
-
+                setTimeout(() => { btn.textContent = originalText; btn.style.background = ''; }, 3000);
                 return;
             }
-
             btn.textContent = '⏳ Отклонение...';
             btn.disabled = true;
-
             try {
-                const { error } = await supabaseClient
+                await supabaseClient
                     .from('orders')
                     .update({ awaiting_confirmation: false })
                     .eq('id', orderId);
-
-                if (error) throw error;
-
-                console.log('✅ Выполнение отклонено');
-                alert('⚠️ Выполнение отклонено. Мастер может отметить работу снова.');
+                alert('⚠️ Выполнение отклонено.');
                 await loadOrders();
                 await loadResponses();
-
             } catch (err) {
-                console.error('❌ Ошибка:', err);
                 alert('❌ Ошибка: ' + err.message);
                 btn.textContent = originalText;
                 btn.disabled = false;
             }
         }
 
-        // ===== ОТПРАВКА ОТКЛИКА С ФИЛЬТРАЦИЕЙ =====
-        async function submitResponse(orderId) {
-            const price = document.getElementById(`response-price-${orderId}`).value.trim();
-            let message = document.getElementById(`response-message-${orderId}`).value.trim();
-
-            if (!price) { alert('Укажите цену'); return; }
-
-            // Проверка на мат в сообщении
-            if (message) {
-                const msgCheck = filterBadWords(message);
-                if (msgCheck.found) {
-                    alert('⚠️ В сообщении обнаружена нецензурная лексика. Пожалуйста, исправьте текст.');
-                    return;
-                }
-                message = sanitizeText(message);
-            }
-
-            const btn = event.target;
-            btn.textContent = '⏳ Отправка...';
-            btn.disabled = true;
-
+        // ===== СМЕНА РОЛИ =====
+        async function toggleRole() {
+            if (!currentUser) return alert('Подождите загрузку');
+            const newRole = currentUser.role === 'customer' ? 'master' : 'customer';
             const { error } = await supabaseClient
-                .from('responses')
-                .insert([{
-                    order_id: orderId,
-                    user_id: currentUser.id,
-                    price: parseFloat(price),
-                    message: message || null,
-                    status: 'pending'
-                }]);
-
+                .from('users')
+                .update({ role: newRole })
+                .eq('id', currentUser.id);
             if (error) {
                 alert('❌ Ошибка: ' + error.message);
-                btn.textContent = '✅ Отправить';
-                btn.disabled = false;
             } else {
-                alert('✅ Отклик отправлен!');
-                cancelResponse(orderId);
-                todayResponsesCount++;
+                currentUser.role = newRole;
+                if (newRole === 'master') await countTodayResponses();
+                else todayResponsesCount = 0;
+                updateProfileUI();
                 await loadOrders();
                 await loadResponses();
-                switchTab('responses');
+                alert(`✅ Роль изменена на: ${newRole === 'master' ? 'Мастер' : 'Заказчик'}`);
             }
         }
 
-        // ===== ОТПРАВКА СООБЩЕНИЯ В ЧАТ С ФИЛЬТРАЦИЕЙ =====
-        async function sendMessage() {
-            const input = document.getElementById('message-input');
-            let message = input.value.trim();
+        // ===== PRO-ПОДПИСКА =====
+        function buyPro() { document.getElementById('pro-modal').classList.add('active'); }
+        function closeProModal() { document.getElementById('pro-modal').classList.remove('active'); }
 
-            if (!message || !currentChatOrderId || !currentChatPartnerId) {
-                alert('Введите сообщение');
-                return;
+        async function connectVKPay() {
+            if (!currentUser) { alert('Подождите загрузку профиля'); return; }
+            if (currentUser.subscription_type === 'pro') { alert('У вас уже активна Pro-подписка!'); return; }
+            const btn = event.target;
+            btn.textContent = '⏳ Обработка...';
+            btn.disabled = true;
+            try {
+                const orderData = {
+                    action: 'pay-to-group',
+                    app_id: parseInt(appId) || 0,
+                    order_id: `order_${currentUser.id}_${Date.now()}`,
+                    amount: 29900,
+                    description: 'Pro-подписка на 1 месяц',
+                    currency: 'RUB',
+                    test_mode: 1
+                };
+                const result = await vkBridge.send('VKWebAppShowOrderBox', orderData);
+                if (result.status === 'success' || result.status === 'success_new') {
+                    await activateProSubscription(result.order_id);
+                } else {
+                    alert('Оплата отменена или не завершена');
+                }
+            } catch (err) {
+                alert('Ошибка оплаты: ' + err.message);
             }
+            btn.textContent = 'Подключить VK Pay';
+            btn.disabled = false;
+        }
 
-            // Проверка на мат
-            const msgCheck = filterBadWords(message);
-            if (msgCheck.found) {
-                document.getElementById('chat-filter-warning').classList.add('show');
-                input.classList.add('error');
-                alert('⚠️ В сообщении обнаружена нецензурная лексика. Пожалуйста, исправьте текст.');
-                return;
+        async function activateProSubscription(vkOrderId) {
+            const expiresAt = new Date();
+            expiresAt.setDate(expiresAt.getDate() + 30);
+            await supabaseClient
+                .from('users')
+                .update({ subscription_type: 'pro', subscription_expires_at: expiresAt.toISOString() })
+                .eq('id', currentUser.id);
+            
+            if (currentUser.invited_by_partner_id) {
+                const partnerAmount = 299 * 0.30;
+                const { data: partnerData } = await supabaseClient
+                    .from('users')
+                    .select('partner_balance')
+                    .eq('id', currentUser.invited_by_partner_id)
+                    .single();
+                if (partnerData) {
+                    await supabaseClient
+                        .from('users')
+                        .update({ partner_balance: (partnerData.partner_balance || 0) + partnerAmount })
+                        .eq('id', currentUser.invited_by_partner_id);
+                }
             }
             
-            document.getElementById('chat-filter-warning').classList.remove('show');
-            input.classList.remove('error');
-            message = sanitizeText(message);
+            currentUser.subscription_type = 'pro';
+            alert(`✅ Pro-подписка активирована! Действует до: ${expiresAt.toLocaleDateString('ru-RU')}`);
+            updateProfileUI();
+            await loadOrders();
+        }
 
+        // ===== ПАРТНЕРСКАЯ ПРОГРАММА =====
+        function openPartnerApplicationModal() { document.getElementById('partner-application-modal').classList.add('active'); }
+        function closePartnerApplicationModal() { document.getElementById('partner-application-modal').classList.remove('active'); }
+
+        async function submitPartnerApplication() {
+            const vk = document.getElementById('partner-vk').value.trim();
+            let description = document.getElementById('partner-description').value.trim();
+            if (!vk || !description) { alert('Заполните все поля'); return; }
+            
+            const descCheck = filterBadWords(description);
+            if (descCheck.found) {
+                document.getElementById('partner-filter-warning').classList.add('show');
+                document.getElementById('partner-description').classList.add('error');
+                alert('⚠️ В описании обнаружена нецензурная лексика. Пожалуйста, исправьте текст.');
+                return;
+            }
+            document.getElementById('partner-filter-warning').classList.remove('show');
+            document.getElementById('partner-description').classList.remove('error');
+            description = sanitizeText(description);
+
+            const btn = event.target;
+            btn.textContent = '📤 Отправка...';
+            btn.disabled = true;
             const { error } = await supabaseClient
-                .from('messages')
-                .insert([{
-                    order_id: currentChatOrderId,
-                    sender_id: currentUser.id,
-                    receiver_id: currentChatPartnerId,
-                    message: message
-                }]);
-
+                .from('partner_applications')
+                .insert([{ user_id: currentUser.id, vk_profile: vk, description: description, status: 'pending' }]);
             if (error) {
-                alert('❌ Ошибка отправки: ' + error.message);
+                alert('❌ Ошибка: ' + error.message);
+                btn.textContent = '📤 Отправить заявку';
+                btn.disabled = false;
             } else {
-                input.value = '';
-                await loadMessages();
+                alert('✅ Заявка отправлена! Мы рассмотрим её в течение 24 часов.');
+                closePartnerApplicationModal();
+                document.getElementById('partner-vk').value = '';
+                document.getElementById('partner-description').value = '';
             }
         }
 
-        // ===== ОТПРАВКА ОТЗЫВА С ФИЛЬТРАЦИЕЙ =====
-        async function submitReview() {
-            if (selectedRating === 0) {
-                alert('Пожалуйста, выберите рейтинг');
+        async function loadPartnerStats() {
+            if (!currentUser || !currentUser.is_partner) return;
+            try {
+                const { count: invitedCount } = await supabaseClient
+                    .from('users')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('invited_by_partner_id', currentUser.id);
+                const { count: proCount } = await supabaseClient
+                    .from('users')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('invited_by_partner_id', currentUser.id)
+                    .eq('subscription_type', 'pro');
+                const { data: earnings } = await supabaseClient
+                    .from('partner_earnings')
+                    .select('amount')
+                    .eq('partner_id', currentUser.id);
+                const totalEarnings = earnings ? earnings.reduce((sum, e) => sum + parseFloat(e.amount), 0) : 0;
+                
+                document.getElementById('stat-invited').textContent = invitedCount || 0;
+                document.getElementById('stat-pro').textContent = proCount || 0;
+                document.getElementById('stat-earnings').textContent = Math.round(totalEarnings) + ' ₽';
+                document.getElementById('partner-balance').textContent = Math.round(currentUser.partner_balance || 0) + ' ₽';
+                
+                const partnerLink = appId ? `https://vk.com/app${appId}?ref=${currentUser.id}` : `https://vk.com/app?ref=${currentUser.id}`;
+                document.getElementById('partner-link').textContent = partnerLink;
+                
+                const withdrawBtn = document.getElementById('withdraw-btn');
+                if (currentUser.partner_balance < MIN_WITHDRAW) {
+                    withdrawBtn.disabled = true;
+                    withdrawBtn.textContent = `💳 Недостаточно средств (мин. ${MIN_WITHDRAW} ₽)`;
+                }
+            } catch (err) { console.error('Ошибка загрузки партнерской статистики:', err); }
+        }
+
+        function copyPartnerLink() {
+            const link = document.getElementById('partner-link').textContent;
+            navigator.clipboard.writeText(link).then(() => alert('✅ Ссылка скопирована!')).catch(() => alert('Не удалось скопировать'));
+        }
+
+        async function sharePartnerLink() {
+            const link = document.getElementById('partner-link').textContent;
+            try { await vkBridge.send('VKWebAppShare', { link: link }); } catch (err) { alert('Не удалось поделиться'); }
+        }
+
+        function openWithdrawModal() {
+            if (currentUser.partner_balance < MIN_WITHDRAW) {
+                alert(`Минимальная сумма вывода: ${MIN_WITHDRAW} ₽`);
                 return;
             }
+            document.getElementById('withdraw-modal').classList.add('active');
+        }
 
+        function closeWithdrawModal() { document.getElementById('withdraw-modal').classList.remove('active'); }
+
+        async function submitWithdrawal() {
+            const amount = parseFloat(document.getElementById('withdraw-amount').value);
+            const method = document.getElementById('withdraw-method').value;
+            const details = document.getElementById('withdraw-details').value.trim();
+            if (!amount || amount < MIN_WITHDRAW) { alert(`Минимальная сумма: ${MIN_WITHDRAW} ₽`); return; }
+            if (!method || !details) { alert('Заполните все поля'); return; }
+            if (amount > currentUser.partner_balance) { alert('Недостаточно средств'); return; }
+            
+            const btn = event.target;
+            btn.textContent = '📤 Отправка...';
+            btn.disabled = true;
+            const { error } = await supabaseClient
+                .from('partner_withdrawals')
+                .insert([{ partner_id: currentUser.id, amount: amount, payment_method: method, payment_details: details, status: 'pending' }]);
+            if (error) {
+                alert('❌ Ошибка: ' + error.message);
+                btn.textContent = '✅ Запросить вывод';
+                btn.disabled = false;
+            } else {
+                alert('✅ Заявка на вывод отправлена! Обработка 1-3 рабочих дня.');
+                closeWithdrawModal();
+                document.getElementById('withdraw-amount').value = '';
+                document.getElementById('withdraw-method').value = '';
+                document.getElementById('withdraw-details').value = '';
+            }
+        }
+
+        // ===== ОТЗЫВЫ =====
+        function openReviewModal(orderId, masterId) {
+            currentReviewOrderId = orderId;
+            currentReviewMasterId = masterId;
+            selectedRating = 0;
+            document.getElementById('review-comment').value = '';
+            updateRatingStars();
+            document.getElementById('review-modal').classList.add('active');
+        }
+
+        function closeReviewModal() {
+            document.getElementById('review-modal').classList.remove('active');
+            currentReviewOrderId = null;
+            currentReviewMasterId = null;
+            selectedRating = 0;
+        }
+
+        function setRating(rating) { selectedRating = rating; updateRatingStars(); }
+
+        function updateRatingStars() {
+            document.querySelectorAll('#rating-stars .star').forEach((star, idx) => {
+                star.classList.toggle('active', idx < selectedRating);
+            });
+        }
+
+        async function submitReview() {
+            if (selectedRating === 0) { alert('Пожалуйста, выберите рейтинг'); return; }
             let comment = document.getElementById('review-comment').value.trim();
-
-            // Проверка на мат
+            
             if (comment) {
                 const commentCheck = filterBadWords(comment);
                 if (commentCheck.found) {
@@ -2655,25 +2499,15 @@
             const btn = event.target;
             btn.textContent = '📤 Отправка...';
             btn.disabled = true;
-
             try {
-                const { error } = await supabaseClient
+                await supabaseClient
                     .from('reviews')
-                    .insert([{
-                        order_id: currentReviewOrderId,
-                        reviewer_id: currentUser.id,
-                        master_id: currentReviewMasterId,
-                        rating: selectedRating,
-                        comment: comment || null
-                    }]);
-
-                if (error) throw error;
-
+                    .insert([{ order_id: currentReviewOrderId, reviewer_id: currentUser.id, master_id: currentReviewMasterId, rating: selectedRating, comment: comment || null }]);
+                
                 const { data: reviews } = await supabaseClient
                     .from('reviews')
                     .select('rating')
                     .eq('master_id', currentReviewMasterId);
-
                 if (reviews && reviews.length > 0) {
                     const avgRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
                     await supabaseClient
@@ -2681,13 +2515,12 @@
                         .update({ average_rating: avgRating })
                         .eq('id', currentReviewMasterId);
                 }
-
+                
                 alert('✅ Отзыв отправлен!');
                 ordersWithReviews.add(currentReviewOrderId);
                 closeReviewModal();
                 await loadOrders();
                 await loadResponses();
-
             } catch (err) {
                 alert('❌ Ошибка: ' + err.message);
                 btn.textContent = '✅ Отправить отзыв';
@@ -2695,80 +2528,253 @@
             }
         }
 
-        // ===== ПАРТНЕРСКАЯ АНКЕТА С ФИЛЬТРАЦИЕЙ =====
-        async function submitPartnerApplication() {
-            const vk = document.getElementById('partner-vk').value.trim();
-            let description = document.getElementById('partner-description').value.trim();
-
-            if (!vk || !description) {
-                alert('Заполните все поля');
-                return;
-            }
-
-            // Проверка на мат
-            const descCheck = filterBadWords(description);
-            if (descCheck.found) {
-                document.getElementById('partner-filter-warning').classList.add('show');
-                document.getElementById('partner-description').classList.add('error');
-                alert('⚠️ В описании обнаружена нецензурная лексика. Пожалуйста, исправьте текст.');
-                return;
-            }
-            
-            document.getElementById('partner-filter-warning').classList.remove('show');
-            document.getElementById('partner-description').classList.remove('error');
-            description = sanitizeText(description);
-
-            const btn = event.target;
-            btn.textContent = '📤 Отправка...';
-            btn.disabled = true;
-
-            const { error } = await supabaseClient
-                .from('partner_applications')
-                .insert([{
-                    user_id: currentUser.id,
-                    vk_profile: vk,
-                    description: description,
-                    status: 'pending'
-                }]);
-
-            if (error) {
-                alert('❌ Ошибка: ' + error.message);
-                btn.textContent = '📤 Отправить заявку';
-                btn.disabled = false;
-            } else {
-                alert('✅ Заявка отправлена! Мы рассмотрим её в течение 24 часов.');
-                closePartnerApplicationModal();
-                document.getElementById('partner-vk').value = '';
-                document.getElementById('partner-description').value = '';
+        // ===== ЗАГРУЗКА ОТЗЫВОВ МАСТЕРА =====
+        async function loadMasterReviews(masterId) {
+            const container = document.getElementById('reviews-list');
+            if (!container) return;
+            try {
+                const { data: reviews, error } = await supabaseClient
+                    .from('reviews')
+                    .select('*')
+                    .eq('master_id', masterId)
+                    .order('created_at', { ascending: false });
+                if (error) throw error;
+                if (!reviews || reviews.length === 0) {
+                    container.innerHTML = '<div style="color:var(--text-muted); text-align:center; padding:20px;">Пока нет отзывов</div>';
+                    return;
+                }
+                const reviewerIds = [...new Set(reviews.map(r => r.reviewer_id))];
+                const { data: users } = await supabaseClient
+                    .from('users')
+                    .select('id, name')
+                    .in('id', reviewerIds);
+                const usersMap = {};
+                if (users) users.forEach(u => usersMap[u.id] = u.name);
+                
+                container.innerHTML = reviews.map(r => `
+                    <div class="review-item">
+                        <div class="review-header"><span>${usersMap[r.reviewer_id] || 'Аноним'}</span><span>${new Date(r.created_at).toLocaleDateString('ru-RU')}</span></div>
+                        <div class="review-stars">${'⭐'.repeat(r.rating)}</div>
+                        <div style="font-size:14px; color:var(--text-secondary);">${r.comment || 'Без комментария'}</div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                console.error('Ошибка загрузки отзывов:', err);
+                container.innerHTML = '<div style="color:var(--text-muted); text-align:center; padding:20px;">Ошибка загрузки отзывов</div>';
             }
         }
 
-        // ===== ОСТАЛЬНЫЕ ФУНКЦИИ (ПРОФИЛЬ, ПАРТНЕРКА, ЧАТ) =====
-        // [Здесь остаются все остальные функции из предыдущей версии]
-        // toggleRole, buyPro, connectVKPay, activateProSubscription,
-        // loadPartnerStats, copyPartnerLink, sharePartnerLink,
-        // openWithdrawModal, closeWithdrawModal, submitWithdrawal,
-        // openReviewModal, closeReviewModal, setRating, updateRatingStars,
-        // loadMasterReviews, updateProfileUI, switchTab,
-        // postOrderToServer, notifyMastersAboutNewOrder,
-        // loadChatOrders, openChat, loadMessages
+        // ===== ОБНОВЛЕНИЕ ПРОФИЛЯ =====
+        function updateProfileUI() {
+            if (!currentUser) return;
+            const firstLetter = currentUser.name.charAt(0).toUpperCase();
+            const roleText = currentUser.role === 'customer' ? '👤 Заказчик' : '👷 Мастер';
+            const switchText = currentUser.role === 'customer' ? 'Стать мастером' : 'Стать заказчиком';
 
-        // ===== ЗАПУСК ПРИЛОЖЕНИЯ =====
-        console.log('🔧 Подготовка к запуску...');
+            let subscriptionBlock = '';
+            if (currentUser.role === 'master') {
+                const isPro = currentUser.subscription_type === 'pro';
+                if (isPro) {
+                    subscriptionBlock = `<div class="subscription-info"><div style="font-size:13px; color:var(--text-muted);">Текущий тариф</div><div style="font-weight:700; color:#F59E0B; font-size:18px;">⭐ PRO-мастер</div></div>`;
+                } else {
+                    subscriptionBlock = `
+                        <div class="subscription-info free">
+                            <div style="font-size:13px; color:var(--text-muted);">Текущий тариф</div>
+                            <div style="font-weight:700; font-size:18px;">Free-мастер</div>
+                            <div style="font-size:12px; color:var(--text-muted);">Откликов: ${todayResponsesCount}/${DAILY_RESPONSE_LIMIT}</div>
+                        </div>
+                        <button class="btn btn-pro" onclick="buyPro()">⭐ Оформить Pro за 299 ₽/мес</button>
+                    `;
+                }
+            }
 
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => {
-                console.log('📄 DOM загружен, запускаем приложение...');
-                initApp();
+            let ratingBlock = '';
+            if (currentUser.role === 'master') {
+                const avgRating = currentUser.average_rating || 0;
+                const stars = avgRating > 0 ? '⭐'.repeat(Math.round(avgRating)) : 'Нет оценок';
+                ratingBlock = `<div style="background:var(--bg); padding:12px; border-radius:var(--radius-sm); margin-top:8px;"><div style="color:var(--text-muted); font-size:13px;">Рейтинг</div><div style="font-size:18px; margin-top:4px;">${stars}</div></div>`;
+            }
+
+            document.getElementById('profile-info').innerHTML = `
+                <div class="profile-avatar ${currentUser.subscription_type === 'pro' ? 'pro' : ''} ${currentUser.is_partner ? 'partner' : ''}">
+                    ${firstLetter}${currentUser.subscription_type === 'pro' ? '⭐' : ''}
+                </div>
+                <div class="profile-name">${currentUser.name}</div>
+                <div class="profile-role">${roleText}</div>
+                ${ratingBlock}
+                ${subscriptionBlock}
+                <div style="background:var(--bg); padding:12px; border-radius:var(--radius-sm); margin:8px 0;">
+                    <div style="color:var(--text-muted); font-size:13px;">VK ID</div>
+                    <div style="font-weight:600;">${currentUser.vk_id}</div>
+                </div>
+                <button class="btn btn-warning" onclick="toggleRole()"><i class="fas fa-exchange-alt"></i> ${switchText}</button>
+            `;
+
+            document.getElementById('partner-section').style.display = currentUser.is_partner ? 'block' : 'none';
+            document.getElementById('become-partner-section').style.display = currentUser.is_partner ? 'none' : 'block';
+            
+            if (currentUser.role === 'master') {
+                document.getElementById('reviews-section').style.display = 'block';
+                loadMasterReviews(currentUser.id);
+            } else {
+                document.getElementById('reviews-section').style.display = 'none';
+            }
+        }
+
+        // ===== ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК =====
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            
+            const navItems = document.querySelectorAll('.nav-item');
+            ['home', 'order', 'responses', 'chat', 'profile'].forEach((t, idx) => {
+                if (t === tabName) navItems[idx].classList.add('active');
             });
+            
+            if (tabName === 'responses') loadResponses();
+            if (tabName === 'chat') loadChatOrders();
+        }
+
+        // ===== ЧАТ =====
+        async function loadChatOrders() {
+            if (!currentUser) return;
+            const container = document.getElementById('chat-orders-container');
+            if (!container) return;
+            try {
+                const { data: orders } = await supabaseClient
+                    .from('orders')
+                    .select('*')
+                    .or(`user_id.eq.${currentUser.id},assigned_master_id.eq.${currentUser.id}`)
+                    .in('status', ['in_progress', 'completed'])
+                    .order('created_at', { ascending: false });
+                if (!orders || orders.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><i class="fas fa-comments"></i><p>Нет активных заявок</p></div>';
+                    return;
+                }
+                const ordersWithPartners = await Promise.all(orders.map(async order => {
+                    const partnerId = order.user_id === currentUser.id ? order.assigned_master_id : order.user_id;
+                    if (!partnerId) return { ...order, partnerName: 'Нет собеседника', hasMessages: false };
+                    const { data: partner } = await supabaseClient.from('users').select('name').eq('id', partnerId).single();
+                    const { data: messages } = await supabaseClient
+                        .from('messages')
+                        .select('id', { count: 'exact', head: true })
+                        .eq('order_id', order.id);
+                    return { ...order, partnerName: partner?.name || 'Пользователь', hasMessages: messages && messages.length > 0 };
+                }));
+                container.innerHTML = ordersWithPartners.map(order => `
+                    <div class="order-card" onclick="openChat(${order.id})" style="cursor:pointer;">
+                        <div style="font-weight:600;">${order.title}</div>
+                        <div style="font-size:13px; color:var(--text-muted);">
+                            <i class="fas fa-user"></i> ${order.partnerName}
+                            ${order.hasMessages ? ' <i class="fas fa-circle" style="color:var(--primary); font-size:8px;"></i>' : ''}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) { console.error('Ошибка загрузки чатов:', err); }
+        }
+
+        async function openChat(orderId) {
+            currentChatOrderId = orderId;
+            try {
+                const { data: order } = await supabaseClient
+                    .from('orders')
+                    .select('user_id, assigned_master_id, title')
+                    .eq('id', orderId)
+                    .single();
+                currentChatPartnerId = order.user_id === currentUser.id ? order.assigned_master_id : order.user_id;
+                const { data: partner } = await supabaseClient.from('users').select('name').eq('id', currentChatPartnerId).single();
+                document.getElementById('chat-partner-name').textContent = `С: ${partner?.name || 'Пользователь'} | ${order.title}`;
+                await loadMessages();
+                if (messagesInterval) clearInterval(messagesInterval);
+                messagesInterval = setInterval(loadMessages, 3000);
+            } catch (err) { console.error('Ошибка открытия чата:', err); alert('Не удалось открыть чат'); }
+        }
+
+        async function loadMessages() {
+            if (!currentChatOrderId) return;
+            const container = document.getElementById('messages-container');
+            if (!container) return;
+            try {
+                const { data: messages } = await supabaseClient
+                    .from('messages')
+                    .select('*')
+                    .eq('order_id', currentChatOrderId)
+                    .order('created_at', { ascending: true });
+                if (!messages || messages.length === 0) {
+                    container.innerHTML = `<div class="empty-state"><i class="fas fa-comment-dots"></i><p>Нет сообщений</p></div>`;
+                    return;
+                }
+                container.innerHTML = messages.map(msg => {
+                    const isMe = msg.sender_id === currentUser.id;
+                    const time = new Date(msg.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+                    return `<div class="chat-message ${isMe ? 'me' : 'other'}">
+                        <div class="bubble">${msg.message}<span class="time">${time}</span></div>
+                    </div>`;
+                }).join('');
+                container.scrollTop = container.scrollHeight;
+            } catch (err) { console.error('Ошибка загрузки сообщений:', err); }
+        }
+
+        // ===== ОТПРАВКА СООБЩЕНИЯ =====
+        async function sendMessage() {
+            const input = document.getElementById('message-input');
+            let message = input.value.trim();
+            if (!message || !currentChatOrderId || !currentChatPartnerId) { alert('Введите сообщение'); return; }
+            
+            const msgCheck = filterBadWords(message);
+            if (msgCheck.found) {
+                document.getElementById('chat-filter-warning').classList.add('show');
+                input.classList.add('error');
+                alert('⚠️ В сообщении обнаружена нецензурная лексика. Пожалуйста, исправьте текст.');
+                return;
+            }
+            document.getElementById('chat-filter-warning').classList.remove('show');
+            input.classList.remove('error');
+            message = sanitizeText(message);
+
+            const { error } = await supabaseClient
+                .from('messages')
+                .insert([{ order_id: currentChatOrderId, sender_id: currentUser.id, receiver_id: currentChatPartnerId, message: message }]);
+            if (error) { alert('❌ Ошибка отправки: ' + error.message); } 
+            else { input.value = ''; await loadMessages(); }
+        }
+
+        // ===== ОТПРАВКА НА СЕРВЕР =====
+        async function postOrderToServer(order) {
+            try {
+                await fetch('https://moymaster-server.vercel.app/api/new-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: order.id, title: order.title, description: order.description, budget: order.budget, district: order.district, category_id: order.category_id, user_id: order.user_id })
+                });
+            } catch (err) { console.error('Ошибка отправки на сервер:', err); }
+        }
+
+        async function notifyMastersAboutNewOrder(order) {
+            try {
+                const { data: masters } = await supabaseClient.from('users').select('vk_id').eq('role', 'master');
+                if (!masters || masters.length === 0) return;
+                await fetch('https://moymaster-server.vercel.app/api/send-notification', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_ids: masters.map(m => m.vk_id),
+                        message: `🔨 Новая заявка в районе ${order.district}!\n\n${order.title}\n💰 Бюджет: ${order.budget || 'Договорная'}\n\nОткликнуться в приложении: https://vk.com/app${appId}`
+                    })
+                });
+            } catch (err) { console.error('Ошибка отправки уведомлений:', err); }
+        }
+
+        // ===== ЗАПУСК =====
+        console.log('🔧 Подготовка к запуску...');
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => { console.log('📄 DOM загружен, запускаем приложение...'); initApp(); });
         } else {
             console.log('📄 Страница уже загружена, запускаем приложение...');
             initApp();
         }
-
-        window.addEventListener('load', () => {
-            console.log('🎉 Всё загружено!');
-        });
+        window.addEventListener('load', () => console.log('🎉 Всё загружено!'));
     </script>
 
 </body>
