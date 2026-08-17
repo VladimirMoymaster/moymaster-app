@@ -4,26 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Мой Мастер</title>
-    <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js">
-    </script>
-    <script>
-    if (typeof vkBridge === 'undefined') {
-        console.error(' VK Bridge не загрузился!');
-        window.vkBridge = {
-            send: async () => { throw new Error('VK Bridge недоступен'); }
-        };
-    }
-</script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-    </script>
+    <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* ===== RESET & BASE ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
             --primary: #2A7DE1;
@@ -40,17 +25,13 @@
             --text-muted: #8A8AA8;
             --border: #E9EDF4;
             --shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.10);
             --radius: 16px;
             --radius-sm: 12px;
             --nav-height: 68px;
             --safe-bottom: env(safe-area-inset-bottom, 0px);
         }
 
-        html {
-            font-size: 16px;
-            -webkit-text-size-adjust: 100%;
-        }
+        html { font-size: 16px; -webkit-text-size-adjust: 100%; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -58,1029 +39,200 @@
             color: var(--text);
             min-height: 100vh;
             padding-bottom: calc(var(--nav-height) + var(--safe-bottom) + 12px);
-            padding-top: 0;
             overflow-x: hidden;
         }
 
-        /* ===== APP CONTAINER ===== */
-        .app-container {
-            max-width: 480px;
-            margin: 0 auto;
-            padding: 0 16px 20px;
-            width: 100%;
-        }
+        .app-container { max-width: 480px; margin: 0 auto; padding: 0 16px 20px; width: 100%; }
 
-        /* ===== HEADER ===== */
         .app-header {
             background: var(--card);
-            padding: 16px 0 12px;
+            padding.getElementById(`response-form-${orderId}`).innerHTML=': 16px 0 12px;
             position: sticky;
             top: 0;
             z-index: 50;
             border-bottom: 1px solid var(--border);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            background: rgba(255, 255, 255, 0.92);
         }
 
-        .app-header-inner {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            max-width: 480px;
-            margin: 0 auto;
-            padding: 0 16px;
-        }
-
-        .app-logo {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text);
-        }
-
-        .app-logo i {
-            color: var(--primary);
-            font-size: 24px;
-        }
-
-        .app-logo span {
-            background: linear-gradient(135deg, var(--primary), #6C5CE7);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .header-actions .badge {
-            background: var(--primary-light);
-            color: var(--primary);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        /* ===== TABS ===== */
-        .tab {
-            display: none;
-            animation: fadeUp 0.3s ease;
-        }
-
-        .tab.active {
-            display: block;
-        }
-
-        @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(12px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* ===== CARDS ===== */
-        .card {
-            background: var(--card);
-            border-radius: var(--radius);
-            padding: 18px 16px;
-            margin-bottom: 14px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            transition: box-shadow 0.2s;
-        }
-
-        .card-title {
-            font-size: 17px;
-            font-weight: 650;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text);
-        }
-
-        .card-title i {
-            color: var(--primary);
-        }
-
-        /* ===== CATEGORY CHIPS ===== */
-        .category-chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .chip {
-            background: var(--bg);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            transition: all 0.15s;
-            border: 1px solid transparent;
-        }
-
-        .chip.active {
-            background: var(--primary);
-            color: #fff;
-            border-color: var(--primary);
-        }
-
-        /* ===== DISTRICT FILTER ===== */
-        .district-scroll {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding: 2px 0 8px;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-        }
-
-        .district-scroll::-webkit-scrollbar {
-            display: none;
-        }
-
-        .district-chip {
-            flex-shrink: 0;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 500;
-            background: var(--bg);
-            color: var(--text-secondary);
-            border: 1px solid var(--border);
-            cursor: pointer;
-            transition: all 0.15s;
-            white-space: nowrap;
-        }
-
-        .district-chip.active {
-            background: var(--primary);
-            color: #fff;
-            border-color: var(--primary);
-        }
-
-        /* ===== ORDER CARD ===== */
-        .order-card {
-            background: var(--card);
-            border-radius: var(--radius-sm);
-            padding: 16px;
-            margin-bottom: 12px;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-            transition: transform 0.15s, box-shadow 0.15s;
-        }
-
-        .order-card:active {
-            transform: scale(0.99);
-        }
-
-        .order-top {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-bottom: 8px;
-            align-items: center;
-        }
-
-        .order-top .badge {
-            font-size: 11px;
-            font-weight: 600;
-            padding: 2px 10px;
-            border-radius: 12px;
-            background: var(--bg);
-            color: var(--text-secondary);
-        }
-
-        .order-top .badge-district {
-            background: #E8F0FE;
-            color: var(--primary);
-        }
-
-        .order-top .status-badge {
-            font-size: 11px;
-            font-weight: 600;
-            padding: 2px 10px;
-            border-radius: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
-
-        .status-badge.open {
-            background: #DCFCE7;
-            color: #166534;
-        }
-        .status-badge.in_progress {
-            background: #FEF3C7;
-            color: #92400E;
-        }
-        .status-badge.completed {
-            background: #E5E7EB;
-            color: #4B5563;
-        }
-
-        .order-title {
-            font-size: 16px;
-            font-weight: 650;
-            margin: 4px 0 6px;
-            color: var(--text);
-        }
-
-        .order-desc {
-            font-size: 14px;
-            color: var(--text-secondary);
-            line-height: 1.5;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .order-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 12px;
-            padding-top: 10px;
-            border-top: 1px solid var(--border);
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .order-price {
-            font-weight: 700;
-            font-size: 16px;
-            color: var(--primary);
-        }
-
-        .order-id {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        .order-photos {
-            display: flex;
-            gap: 8px;
-            margin: 10px 0 8px;
-            flex-wrap: wrap;
-        }
-
-        .order-photos img {
-            width: 72px;
-            height: 72px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            cursor: pointer;
-            transition: transform 0.15s;
-        }
-
-        .order-photos img:hover {
-            transform: scale(1.04);
-        }
-
-        /* ===== BUTTONS ===== */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            padding: 10px 18px;
-            border: none;
-            border-radius: var(--radius-sm);
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.15s;
-            text-decoration: none;
-            width: 100%;
-            background: var(--bg);
-            color: var(--text);
-            border: 1px solid var(--border);
-        }
-
-        .btn:active {
-            transform: scale(0.97);
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: #fff;
-            border-color: var(--primary);
-            box-shadow: 0 2px 12px rgba(42, 125, 225, 0.25);
-        }
-
-        .btn-primary:active {
-            background: var(--primary-dark);
-        }
-
-        .btn-success {
-            background: var(--success);
-            color: #fff;
-            border-color: var(--success);
-            box-shadow: 0 2px 12px rgba(34, 197, 94, 0.25);
-        }
-
-        .btn-warning {
-            background: var(--warning);
-            color: #fff;
-            border-color: var(--warning);
-        }
-
-        .btn-danger {
-            background: var(--danger);
-            color: #fff;
-            border-color: var(--danger);
-        }
-
-        .btn-pro {
-            background: linear-gradient(135deg, #F59E0B, #D97706);
-            color: #fff;
-            border-color: #D97706;
-        }
-
-        .btn-partner {
-            background: linear-gradient(135deg, #8B5CF6, #7C3AED);
-            color: #fff;
-            border-color: #7C3AED;
-        }
-
-        .btn-secondary {
-            background: var(--bg);
-            color: var(--text-secondary);
-            border-color: var(--border);
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        .btn-sm {
-            padding: 6px 14px;
-            font-size: 13px;
-            width: auto;
-        }
-
-        /* ===== FORMS ===== */
-        .form-group {
-            margin-bottom: 12px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            margin-bottom: 4px;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1.5px solid var(--border);
-            border-radius: var(--radius-sm);
-            font-size: 15px;
-            font-family: inherit;
-            background: var(--card);
-            color: var(--text);
-            transition: border-color 0.15s;
-            -webkit-appearance: none;
-            appearance: none;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(42, 125, 225, 0.1);
-        }
-
-        select.form-control {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234A4A6A' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 14px center;
-            padding-right: 40px;
-        }
-
-        textarea.form-control {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        /* ===== PHOTO UPLOAD ===== */
-        .photo-upload {
-            border: 2px dashed var(--border);
-            border-radius: var(--radius-sm);
-            padding: 24px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            background: var(--bg);
-        }
-
-        .photo-upload:hover {
-            border-color: var(--primary);
-            background: var(--primary-light);
-        }
-
-        .photo-upload i {
-            font-size: 28px;
-            color: var(--text-muted);
-            margin-bottom: 4px;
-        }
-
-        .photo-upload span {
-            display: block;
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        .photo-preview {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-top: 10px;
-        }
-
-        .photo-preview img {
-            width: 68px;
-            height: 68px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            cursor: pointer;
-        }
-
-        /* ===== RESPONSE ITEM ===== */
-        .response-item {
-            background: var(--bg);
-            border-radius: var(--radius-sm);
-            padding: 14px;
-            margin-bottom: 10px;
-            border-left: 3px solid var(--primary);
-        }
-
-        .response-item .price {
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        /* ===== PROFILE ===== */
-        .profile-avatar {
-            width: 72px;
-            height: 72px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), #6C5CE7);
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            font-weight: 700;
-            margin: 0 auto 12px;
-            border: 3px solid var(--card);
-            box-shadow: var(--shadow);
-        }
-
-        .profile-avatar.pro {
-            border-color: #F59E0B;
-        }
-
-        .profile-avatar.partner {
-            border-color: #8B5CF6;
-        }
-
-        .profile-name {
-            text-align: center;
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .profile-role {
-            text-align: center;
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 12px;
-        }
-
-        /* ===== PARTNER CARD ===== */
-        .partner-card {
-            background: linear-gradient(135deg, #7C3AED, #6D28D9);
-            border-radius: var(--radius);
-            padding: 18px 16px;
-            color: #fff;
-            margin-bottom: 14px;
-        }
-
-        .partner-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin: 12px 0;
-        }
-
-        .partner-stat {
-            background: rgba(255, 255, 255, 0.12);
-            border-radius: var(--radius-sm);
-            padding: 12px 8px;
-            text-align: center;
-            backdrop-filter: blur(4px);
-        }
-
-        .partner-stat-value {
-            font-size: 22px;
-            font-weight: 700;
-        }
-
-        .partner-stat-label {
-            font-size: 11px;
-            opacity: 0.8;
-        }
-
-        .partner-link-box {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 10px 12px;
-            border-radius: var(--radius-sm);
-            font-size: 13px;
-            word-break: break-all;
-            margin: 10px 0;
-        }
-
-        /* ===== BALANCE ===== */
-        .balance-card {
-            background: var(--card);
-            border-radius: var(--radius);
-            padding: 18px 16px;
-            text-align: center;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-            margin-bottom: 14px;
-        }
-
-        .balance-amount {
-            font-size: 30px;
-            font-weight: 700;
-            color: var(--success);
-            margin: 6px 0;
-        }
-
-        /* ===== CHAT ===== */
-        .chat-messages {
-            height: 380px;
-            overflow-y: auto;
-            padding: 12px 8px;
-            background: var(--bg);
-            border-radius: var(--radius-sm);
-            margin-bottom: 10px;
-        }
-
-        .chat-message {
-            display: flex;
-            margin-bottom: 10px;
-        }
-
-        .chat-message.me {
-            justify-content: flex-end;
-        }
-
-        .chat-message .bubble {
-            max-width: 78%;
-            padding: 10px 14px;
-            border-radius: 16px;
-            font-size: 14px;
-            line-height: 1.4;
-        }
-
-        .chat-message.me .bubble {
-            background: var(--primary);
-            color: #fff;
-            border-bottom-right-radius: 4px;
-        }
-
-        .chat-message.other .bubble {
-            background: var(--card);
-            color: var(--text);
-            border: 1px solid var(--border);
-            border-bottom-left-radius: 4px;
-        }
-
-        .chat-message .time {
-            font-size: 10px;
-            opacity: 0.6;
-            margin-top: 4px;
-            display: block;
-        }
-
-        .chat-input-row {
-            display: flex;
-            gap: 10px;
-        }
-
-        .chat-input-row .form-control {
-            flex: 1;
-            margin: 0;
-        }
-
-        .chat-input-row .btn {
-            width: auto;
-            padding: 0 18px;
-        }
-
-        /* ===== MODAL ===== */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: var(--card);
-            border-radius: var(--radius);
-            padding: 28px 24px;
-            max-width: 400px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            animation: slideUp 0.25s ease;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px) scale(0.96);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        .modal-title {
-            font-size: 20px;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 8px;
-        }
-
-        .modal-text {
-            color: var(--text-secondary);
-            text-align: center;
-            font-size: 14px;
-            margin-bottom: 16px;
-            line-height: 1.5;
-        }
-
-        .modal-features {
-            text-align: left;
-            margin-bottom: 16px;
-        }
-
-        .modal-features div {
-            padding: 6px 0;
-            border-bottom: 1px solid var(--border);
-            font-size: 14px;
-        }
-
-        .modal-close {
-            background: var(--bg);
-            border: none;
-            padding: 10px 20px;
-            border-radius: var(--radius-sm);
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 8px;
-            color: var(--text-secondary);
-        }
-
-        /* ===== RATING STARS ===== */
-        .rating-stars {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            font-size: 32px;
-            margin: 10px 0 14px;
-        }
-
-        .rating-stars .star {
-            cursor: pointer;
-            color: #D1D5DB;
-            transition: color 0.15s;
-        }
-
-        .rating-stars .star.active {
-            color: #F59E0B;
-        }
-
-        /* ===== REVIEW ITEM ===== */
-        .review-item {
-            background: var(--bg);
-            padding: 14px;
-            border-radius: var(--radius-sm);
-            margin-bottom: 10px;
-        }
-
-        .review-header {
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-bottom: 4px;
-        }
-
-        .review-stars {
-            color: #F59E0B;
-            letter-spacing: 1px;
-        }
-
-        /* ===== NAVIGATION ===== */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--card);
-            display: flex;
-            justify-content: space-around;
-            padding: 6px 0 calc(6px + var(--safe-bottom));
-            border-top: 1px solid var(--border);
-            box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.06);
-            z-index: 100;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            background: rgba(255, 255, 255, 0.95);
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 2px;
-            padding: 6px 12px;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            transition: all 0.15s;
-            background: transparent;
-            border: none;
-            font-family: inherit;
-            min-width: 48px;
-            color: var(--text-muted);
-        }
-
-        .nav-item i {
-            font-size: 22px;
-            transition: color 0.15s;
-        }
-
-        .nav-item span {
-            font-size: 10px;
-            font-weight: 500;
-            letter-spacing: 0.2px;
-        }
-
-        .nav-item.active {
-            color: var(--primary);
-        }
-
-        .nav-item.active i {
-            color: var(--primary);
-        }
-
-        .nav-item:active {
-            transform: scale(0.92);
-        }
-
-        /* ===== EMPTY STATE ===== */
-        .empty-state {
-            text-align: center;
-            padding: 32px 16px;
-            color: var(--text-muted);
-        }
-
-        .empty-state i {
-            font-size: 40px;
-            margin-bottom: 10px;
-            opacity: 0.5;
-        }
-
-        /* ===== UTILITY ===== */
-        .text-center {
-            text-align: center;
-        }
-        .mt-8 {
-            margin-top: 8px;
-        }
-        .mt-12 {
-            margin-top: 12px;
-        }
-        .gap-8 {
-            gap: 8px;
-        }
-        .flex {
-            display: flex;
-        }
-        .flex-col {
-            flex-direction: column;
-        }
-        .items-center {
-            align-items: center;
-        }
-        .justify-between {
-            justify-content: space-between;
-        }
-        .w-full {
-            width: 100%;
-        }
-
-        .limit-warning {
-            background: #FEF3C7;
-            color: #92400E;
-            padding: 10px 14px;
-            border-radius: var(--radius-sm);
-            font-size: 13px;
-            margin: 8px 0;
-        }
-
-        .confirmation-banner {
-            background: #FEF3C7;
-            color: #92400E;
-            padding: 10px 14px;
-            border-radius: var(--radius-sm);
-            font-size: 13px;
-            margin: 8px 0;
-            border-left: 3px solid var(--warning);
-        }
-
-        .auto-complete-timer {
-            background: var(--bg);
-            padding: 8px 12px;
-            border-radius: var(--radius-sm);
-            font-size: 12px;
-            color: var(--text-muted);
-            margin: 6px 0;
-        }
-
-        .subscription-info {
-            background: var(--bg);
-            padding: 12px 14px;
-            border-radius: var(--radius-sm);
-            margin: 8px 0;
-        }
-
-        .subscription-info.free {
-            background: #FEF3C7;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 20px;
-            color: var(--text-muted);
-        }
-
-        .error {
-            background: #FEE2E2;
-            color: #991B1B;
-            padding: 12px 14px;
-            border-radius: var(--radius-sm);
-            border-left: 3px solid var(--danger);
-        }
-
-        .success {
-            background: #DCFCE7;
-            color: #166534;
-            padding: 12px 14px;
-            border-radius: var(--radius-sm);
-            border-left: 3px solid var(--success);
-        }
+        .app-header-inner { display: flex; align-items: center; justify-content: space-between; max-width: 480px; margin: 0 auto; padding: 0 16px; }
+        .app-logo { display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 700; color: var(--text); }
+        .app-logo i { color: var(--primary); font-size: 24px; }
+        .app-logo span { background: linear-gradient(135deg, var(--primary), #6C5CE7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header-actions .badge { background: var(--primary-light); color: var(--primary); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+
+        .tab { display: none; animation: fadeUp 0.3s ease; }
+        .tab.active { display: block; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card { background: var(--card); border-radius: var(--radius); padding: 18px 16px; margin-bottom: 14px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+        .card-title { font-size: 17px; font-weight: 650; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; color: var(--text); }
+        .card-title i { color: var(--primary); }
+
+        .category-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+        .chip { background: var(--bg); padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500; color: var(--text-secondary); border: 1px solid transparent; cursor: pointer; }
+        .chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+        .district-scroll { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 8px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        .district-scroll::-webkit-scrollbar { display: none; }
+        .district-chip { flex-shrink: 0; padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; background: var(--bg); color: var(--text-secondary); border: 1px solid var(--border); cursor: pointer; white-space: nowrap; }
+        .district-chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+        .order-card { background: var(--card); border-radius: var(--radius-sm); padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+        .order-top { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; align-items: center; }
+        .order-top .badge { font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 12px; background: var(--bg); color: var(--text-secondary); }
+        .order-top .badge-district { background: #E8F0FE; color: var(--primary); }
+        .order-top .status-badge { font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.3px; }
+        .status-badge.open { background: #DCFCE7; color: #166534; }
+        .status-badge.in_progress { background: #FEF3C7; color: #92400E; }
+        .status-badge.completed { background: #E5E7EB; color: #4B5563; }
+
+        .order-title { font-size: 16px; font-weight: 650; margin: 4px 0 6px; color: var(--text); }
+        .order-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .order-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 8px; }
+        .order-price { font-weight: 700; font-size: 16px; color: var(--primary); }
+        .order-id { font-size: 12px; color: var(--text-muted); }
+        .order-photos { display: flex; gap: 8px; margin: 10px 0 8px; flex-wrap: wrap; }
+        .order-photos img { width: 72px; height: 72px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; }
+
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 18px; border: none; border-radius: var(--radius-sm); font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.15s; width: 100%; background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+        .btn:active { transform: scale(0.97); }
+        .btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .btn-success { background: var(--success); color: #fff; border-color: var(--success); }
+        .btn-warning { background: var(--warning); color: #fff; border-color: var(--warning); }
+        .btn-danger { background: var(--danger); color: #fff; border-color: var(--danger); }
+        .btn-pro { background: linear-gradient(135deg, #F59E0B, #D97706); color: #fff; border-color: #D97706; }
+        .btn-partner { background: linear-gradient(135deg, #8B5CF6, #7C3AED); color: #fff; border-color: #7C3AED; }
+        .btn-secondary { background: var(--bg); color: var(--text-secondary); border-color: var(--border); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-sm { padding: 6px 14px; font-size: 13px; width: auto; }
+
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: 4px; }
+        .form-control { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 15px; font-family: inherit; background: var(--card); color: var(--text); }
+        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(42, 125, 225, 0.1); }
+        select.form-control { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234A4A6A' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px; appearance: none; }
+        textarea.form-control { resize: vertical; min-height: 80px; }
+
+        .photo-upload { border: 2px dashed var(--border); border-radius: var(--radius-sm); padding: 24px; text-align: center; cursor: pointer; background: var(--bg); }
+        .photo-upload:hover { border-color: var(--primary); background: var(--primary-light); }
+        .photo-upload i { font-size: 28px; color: var(--text-muted); margin-bottom: 4px; }
+        .photo-upload span { display: block; font-size: 13px; color: var(--text-muted); }
+        .photo-preview { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+        .photo-preview img { width: 68px; height: 68px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; }
+
+        .response-item { background: var(--bg); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 10px; border-left: 3px solid var(--primary); }
+        .response-item .price { font-weight: 700; color: var(--primary); }
+
+        .profile-avatar { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), #6C5CE7); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; margin: 0 auto 12px; border: 3px solid var(--card); box-shadow: var(--shadow); }
+        .profile-avatar.pro { border-color: #F59E0B; }
+        .profile-avatar.partner { border-color: #8B5CF6; }
+        .profile-name { text-align: center; font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+        .profile-role { text-align: center; font-size: 14px; color: var(--text-secondary); margin-bottom: 12px; }
+
+        .partner-card { background: linear-gradient(135deg, #7C3AED, #6D28D9); border-radius: var(--radius); padding: 18px 16px; color: #fff; margin-bottom: 14px; }
+        .partner-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+        .partner-stat { background: rgba(255, 255, 255, 0.12); border-radius: var(--radius-sm); padding: 12px 8px; text-align: center; }
+        .partner-stat-value { font-size: 22px; font-weight: 700; }
+        .partner-stat-label { font-size: 11px; opacity: 0.8; }
+        .partner-link-box { background: rgba(255, 255, 255, 0.15); padding: 10px 12px; border-radius: var(--radius-sm); font-size: 13px; word-break: break-all; margin: 10px 0; }
+
+        .balance-card { background: var(--card); border-radius: var(--radius); padding: 18px 16px; text-align: center; border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 14px; }
+        .balance-amount { font-size: 30px; font-weight: 700; color: var(--success); margin: 6px 0; }
+
+        .chat-messages { height: 380px; overflow-y: auto; padding: 12px 8px; background: var(--bg); border-radius: var(--radius-sm); margin-bottom: 10px; }
+        .chat-message { display: flex; margin-bottom: 10px; }
+        .chat-message.me { justify-content: flex-end; }
+        .chat-message .bubble { max-width: 78%; padding: 10px 14px; border-radius: 16px; font-size: 14px; line-height: 1.4; }
+        .chat-message.me .bubble { background: var(--primary); color: #fff; border-bottom-right-radius: 4px; }
+        .chat-message.other .bubble { background: var(--card); color: var(--text); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+        .chat-message .time { font-size: 10px; opacity: 0.6; margin-top: 4px; display: block; }
+        .chat-input-row { display: flex; gap: 10px; }
+        .chat-input-row .form-control { flex: 1; margin: 0; }
+        .chat-input-row .btn { width: auto; padding: 0 18px; }
+
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: var(--card); border-radius: var(--radius); padding: 28px 24px; max-width: 400px; width: 100%; max-height: 90vh; overflow-y: auto; animation: slideUp 0.25s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .modal-title { font-size: 20px; font-weight: 700; text-align: center; margin-bottom: 8px; }
+        .modal-text { color: var(--text-secondary); text-align: center; font-size: 14px; margin-bottom: 16px; line-height: 1.5; }
+        .modal-features { text-align: left; margin-bottom: 16px; }
+        .modal-features div { padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+        .modal-close { background: var(--bg); border: none; padding: 10px 20px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; cursor: pointer; width: 100%; margin-top: 8px; color: var(--text-secondary); }
+
+        .rating-stars { display: flex; justify-content: center; gap: 8px; font-size: 32px; margin: 10px 0 14px; }
+        .rating-stars .star { cursor: pointer; color: #D1D5DB; }
+        .rating-stars .star.active { color: #F59E0B; }
+
+        .review-item { background: var(--bg); padding: 14px; border-radius: var(--radius-sm); margin-bottom: 10px; }
+        .review-header { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-secondary); margin-bottom: 4px; }
+        .review-stars { color: #F59E0B; letter-spacing: 1px; }
+
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); display: flex; justify-content: space-around; padding: 6px 0 calc(6px + var(--safe-bottom)); border-top: 1px solid var(--border); box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.06); z-index: 100; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 12px; border-radius: var(--radius-sm); cursor: pointer; background: transparent; border: none; font-family: inherit; min-width: 48px; color: var(--text-muted); }
+        .nav-item i { font-size: 22px; }
+        .nav-item span { font-size: 10px; font-weight: 500; }
+        .nav-item.active { color: var(--primary); }
+        .nav-item.active i { color: var(--primary); }
+
+        .empty-state { text-align: center; padding: 32px 16px; color: var(--text-muted); }
+        .empty-state i { font-size: 40px; margin-bottom: 10px; opacity: 0.5; }
+        .limit-warning { background: #FEF3C7; color: #92400E; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 13px; margin: 8px 0; }
+        .confirmation-banner { background: #FEF3C7; color: #92400E; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 13px; margin: 8px 0; border-left: 3px solid var(--warning); }
+        .auto-complete-timer { background: var(--bg); padding: 8px 12px; border-radius: var(--radius-sm); font-size: 12px; color: var(--text-muted); margin: 6px 0; }
+        .subscription-info { background: var(--bg); padding: 12px 14px; border-radius: var(--radius-sm); margin: 8px 0; }
+        .subscription-info.free { background: #FEF3C7; }
+        .loading { text-align: center; padding: 20px; color: var(--text-muted); }
+        .error { background: #FEE2E2; color: #991B1B; padding: 12px 14px; border-radius: var(--radius-sm); border-left: 3px solid var(--danger); }
+        .success { background: #DCFCE7; color: #166534; padding: 12px 14px; border-radius: var(--radius-sm); border-left: 3px solid var(--success); }
 
-        /* ===== RESPONSIVE TWEAKS ===== */
         @media (max-width: 400px) {
-            .app-logo {
-                font-size: 17px;
-            }
-            .card {
-                padding: 14px 12px;
-            }
-            .partner-stats {
-                grid-template-columns: 1fr 1fr;
-            }
-            .order-photos img {
-                width: 56px;
-                height: 56px;
-            }
+            .app-logo { font-size: 17px; }
+            .card { padding: 14px 12px; }
+            .partner-stats { grid-template-columns: 1fr 1fr; }
+            .order-photos img { width: 56px; height: 56px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== HEADER ===== -->
     <header class="app-header">
         <div class="app-header-inner">
-            <div class="app-logo">
-                <i class="fas fa-hammer"></i>
-                <span>Мой Мастер</span>
-            </div>
-            <div class="header-actions">
-                <span class="badge"><i class="fas fa-map-pin"></i> Барнаул</span>
-            </div>
+            <div class="app-logo"><i class="fas fa-hammer"></i><span>Мой Мастер</span></div>
+            <div class="header-actions"><span class="badge"><i class="fas fa-map-pin"></i> Барнаул</span></div>
         </div>
     </header>
 
-    <!-- ===== APP CONTENT ===== -->
     <div class="app-container">
-
-        <!-- ===== TAB: HOME ===== -->
         <div id="tab-home" class="tab active">
             <div class="card">
                 <div class="card-title"><i class="fas fa-tags"></i> Категории</div>
                 <div id="categories-list" class="category-chips loading">Загрузка...</div>
             </div>
-
             <div class="card">
                 <div class="card-title"><i class="fas fa-filter"></i> Район</div>
                 <div class="district-scroll" id="district-filter"></div>
             </div>
-
             <div class="card">
                 <div class="card-title"><i class="fas fa-clipboard-list"></i> Активные заявки</div>
                 <div id="orders-list" class="loading">Загрузка...</div>
             </div>
         </div>
 
-        <!-- ===== TAB: ORDER ===== -->
         <div id="tab-order" class="tab">
             <div class="card">
                 <div class="card-title"><i class="fas fa-plus-circle"></i> Новая заявка</div>
-
-                <div class="form-group">
-                    <label>Район Барнаула</label>
-                    <select id="order-district" class="form-control">
-                        <option value="">Выберите район</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Категория</label>
-                    <select id="order-category" class="form-control">
-                        <option value="">Выберите категорию</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Заголовок</label>
-                    <input type="text" id="order-title" class="form-control" placeholder="Например: Починить розетку">
-                </div>
-
-                <div class="form-group">
-                    <label>Описание</label>
-                    <textarea id="order-description" class="form-control" rows="3" placeholder="Опишите проблему подробнее..."></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>Бюджет (руб)</label>
-                    <input type="number" id="order-budget" class="form-control" placeholder="Например: 1500">
-                </div>
-
-                <div class="form-group">
-                    <label>Фотографии</label>
-                    <div class="photo-upload" onclick="uploadPhotos()">
-                        <i class="fas fa-camera"></i>
-                        <span>Нажмите, чтобы добавить фото</span>
-                    </div>
-                    <div class="photo-preview" id="photo-preview"></div>
-                </div>
-
+                <div class="form-group"><label>Район</label><select id="order-district" class="form-control"><option value="">Выберите район</option></select></div>
+                <div class="form-group"><label>Категория</label><select id="order-category" class="form-control"><option value="">Выберите категорию</option></select></div>
+                <div class="form-group"><label>Заголо'; await loadOrders(); await loadResponses(); }вок</label><input type="text" id="order-title" class="form-control" placeholder="Например: Починить розетку"></div>
+                <div class="form-group"><label>Описание</label><textarea id="order-description" class="form-control" rows="3" placeholder="Опишите проблему..."></textarea></div>
+                <div class="form-group"><label>Бюджет (руб)</label><input type="number" id="order-budget" class="form-control" placeholder="1500"></div>
+                <div class="form-group"><label>Фото</label><div class="photo-upload" onclick="uploadPhotos()"><i class="fas fa-camera"></i><span>Добавить фото</span></div><div class="photo-preview" id="photo-preview"></div></div>
                 <button class="btn btn-primary" onclick="createOrder()"><i class="fas fa-paper-plane"></i> Создать заявку</button>
             </div>
         </div>
 
-        <!-- ===== TAB: RESPONSES ===== -->
         <div id="tab-responses" class="tab">
             <div class="card">
                 <div class="card-title"><i class="fas fa-briefcase"></i> <span id="responses-title">Отклики</span></div>
@@ -1088,215 +240,138 @@
             </div>
         </div>
 
-        <!-- ===== TAB: PROFILE ===== -->
         <div id="tab-profile" class="tab">
             <div class="card">
                 <div class="card-title"><i class="fas fa-user-circle"></i> Профиль</div>
                 <div id="profile-info" class="loading">Загрузка...</div>
             </div>
-
             <div id="partner-section" style="display:none;">
                 <div class="partner-card">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
-                        <i class="fas fa-handshake" style="font-size:24px;"></i>
-                        <span style="font-size:18px; font-weight:700;">Партнерская программа</span>
-                    </div>
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;"><i class="fas fa-handshake" style="font-size:24px;"></i><span style="font-size:18px; font-weight:700;">Партнерская программа</span></div>
                     <p style="font-size:14px; opacity:0.9; margin-bottom:12px;">Приглашайте мастеров и получайте 30% с их подписки Pro</p>
-                    <div class="partner-link-box" id="partner-link">Загрузка ссылки...</div>
+                    <div class="partner-link-box" id="partner-link">Загрузка...</div>
                     <div style="display:flex; gap:8px;">
-                        <button class="btn btn-sm" style="background:rgba(255,255,255,0.2); color:#fff; border-color:rgba(255,255,255,0.3);" onclick="copyPartnerLink()"><i class="fas fa-copy"></i> Копировать</button>
-                        <button class="btn btn-sm" style="background:rgba(255,255,255,0.2); color:#fff; border-color:rgba(255,255,255,0.3);" onclick="sharePartnerLink()"><i class="fas fa-share-alt"></i> Поделиться</button>
+                        <button class="btn btn-sm" style="background:rgba(255,255,255,0.2); color:#fff;" onclick="copyPartnerLink()"><i class="fas fa-copy"></i> Копировать</button>
+                        <button class="btn btn-sm" style="background:rgba(255,255,255,0.2); color:#fff;" onclick="sharePartnerLink()"><i class="fas fa-share-alt"></i> Поделиться</button>
                     </div>
                 </div>
-
-                <div class="partner-stats" style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:12px;">
-                    <div class="partner-stat" style="background:var(--bg); border-radius:var(--radius-sm); padding:12px; text-align:center;">
-                        <div class="partner-stat-value" id="stat-invited" style="font-size:22px; font-weight:700; color:var(--text);">0</div>
-                        <div class="partner-stat-label" style="font-size:12px; color:var(--text-muted);">Приглашено</div>
-                    </div>
-                    <div class="partner-stat" style="background:var(--bg); border-radius:var(--radius-sm); padding:12px; text-align:center;">
-                        <div class="partner-stat-value" id="stat-pro" style="font-size:22px; font-weight:700; color:var(--text);">0</div>
-                        <div class="partner-stat-label" style="font-size:12px; color:var(--text-muted);">Pro мастеров</div>
-                    </div>
-                    <div class="partner-stat" style="background:var(--bg); border-radius:var(--radius-sm); padding:12px; text-align:center;">
-                        <div class="partner-stat-value" id="stat-earnings" style="font-size:22px; font-weight:700; color:var(--text);">0 ₽</div>
-                        <div class="partner-stat-label" style="font-size:12px; color:var(--text-muted);">Заработано</div>
-                    </div>
+                <div class="partner-stats">
+                    <div class="partner-stat"><div class="partner-stat-value" id="stat-invited">0</div><div class="partner-stat-label">Приглашено</div></div>
+                    <div class="partner-stat"><div class="partner-stat-value" id="stat-pro">0</div><div class="partner-stat-label">Pro мастеров</div></div>
+                    <div class="partner-stat"><div class="partner-stat-value" id="stat-earnings">0 ₽</div><div class="partner-stat-label">Заработано</div></div>
                 </div>
-
                 <div class="balance-card">
                     <div style="font-size:14px; color:var(--text-secondary);">Ваш баланс</div>
                     <div class="balance-amount" id="partner-balance">0 ₽</div>
-                    <div style="font-size:12px; color:var(--text-muted);">Минимальный вывод: 1000 ₽</div>
-                    <button class="btn btn-success" style="margin-top:12px;" onclick="openWithdrawModal()" id="withdraw-btn"><i class="fas fa-credit-card"></i> Вывести средства</button>
+                    <div style="font-size:12px; color:var(--text-muted);">Мин: 1000 ₽</div>
+                    <button class="btn btn-success" style="margin-top:12px;" onclick="openWithdrawModal()" id="withdraw-btn"><i class="fas fa-credit-card"></i> Вывести</button>
                 </div>
             </div>
-
             <div id="become-partner-section" style="display:none;">
                 <div class="card">
-                    <div class="card-title"><i class="fas fa-handshake"></i> Стать партнером</div>
-                    <p style="color:var(--text-secondary); font-size:14px; margin-bottom:14px;">Приглашайте мастеров и получайте <b>30% с каждой Pro-подписки</b>. Пассивный доход от 89 ₽ с каждого мастера в месяц!</p>
-                    <button class="btn btn-partner" onclick="openPartnerApplicationModal()"><i class="fas fa-pen"></i> Оставить заявку</button>
+                    <div class="card-title"><i
+        }
+
+        async function loadResponses() class="fas fa-handshake"></i> Стать партнером</div>
+                    <p style="color:var(--text-secondary); font-size:14px; margin-bottom:14px;">Получайте <b>30%</b> с Pro-подписок</p>
+                    <button class="btn btn-partner" onclick="openPartnerApplicationModal()"><i class="fas fa-pen"></i> Заявка</button>
                 </div>
             </div>
-
             <div class="card" id="reviews-section" style="display:none;">
                 <div class="card-title"><i class="fas fa-star"></i> Отзывы</div>
                 <div id="reviews-list"></div>
             </div>
         </div>
 
-        <!-- ===== TAB: CHAT ===== -->
         <div id="tab-chat" class="tab">
-            <div class="card" style="border-radius:0; margin:0 -16px; border-left:0; border-right:0; box-shadow:none;">
+            <div class="card" style="border-radius:0; margin:0 -16px; border-left:0; border-right:0;">
                 <div style="padding-bottom:12px; border-bottom:1px solid var(--border);">
                     <div style="font-weight:600; font-size:16px;"><i class="fas fa-comment-dots" style="color:var(--primary);"></i> Чат</div>
                     <div id="chat-partner-name" style="font-size:13px; color:var(--text-muted); margin-top:2px;"></div>
                 </div>
-
                 <div class="chat-messages" id="messages-container">
-                    <div style="text-align:center; color:var(--text-muted); padding:40px 0;">
-                        <i class="fas fa-comments" style="font-size:36px; opacity:0.3; display:block; margin-bottom:8px;"></i>
-                        Выберите заявку для общения
-                    </div>
+                    <div style="text-align:center; color:var(--text-muted); padding:40px 0;"><i class="fas fa-comments" style="font-size:36px; opacity:0.3;"></i><p>Выберите заявку</p></div>
                 </div>
-
                 <div class="chat-input-row">
-                    <input type="text" id="message-input" class="form-control" placeholder="Введите сообщение...">
+                    <input type="text" id="message-input" class="form-control" placeholder="Сообщение...">
                     <button class="btn btn-primary" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
-
             <div style="padding:12px 4px;">
                 <div style="font-weight:600; font-size:15px; margin-bottom:10px;">Заявки с чатами</div>
                 <div id="chat-orders-container"></div>
             </div>
         </div>
-
     </div>
 
-    <!-- ===== BOTTOM NAVIGATION ===== -->
     <nav class="bottom-nav">
-        <button class="nav-item active" onclick="switchTab('home')">
-            <i class="fas fa-home"></i>
-            <span>Главная</span>
-        </button>
-        <button class="nav-item" onclick="switchTab('order')">
-            <i class="fas fa-plus-circle"></i>
-            <span>Заявка</span>
-        </button>
-        <button class="nav-item" onclick="switchTab('responses')">
-            <i class="fas fa-briefcase"></i>
-            <span>Отклики</span>
-        </button>
-        <button class="nav-item" onclick="switchTab('chat')">
-            <i class="fas fa-comment-dots"></i>
-            <span>Чат</span>
-        </button>
-        <button class="nav-item" onclick="switchTab('profile')">
-            <i class="fas fa-user"></i>
-            <span>Профиль</span>
-        </button>
+        <button class="nav-item active" onclick="switchTab('home')"><i class="fas fa-home"></i><span>Главная</span></button>
+        <button class="nav-item" onclick="switchTab('order')"><i class="fas fa-plus-circle"></i><span>Заявка</span></button>
+        <button class="nav-item" onclick="switchTab('responses')"><i class="fas fa-briefcase"></i><span>Отклики</span></button>
+        <button class="nav-item" onclick="switchTab('chat')"><i class="fas fa-comment-dots"></i><span>Чат</span></button>
+        <button class="nav-item" onclick="switchTab('profile')"><i class="fas fa-user"></i><span>Профиль</span></button>
     </nav>
 
-    <!-- ===== MODALS ===== -->
-
-    <!-- PRO Modal -->
+    <!-- MODALS -->
     <div class="modal-overlay" id="pro-modal">
         <div class="modal-content">
             <div style="font-size:40px; text-align:center;">⭐</div>
             <div class="modal-title">PRO-мастер</div>
-            <div class="modal-text">Получите неограниченные возможности для заработка!</div>
-            <div class="modal-features">
-                <div>✅ Безлимитные отклики на заявки</div>
-                <div>⭐ Золотой значок в профиле</div>
-                <div>🚀 Приоритетное отображение</div>
-            </div>
-            <div style="text-align:center; font-size:22px; font-weight:700; color:var(--primary); margin-bottom:16px;">299 ₽ / месяц</div>
-            <button class="btn btn-pro" onclick="connectVKPay()"><i class="fas fa-credit-card"></i> Подключить VK Pay</button>
+            <div class="modal-text">Безлимитные отклики и приоритет!</div>
+            <div class="modal-features"><div>✅ Безлимитные отклики</div><div>⭐ Золотой значок</div><div>🚀 Приоритет</div></div>
+            <div style="text-align:center; font-size:22px; font-weight:700; color:var(--primary); margin-bottom:16px;">299 ₽/мес</div>
+            <button class="btn btn-pro" onclick="connectVKPay()"><i class="fas fa-credit-card"></i> VK Pay</button>
             <button class="modal-close" onclick="closeProModal()">Позже</button>
         </div>
     </div>
 
-    <!-- Partner Application Modal -->
     <div class="modal-overlay" id="partner-application-modal">
         <div class="modal-content">
             <div style="font-size:40px; text-align:center;">🤝</div>
-            <div class="modal-title">Заявка на партнерство</div>
-            <div class="modal-text">Заполните анкету, и мы рассмотрим вашу заявку в течение 24 часов</div>
-            <div class="form-group">
-                <label>Ссылка на профиль ВК</label>
-                <input type="text" id="partner-vk" class="form-control" placeholder="https://vk.com/...">
-            </div>
-            <div class="form-group">
-                <label>Откуда будете привлекать мастеров?</label>
-                <textarea id="partner-description" class="form-control" rows="3" placeholder="Опишите ваши каналы привлечения..."></textarea>
-            </div>
-            <button class="btn btn-partner" onclick="submitPartnerApplication()"><i class="fas fa-paper-plane"></i> Отправить заявку</button>
+            <div class="modal-title">Партнерство</div>
+            <div class="form-group"><label>Профиль ВК</label><input type="text" id="partner-vk" class="form-control" placeholder="https://vk.com/..."></div>
+            <div class="form-group"><label>Как будете привлекать?</label><textarea id="partner-description" class="form-control" rows="3"></textarea></div>
+            <button class="btn btn-partner" onclick="submitPartnerApplication()">Отправить</button>
             <button class="modal-close" onclick="closePartnerApplicationModal()">Отмена</button>
         </div>
     </div>
 
-    <!-- Withdraw Modal -->
     <div class="modal-overlay" id="withdraw-modal">
         <div class="modal-content">
             <div style="font-size:40px; text-align:center;">💳</div>
             <div class="modal-title">Вывод средств</div>
-            <div class="modal-text">Минимальная сумма: 1000 ₽<br>Комиссия: 0%<br>Срок: 1-3 рабочих дня</div>
-            <div class="form-group">
-                <label>Сумма вывода</label>
-                <input type="number" id="withdraw-amount" class="form-control" placeholder="Сумма (мин. 1000 ₽)" min="1000">
-            </div>
-            <div class="form-group">
-                <label>Способ вывода</label>
-                <select id="withdraw-method" class="form-control">
-                    <option value="">Выберите способ</option>
-                    <option value="vk_pay">VK Pay</option>
-                    <option value="card">Банковская карта</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Реквизиты</label>
-                <input type="text" id="withdraw-details" class="form-control" placeholder="Номер карты или VK Pay">
-            </div>
-            <button class="btn btn-success" onclick="submitWithdrawal()"><i class="fas fa-check-circle"></i> Запросить вывод</button>
+            <div class="form-group"><label>Сумма (мин. 1000 ₽)</label><input type="number" id="withdraw-amount" class="form-control" min="1000"></div>
+            <div class="form-group"><label>Способ</label><select id="withdraw-method" class="form-control"><option value="">Выберите</option><option value="vk_pay">VK Pay</option><option value="card">Карта</option></select></div>
+            <div class="form-group"><label>Реквизиты</label><input type="text" id="withdraw-details" class="form-control" placeholder="Номер карты"></div>
+            <button class="btn btn-success" onclick="submitWithdrawal()">Запросить</button>
             <button class="modal-close" onclick="closeWithdrawModal()">Отмена</button>
         </div>
     </div>
 
-    <!-- Review Modal -->
     <div class="modal-overlay" id="review-modal">
         <div class="modal-content">
             <div style="font-size:40px; text-align:center;">⭐</div>
-            <div class="modal-title">Оставить отзыв</div>
-            <div class="modal-text">Оцените работу мастера</div>
+            <div class="modal-title">Отзыв</div>
             <div class="rating-stars" id="rating-stars">
-                <span class="star" data-rating="1" onclick="setRating(1)">★</span>
-                <span class="star" data-rating="2" onclick="setRating(2)">★</span>
-                <span class="star" data-rating="3" onclick="setRating(3)">★</span>
-                <span class="star" data-rating="4" onclick="setRating(4)">★</span>
-                <span class="star" data-rating="5" onclick="setRating(5)">★</span>
+                <span class="star" onclick="setRating(1)">★</span><span class="star" onclick="setRating(2)">★</span>
+                <span class="star" onclick="setRating(3)">★</span><span class="star" onclick="setRating(4)">★</span>
+                <span class="star" onclick="setRating(5)">★</span>
             </div>
-            <div class="form-group">
-                <label>Комментарий (необязательно)</label>
-                <textarea id="review-comment" class="form-control" rows="3" placeholder="Ваш отзыв..."></textarea>
-            </div>
-            <button class="btn btn-success" onclick="submitReview()"><i class="fas fa-check-circle"></i> Отправить отзыв</button>
+            <div class="form-group"><label>Комментарий</label><textarea id="review-comment" class="form-control" rows="3"></textarea></div>
+            <button class="btn btn-success" onclick="submitReview()">Отправить</button>
             <button class="modal-close" onclick="closeReviewModal()">Отмена</button>
         </div>
     </div>
 
     <div id="loading-screen" style="position:fixed; top:0; left:0; right:0; bottom:0; background:var(--bg); display:flex; align-items:center; justify-content:center; flex-direction:column; z-index:9999;">
-    <div style="font-size:24px; margin-bottom:20px;">🔨</div>
-    <div style="font-size:18px; color:var(--text); margin-bottom:10px;">Загрузка приложения...</div>
-    <div style="font-size:14px; color:var(--text-muted);">Пожалуйста, подождите</div>
-</div>
+        <div style="font-size:48px; margin-bottom:20px;">🔨</div>
+        <div style="font-size:18px; color:var(--text); margin-bottom:10px;">Загрузка...</div>
+        <div style="font-size:14px; color:var(--text-muted);">Пожалуйста, подождите</div>
+    </div>
 
-    <!-- ===== SCRIPTS (unchanged) ===== -->
     <script>
         const SUPABASE_URL = 'https://kmjuddmhvlccrbyyfcce.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttanVkZG1odmxjY3JieXlmY2NlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2Mjc5ODcsImV4cCI6MjEwMjIwMzk4N30.PhJxMFSRlF9tmUuvOLH-JC9Tn-9kAgQ11XEg69eJZ6c';
-
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         const BARNAUL_DISTRICTS = ['Центральный', 'Железнодорожный', 'Октябрьский', 'Индустриальный', 'Ленинский'];
@@ -1311,1574 +386,724 @@
         let currentCategoryFilter = 'all';
         let todayResponsesCount = 0;
         let uploadedPhotos = [];
-        let partnerStats = { invited: 0, pro: 0, earnings: 0 };
         let appId = '';
         let selectedRating = 0;
         let currentReviewOrderId = null;
         let currentReviewMasterId = null;
         let ordersWithReviews = new Set();
-
         let currentChatOrderId = null;
         let currentChatPartnerId = null;
         let messagesInterval = null;
 
-        console.log('🚀 Запуск...');
-
         async function uploadPhotos() {
-            console.log('📸 Попытка загрузки фото...');
-
             const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.multiple = true;
-            input.style.display = 'none';
-
+            input.type = 'file'; input.accept = 'image/*'; input.multiple = true; input.style.display = 'none';
             input.onchange = async () => {
-                if (input.files && input.files.length > 0) {
-                    console.log(`Выбрано файлов: ${input.files.length}`);
-
+                if (input.files) {
                     for (let i = 0; i < input.files.length; i++) {
                         const file = input.files[i];
-
-                        if (file.size > 5 * 1024 * 1024) {
-                            alert(`Файл "${file.name}" слишком большой (макс. 5MB)`);
-                            continue;
-                        }
-
+                        if (file.size > 5 * 1024 * 1024) { alert('Файл слишком большой (макс. 5MB)'); continue; }
                         try {
-                            const base64 = await fileToBase64(file);
-                            uploadedPhotos.push(base64);
-                            console.log('✅ Фото добавлено');
-                        } catch (err) {
-                            console.error('❌ Ошибка:', err);
-                            alert('Не удалось обработать фото');
-                        }
+                            const reader = new FileReader();
+                            reader.readAsDataURL(file);
+                            await new Promise(resolve => { reader.onload = () => { uploadedPhotos.push(reader.result); resolve(); }; });
+                        } catch (err) { alert('Ошибка фото'); }
                     }
-
                     renderPhotoPreview();
                 }
             };
-
-            document.body.appendChild(input);
-            input.click();
-
-            setTimeout(() => {
-                if (input.parentNode) {
-                    input.parentNode.removeChild(input);
-                }
-            }, 1000);
-        }
-
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
+            document.body.appendChild(input); input.click();
+            setTimeout(() => { if (input.parentNode) input.parentNode.removeChild(input); }, 1000);
         }
 
         function renderPhotoPreview() {
             const container = document.getElementById('photo-preview');
-            if (uploadedPhotos.length === 0) {
-                container.innerHTML = '';
-                return;
-            }
-            container.innerHTML = uploadedPhotos.map((photo, idx) =>
-                `<img src="${photo}" onclick="removePhoto(${idx})" title="Нажмите, чтобы удалить">`
-            ).join('');
+            container.innerHTML = uploadedPhotos.map((photo, idx) => `<img src="${photo}" onclick="uploadedPhotos.splice(${idx},1);renderPhotoPreview()" style="width:68px;height:68px;object-fit:cover;border-radius:8px;border:1px solid var(--border);cursor:pointer;">`).join('');
         }
 
-        function removePhoto(idx) {
-            uploadedPhotos.splice(idx, 1);
-            renderPhotoPreview();
-        }
-      async function initApp() {
-    console.log('🚀 Запуск приложения...');
-    
-    // Скрываем экран загрузки через 3 секунды, даже если что-то пошло не так
-    const hideLoading = setTimeout(() => {
-        const loadingScreen = document.getElementById('loading-screen');
-        if (loadingScreen) loadingScreen.style.display = 'none';
-    }, 3000);
-    
-    try {
-        // Пробуем инициализировать VK Bridge с таймаутом
-        console.log(' Инициализация VK Bridge...');
-        
-        const initPromise = vkBridge.send('VKWebAppInit');
-        const timeoutPromise = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Таймаут инициализации')), 5000)
-        );
-        
-        await Promise.race([initPromise, timeoutPromise]);
-        console.log('✅ VK Bridge инициализирован');
-        
-        try {
-            const launchParams = await vkBridge.send('VKWebAppGetLaunchParams');
-            if (launchParams.app_id) {
-                appId = launchParams.app_id;
-                console.log('✅ App ID:', appId);
+        async function initApp() {
+            console.log('🚀 Запуск...');
+            try {
+                await vkBridge.send('VKWebAppInit');
+                console.log('✅ VK Bridge OK');
+                try {
+                    const params = await vkBridge.send('VKWebAppGetLaunchParams');
+                    if (params.app_id) appId = params.app_id;
+                } catch (e) {}
+                const user = await vkBridge.send('VKWebAppGetUserInfo');
+                await loadOrCreateUser(user.id, `${user.first_name} ${user.last_name}`.trim());
+            } catch (err) {
+                console.log('️ Тестовый режим');
+                await loadOrCreateUser(999999, 'Тест');
             }
-        } catch (err) {
-            console.log('⚠️ Не удалось получить app_id');
+            document.getElementById('loading-screen').style.display = 'none';
         }
-        
-        console.log('👤 Получение данных пользователя...');
-        const userData = await vkBridge.send('VKWebAppGetUserInfo');
-        console.log('✅ Пользователь:', userData);
-        
-        await loadOrCreateUser(userData.id, `${userData.first_name} ${userData.last_name}`.trim());
-        
-    } catch (err) {
-        console.error('❌ Ошибка инициализации:', err);
-        console.log('⚠️ Переход в тестовый режим...');
-        await loadOrCreateUser(999999, 'Тестовый Пользователь');
-    } finally {
-        clearTimeout(hideLoading);
-        const loadingScreen = document.getElementById('loading-screen');
-        if (loadingScreen) loadingScreen.style.display = 'none';
-    }
-}
+
         async function loadOrCreateUser(vkId, name) {
             try {
-                let { data: users } = await supabaseClient
-                    .from('users')
-                    .select('*')
-                    .eq('vk_id', vkId)
-                    .single();
-
+                let { data: users } = await supabaseClient.from('users').select('*').eq('vk_id', vkId).single();
                 if (!users) {
-                    const { data: newUser } = await supabaseClient
-                        .from('users')
-                        .insert([{
-                            vk_id: vkId,
-                            name: name,
-                            role: 'customer',
-                            subscription_type: 'free',
-                            average_rating: 0,
-                            is_partner: false,
-                            partner_balance: 0
-                        }])
-                        .select()
-                        .single();
-                    currentUser = newUser;
-                } else {
-                    currentUser = users;
-                }
-
-                console.log('✅ Пользователь:', currentUser);
-
-                if (currentUser.role === 'master') {
-                    await countTodayResponses();
-                }
-
-                await checkAutoComplete();
-
+                    const { data } = await supabaseClient.from('users').insert([{ vk_id: vkId, name, role: 'customer', subscription_type: 'free', average_rating: 0, is_partner: false, partner_balance: 0 }]).select().single();
+                    currentUser = data;
+                } else { currentUser = users; }
+                
+                if (currentUser.role === 'master') await countTodayResponses();
                 updateProfileUI();
                 renderDistrictFilters();
                 await loadCategories();
                 await loadOrders();
                 await loadResponses();
-
-                if (currentUser.is_partner) {
-                    await loadPartnerStats();
-                }
+                if (currentUser.is_partner) await loadPartnerStats();
             } catch (err) {
                 console.error('❌ Ошибка:', err);
-                document.getElementById('profile-info').innerHTML =
-                    `<div class="error">Ошибка: ${err.message}</div>`;
-            }
-        }
-
-        async function checkAutoComplete() {
-            if (!currentUser) return;
-
-            const threeDaysAgo = new Date();
-            threeDaysAgo.setDate(threeDaysAgo.getDate() - AUTO_COMPLETE_DAYS);
-            const threeDaysAgoISO = threeDaysAgo.toISOString();
-
-            const { data: oldOrders, error } = await supabaseClient
-                .from('orders')
-                .select('id, awaiting_confirmation, completed_at')
-                .eq('user_id', currentUser.id)
-                .eq('awaiting_confirmation', true)
-                .lt('created_at', threeDaysAgoISO)
-                .is('completed_at', null);
-
-            if (error || !oldOrders || oldOrders.length === 0) return;
-
-            console.log(`⏰ Автозавершение ${oldOrders.length} заявок`);
-
-            for (const order of oldOrders) {
-                await supabaseClient
-                    .from('orders')
-                    .update({
-                        status: 'completed',
-                        completed_at: new Date().toISOString(),
-                        awaiting_confirmation: false
-                    })
-                    .eq('id', order.id);
             }
         }
 
         async function countTodayResponses() {
             if (!currentUser || currentUser.role !== 'master') return;
-
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const todayISO = today.toISOString();
-
-            const { count, error } = await supabaseClient
-                .from('responses')
-                .select('*', { count: 'exact', head: true })
-                .eq('user_id', currentUser.id)
-                .gte('created_at', todayISO);
-
-            if (error) {
-                todayResponsesCount = 0;
-            } else {
-                todayResponsesCount = count || 0;
-            }
+            const today = new Date(); today.setHours(0,0,0,0);
+            const { count } = await supabaseClient.from('responses').select('*', { count: 'exact', head: true }).eq('user_id', currentUser.id).gte('created_at', today.toISOString());
+            todayResponsesCount = count || 0;
         }
 
         function renderDistrictFilters() {
             const container = document.getElementById('district-filter');
             const select = document.getElementById('order-district');
-
-            let html =
-                `<div class="district-chip active" onclick="filterByDistrict('all', this)"><i class="fas fa-globe"></i> Все</div>`;
-            BARNAUL_DISTRICTS.forEach(d => {
-                html += `<div class="district-chip" onclick="filterByDistrict('${d}', this)">${d}</div>`;
-            });
+            let html = `<div class="district-chip active" onclick="filterByDistrict('all',this)">Все</div>`;
+            BARNAUL_DISTRICTS.forEach(d => { html += `<div class="district-chip" onclick="filterByDistrict('${d {
+            if (!currentUser) return;
+            const}',this)">${d}</div>`; });
             container.innerHTML = html;
-
-            select.innerHTML = '<option value="">Выберите район</option>' +
-                BARNAUL_DISTRICTS.map(d => `<option value="${d}">${d}</option>`).join('');
+            select.innerHTML = '<option value="">Район</option>' + BARNAUL_DISTRICTS.map(d => `<option value="${d}">${d}</option>`).join('');
         }
 
-        function filterByDistrict(district, element) {
-            currentDistrictFilter = district;
+        function filterByDistrict(d, el) {
+            currentDistrictFilter = d;
             document.querySelectorAll('.district-chip').forEach(c => c.classList.remove('active'));
-            element.classList.add('active');
+            el.classList.add('active');
             renderOrders();
         }
-        
-        function filterByCategory(categoryId, element) {
-    currentCategoryFilter = categoryId;
-    document.querySelectorAll('#categories-list .chip').forEach(c => c.classList.remove('active'));
-    element.classList.add('active');
-    renderOrders();
-}
+
+        function filterByCategory(catId, el) {
+            currentCategoryFilter = catId;
+            document.querySelectorAll('#categories-list .chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            renderOrders();
+        }
+
         async function loadCategories() {
-    const { data, error } = await supabaseClient
-        .from('categories')
-        .select('*')
-        .order('sort_order', { ascending: true });
+            const { data, error } = await supabaseClient.from('categories').select('*').order('sort_order');
+            const container = document.getElementById('categories-list');
+            const select = document.getElementById('order-category');
+            if (error || !data) { container.innerHTML = '<div class="error">Ошибка</div>'; return; }
+            categoriesCache = data;
+            let html = `<span class="chip active" onclick="filterByCategory('all',this)">Все</span>`;
+            data.forEach(c => { html += `<span class="chip" onclick="filterByCategory(${c.id},this)">${c.name}</span>`; });
+            container.innerHTML = html;
+            select.innerHTML = '<option value="">Категория</option>' + data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        }
 
-    const container = document.getElementById('categories-list');
-    const select = document.getElementById('order-category');
-    
-    if (error || !data) {
-        container.innerHTML = '<div class="error">Ошибка загрузки</div>';
-        return;
-    }
-
-    categoriesCache = data;
-    
-    // Добавляем кнопку "Все категории"
-    let html = `<span class="chip active" onclick="filterByCategory('all', this)">Все</span>`;
-    data.forEach(c => {
-        html += `<span class="chip" onclick="filterByCategory(${c.id}, this)">${c.name}</span>`;
-    });
-    container.innerHTML = html;
-    
-    select.innerHTML = '<option value="">Выберите категорию</option>' + 
-        data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-}
-        
         async function loadOrders() {
-    const { data, error } = await supabaseClient
-        .from('orders')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(50);
-
-    if (error || !data) {
-        document.getElementById('orders-list').innerHTML = '<div class="error">Ошибка загрузки</div>';
-        return;
-    }
-
-    allOrders = data;
-    
-    // Загружаем информацию о том, для каких заявок уже есть отзывы
-    await loadReviewStatus();
-    
-    renderOrders();
-}
-
-async function loadReviewStatus() {
-    if (!currentUser) return;
-    
-    // Получаем ID завершенных заявок текущего пользователя
-    const userOrderIds = allOrders
-        .filter(o => o.user_id === currentUser.id && o.status === 'completed')
-        .map(o => o.id);
-    
-    if (userOrderIds.length === 0) {
-        ordersWithReviews = new Set();
-        return;
-    }
-    
-    // Проверяем, для каких заявок уже есть отзывы от текущего пользователя
-    const { data: reviews } = await supabaseClient
-        .from('reviews')
-        .select('order_id')
-        .in('order_id', userOrderIds)
-        .eq('reviewer_id', currentUser.id);
-    
-    ordersWithReviews = new Set(reviews?.map(r => r.order_id) || []);
-}
-
-       function renderOrders() {
-    const container = document.getElementById('orders-list');
-    
-    // Фильтрация по району И категории
-    let filteredOrders = allOrders;
-    
-    if (currentDistrictFilter !== 'all') {
-        filteredOrders = filteredOrders.filter(o => o.district === currentDistrictFilter);
-    }
-    
-    if (currentCategoryFilter !== 'all') {
-        filteredOrders = filteredOrders.filter(o => o.category_id === currentCategoryFilter);
-    }
-
-    if (filteredOrders.length === 0) {
-        container.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>В этом районе заявок пока нет</p></div>`;
-        return;
-    }
-
-    container.innerHTML = filteredOrders.map(order => {
-        const cat = categoriesCache.find(c => c.id === order.category_id);
-        const statusClass = order.status === 'open' ? 'open' : order.status === 'in_progress' ? 'in_progress' : 'completed';
-        const statusText = order.status === 'open' ? 'Открыта' : order.status === 'in_progress' ? 'В работе' : 'Завершена';
-        const isOwnOrder = currentUser && order.user_id === currentUser.id;
-        let responseBtn = '';
-
-        if (currentUser?.role === 'master' && order.status === 'open' && !isOwnOrder) {
-            const isPro = currentUser.subscription_type === 'pro';
-            const limitReached = !isPro && todayResponsesCount >= DAILY_RESPONSE_LIMIT;
-            if (limitReached) {
-                responseBtn = `<div class="limit-warning"><i class="fas fa-exclamation-triangle"></i> Лимит исчерпан</div><button class="btn btn-pro" onclick="buyPro()">⭐ Оформить Pro</button>`;
-            } else {
-                responseBtn = `<button class="btn btn-success" onclick="showResponseForm(${order.id})"><i class="fas fa-hand-paper"></i> Откликнуться</button>`;
-            }
-        } else if (isOwnOrder) {
-            if (order.awaiting_confirmation) {
-                const createdAt = new Date(order.created_at);
-                const daysLeft = Math.ceil((new Date(createdAt.getTime() + AUTO_COMPLETE_DAYS * 24 * 60 * 60 * 1000) - new Date()) / (1000 * 60 * 60 * 24));
-                responseBtn = `<div class="confirmation-banner"><i class="fas fa-info-circle"></i> Мастер отметил работу выполненной</div><div class="auto-complete-timer"> Автоподтверждение через ${daysLeft} дн.</div><div style="display:flex; gap:8px; margin-top:8px;"><button class="btn btn-success btn-sm" onclick="confirmCompletion(${order.id})" id="confirm-btn-${order.id}"><i class="fas fa-check"></i> Подтвердить</button><button class="btn btn-danger btn-sm" onclick="rejectCompletion(${order.id})" id="reject-btn-${order.id}"><i class="fas fa-times"></i> Отклонить</button></div>`;
-            } else if (order.status === 'completed' && !ordersWithReviews.has(order.id)) {
-                responseBtn = `<button class="btn btn-warning" onclick="openReviewModal(${order.id}, ${order.assigned_master_id})"><i class="fas fa-star"></i> Оставить отзыв</button>`;
-            } else if (order.status === 'completed' && ordersWithReviews.has(order.id)) {
-                responseBtn = `<div style="font-size:13px; color:var(--success); font-weight:600; margin-top:10px;"><i class="fas fa-check-circle"></i> Отзыв оставлен</div>`;
-            } else {
-                responseBtn = `<div style="font-size:13px; color:var(--text-muted);"><i class="fas fa-tag"></i> Ваша заявка</div>`;
-            }
+            const { data, error } = await supabaseClient.from('orders').select('*').order('created_at', { ascending: false }).limit(50);
+            if (error || !data) { document.getElementById('orders-list').innerHTML = '<div class="error">Ошибка</div>'; return; }
+            allOrders = data;
+            await loadReviewStatus();
+            renderOrders();
         }
 
-        let photosHtml = '';
-        if (order.photos && Array.isArray(order.photos) && order.photos.length > 0) {
-            photosHtml = `<div class="order-photos">${order.photos.map(p => `<img src="${p}" onclick="window.open('${p}')">`).join('')}</div>`;
+        async function loadReviewStatus() {
+            if (!currentUser) return;
+            const ids = allOrders.filter(o => o.user_id === currentUser.id && o.status === 'completed').map(o => o.id);
+            if (ids.length === 0) { ordersWithReviews = new Set(); return; }
+            const { data } = await supabaseClient.from('reviews').select('order_id').in('order_id', ids).eq('reviewer_id', currentUser.id);
+            ordersWithReviews = new Set(data?.map(r => r.order_id) || []);
         }
 
-        return `<div class="order-card"><div class="order-top"><span class="badge">${cat?.name || 'Без категории'}</span>${order.district ? `<span class="badge badge-district"><i class="fas fa-map-pin"></i> ${order.district}</span>` : ''}<span class="status-badge ${statusClass}">${statusText}</span></div><div class="order-title">${order.title}</div>${order.description ? `<div class="order-desc">${order.description}</div>` : ''}${photosHtml}<div class="order-footer"><span class="order-price">${order.budget ? order.budget + ' ₽' : 'Договорная'}</span><span class="order-id">ID: ${order.id}</span></div><div id="response-form-${order.id}"></div>${responseBtn}</div>`;
-    }).join('');
-}
+        function renderOrders() {
+            const container = document.getElementById('orders-list');
+            let filtered = allOrders.filter(o => currentDistrictFilter === 'all' || o.district === currentDistrictFilter);
+            filtered = filtered.filter(o => currentCategoryFilter === 'all' || o.category_id === currentCategoryFilter);
+            
+            if (filtered.length === 0) { container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>Нет заявок</p></div>'; return; }
 
-        function showResponseForm(orderId) {
-            const formContainer = document.getElementById(`response-form-${orderId}`);
-            formContainer.innerHTML = `
-                <div style="background:var(--bg); padding:14px; border-radius:var(--radius-sm); margin-top:10px;">
-                    <div class="form-group" style="margin-bottom:8px;">
-                        <input type="number" id="response-price-${orderId}" class="form-control" placeholder="Ваша цена (руб)">
-                    </div>
-                    <div class="form-group" style="margin-bottom:8px;">
-                        <textarea id="response-message-${orderId}" class="form-control" rows="2" placeholder="Сообщение"></textarea>
-                    </div>
-                    <div style="display:flex; gap:8px;">
-                        <button class="btn btn-success btn-sm" onclick="submitResponse(${orderId})"><i class="fas fa-check"></i> Отправить</button>
-                        <button class="btn btn-secondary btn-sm" onclick="cancelResponse(${orderId})">Отмена</button>
-                    </div>
-                </div>
-            `;
+            container.innerHTML = filtered.map(order => {
+                const cat = categoriesCache.find(c => c.id === order.category_id);
+                const statusClass = order.status === 'open' ? 'open' : order.status === 'in_progress' ? 'in_progress' : 'completed';
+                const statusText = order.status === 'open' ? 'Открыта' : order.status === 'in_progress' ? 'В работе' : 'Завершена';
+                const isOwn = currentUser && order.user_id === currentUser.id;
+                let btn = '';
+
+                if (currentUser?.role === 'master' && order.status === 'open' && !isOwn) {
+                    const limit = !currentUser.subscription_type === 'pro' && todayResponsesCount >= DAILY_RESPONSE_LIMIT;
+                    btn = limit ? `<div class="limit-warning">Лимит</div><button class="btn btn-pro" onclick="buyPro()">Pro</button>` : `<button class="btn btn-success" onclick="showResponseForm(${order.id})">Откликнуться</button>`;
+                } else if (isOwn) {
+                    if (order.awaiting_confirmation) {
+                        btn = `<div class="confirmation-banner">Мастер выполнил работу</div><div style="display:flex;gap:8px;margin-top:8px;"><button class="btn btn-success btn-sm" onclick="confirmCompletion(${order.id})">Подтвердить</button><button class="btn btn-danger btn-sm" onclick="rejectCompletion(${order.id})">Отклонить</button></div>`;
+                    } else if (order.status === 'completed' && !ordersWithReviews.has(order.id)) {
+                        btn = `<button class="btn btn-warning" onclick="openReviewModal(${order.id},${order.assigned_master_id})">Отзыв</button>`;
+                    } else if (order.status === 'completed' && ordersWithReviews.has(order.id)) {
+                        btn = `<div style="color:var(--success);font-size:13px;margin-top:10px;">✅ Отзыв оставлен</div>`;
+                    } else {
+                        btn = `<div style="color:var(--text-muted);font-size:13px;">Ваша заявка</div>`;
+                    }
+                }
+
+                return `<div class="order-card"><div class="order-top"><span class="badge">${cat?.name||'Без категории'}</span>${order.district?`<span class="badge badge-district">${order.district}</span>`:''}<span class="status-badge ${statusClass}">${statusText}</span></div><div style="font-weight:600;margin:4px 0;">${order.title}</div>${order.description?`<div style container = document.getElementById('responses-list');
+            const="font-size:14px;color:var(--text-secondary);">${order.description}</div>`:''}<div style="display:flex;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);"><span style="font-weight:700;color:var(--primary);">${order.budget?order.budget+' ₽':'Договорная'}</span><span style="font-size:12px;color:var(--text-muted);">ID:${order.id}</span></div><div id="response-form-${order.id}"></div>${btn}</div>`;
+            }).join('');
         }
 
-        function cancelResponse(orderId) {
-            const formContainer = document.getElementById(`response-form-${orderId}`);
-            if (formContainer) formContainer.innerHTML = '';
+        function showResponseForm(id) {
+            document.getElementById(`response-form-${id}`).innerHTML = `<div style="background:var(--bg);padding:14px;border-radius:var(--radius-sm);margin-top:10px;"><input type="number" id="response-price-${id}" class="form-control" placeholder="Цена" style="margin-bottom:8px;"><textarea id="response-message-${id}" class="form-control" rows="2" placeholder="Сообщение" style="margin-bottom:8px;"></textarea><div style="display:flex;gap:8px;"><button class="btn btn-success btn-sm" onclick="submitResponse(${id})">Отправить</button><button class="btn btn-secondary btn-sm" onclick="document.getElementById('response-form-${id}').innerHTML=''">Отмена</button></div></div>`;
         }
 
         async function submitResponse(orderId) {
-            const price = document.getElementById(`response-price-${orderId}`).value.trim();
-            const message = document.getElementById(`response-message-${orderId}`).value.trim();
-
+            const price = document.getElementById(`response-price-${orderId}`).value;
+            const msg = document.getElementById(`response-message-${orderId}`).value;
             if (!price) { alert('Укажите цену'); return; }
-
-            const btn = event.target;
-            btn.textContent = '⏳ Отправка...';
-            btn.disabled = true;
-
-            const { error } = await supabaseClient
-                .from('responses')
-                .insert([{
-                    order_id: orderId,
-                    user_id: currentUser.id,
-                    price: parseFloat(price),
-                    message: message || null,
-                    status: 'pending'
-                }]);
-
-            if (error) {
-                alert('❌ Ошибка: ' + error.message);
-                btn.textContent = '✅ Отправить';
-                btn.disabled = false;
-            } else {
-                alert('✅ Отклик отправлен!');
-                cancelResponse(orderId);
-                todayResponsesCount++;
-                await loadOrders();
-                await loadResponses();
-                switchTab('responses');
-            }
+            const { error } = await supabaseClient.from('responses').insert([{ order_id: orderId, user_id: currentUser.id, price: parseFloat(price), message: msg, status: 'pending' }]);
+            if (error) { alert('Ошибка: '+error.message); } 
+            else { alert('✅ Отправлено!'); todayResponsesCount++; document.getElementById(`response-form-${orderId}`).innerHTML=''; await loadOrders(); await loadResponses(); }
         }
 
         async function loadResponses() {
-    if (!currentUser) return;
+            if (!currentUser) return;
+            const container = document.getElementById('responses-list');
+            const title = document.getElementById('responses-title');
 
-    const container = document.getElementById('responses-list');
-    const title = document.getElementById('responses-title');
+            if ( title = document.getElementById('responses-title');
 
-    if (currentUser.role === 'master') {
-        title.textContent = 'Мои отклики';
-        
-        // ВАЖНО: добавляем orders(status, awaiting_confirmation), чтобы знать финальный статус
-        const { data, error } = await supabaseClient
-            .from('responses')
-            .select('*, orders(status, awaiting_confirmation)')
-            .eq('user_id', currentUser.id)
-            .order('created_at', { ascending: false });
-
-        if (error || !data || data.length === 0) {
-            container.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>Вы пока не откликались</p></div>`;
-            return;
-        }
-
-        container.innerHTML = data.map(r => {
-            const statusText = r.status === 'pending' ? '⏳ Ожидает' :
-                              r.status === 'accepted' ? '✅ Принят' : '❌ Отклонен';
-            
-            let completeBtn = '';
-            
-            if (r.status === 'accepted') {
-                const orderStatus = r.orders?.status;
-                const isAwaiting = r.orders?.awaiting_confirmation;
-
-                // 1. Если заказчик уже подтвердил выполнение
-                if (orderStatus === 'completed') {
-                    completeBtn = `<div style="margin-top:8px; font-size:13px; color:var(--success); font-weight:600;"><i class="fas fa-check-circle"></i> Работа подтверждена заказчиком</div>`;
-                } 
-                // 2. Если мастер нажал "выполнено", но заказчик еще не ответил
-                else if (isAwaiting) {
-                    completeBtn = `<div style="margin-top:8px; font-size:13px; color:var(--warning); font-weight:600;"><i class="fas fa-clock"></i> Ожидает подтверждения заказчика</div>`;
-                } 
-                // 3. Если отклик принят, но работа еще не отмечена как выполненная
-                else {
-                    completeBtn = `<button class="btn btn-success btn-sm" onclick="completeWork(${r.order_id})" style="margin-top:8px;" id="complete-btn-${r.order_id}"><i class="fas fa-check-circle"></i> Работа выполнена</button>`;
-                }
-            }
-            
-            return `
-                <div class="response-item">
-                    <div style="font-weight:600; margin-bottom:4px;">Заявка #${r.order_id}</div>
-                    <div style="font-size:14px; color:var(--text-secondary);">${r.message || 'Без сообщения'}</div>
-                    <div style="display:flex; justify-content:space-between; margin-top:8px; align-items:center;">
-                        <span class="price">${r.price} ₽</span>
-                        <span style="font-size:13px; color:var(--text-muted);">${statusText}</span>
-                    </div>
-                    ${completeBtn}
-                </div>
-            `;
-        }).join('');
-        
-    } else {
-        // Логика для Заказчика (остается без изменений)
-        title.textContent = 'Отклики на мои заявки';
-        
-        const { data: myOrders } = await supabaseClient
-            .from('orders')
-            .select('id, title')
-            .eq('user_id', currentUser.id);
-        
-        if (!myOrders || myOrders.length === 0) {
-            container.innerHTML = `<div class="empty-state"><i class="fas fa-file-alt"></i><p>Нет заявок</p></div>`;
-            return;
-        }
-        
-        const orderIds = myOrders.map(o => o.id);
-        const { data: responses } = await supabaseClient
-            .from('responses')
-            .select('*')
-            .in('order_id', orderIds)
-            .order('created_at', { ascending: false });
-        
-        if (!responses || responses.length === 0) {
-            container.innerHTML = `<div class="empty-state"><i class="fas fa-clock"></i><p>Нет откликов</p></div>`;
-            return;
-        }
-        
-        container.innerHTML = responses.map(r => {
-            const order = myOrders.find(o => o.id === r.order_id);
-            const acceptBtn = r.status === 'pending' ? 
-                `<button class="btn btn-success btn-sm" onclick="acceptResponse(${r.id}, ${r.order_id})"><i class="fas fa-check"></i> Принять</button>` : '';
-            return `
-                <div class="response-item">
-                    <div style="font-size:13px; color:var(--text-muted);">На: ${order?.title || '#' + r.order_id}</div>
-                    <div style="font-size:14px; color:var(--text-secondary); margin:4px 0;">${r.message || 'Без сообщения'}</div>
-                    <div style="display:flex; justify-content:space-between; margin-top:6px; align-items:center;">
-                        <span class="price">${r.price} ₽</span>
-                        <span style="font-size:13px; color:var(--text-muted);">Пользователь #${r.user_id}</span>
-                    </div>
-                    ${acceptBtn}
-                </div>
-            `;
-        }).join('');
-    }
-}
-        
-        async function acceptResponse(responseId, orderId) {
-            const btn = event.target;
-            const originalText = btn.textContent;
-
-            if (originalText.includes('Принять')) {
-                btn.textContent = '⚠️ Точно принять?';
-                setTimeout(() => {
-                    btn.textContent = originalText;
-                }, 3000);
-                return;
-            }
-
-            btn.textContent = '⏳ Принятие...';
-            btn.disabled = true;
-
-            try {
-                const { data: responseData } = await supabaseClient
-                    .from('responses')
-                    .select('user_id')
-                    .eq('id', responseId)
-                    .single();
-
-                await supabaseClient.from('responses').update({ status: 'accepted' }).eq('id', responseId);
-                await supabaseClient.from('orders').update({
-                    status: 'in_progress',
-                    assigned_master_id: responseData.user_id
-                }).eq('id', orderId);
-
-                alert('✅ Мастер принят!');
-                await loadOrders();
-                await loadResponses();
-
-            } catch (err) {
-                alert('Ошибка: ' + err.message);
-                btn.textContent = originalText;
-                btn.disabled = false;
+            if (currentUser.role === 'master') {
+                title.textContent =currentUser.role === 'master') {
+                title.textContent = 'Мои отклики';
+                const { data 'Мои отклики';
+                const { data } = await supabaseClient.from('responses').select(' } = await supabaseClient.from('responses').select('*,orders(status,awaiting_confirmation)').eq('user*,orders(status,awaiting_confirmation)').eq('user_id', currentUser.id).order('created_at', { ascending_id', currentUser.id).order('created_at', { ascending: false });
+                if (!data || data.length: false });
+                if (!data || data.length === 0) { container.innerHTML = '<div class=" === 0) { container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></iempty-state"><i class="fas fa-inbox"></i><p>Нет откликов</p></div>';><p>Нет откликов</p></div>'; return; }
+                
+                container.innerHTML = data.map(r return; }
+                
+                container.innerHTML = data.map(r => {
+                    const status = r.status === 'pending => {
+                    const status = r.status === 'pending' ? '⏳ Ожидает' ? '⏳ Ожидает' : r.status === 'accepted' ? '✅ Прин' : r.status === 'accepted' ? '✅ Принят' : '❌ Отклонен';
+                   ят' : '❌ Отклонен';
+                    let btn = '';
+                    if (r.status === ' let btn = '';
+                    if (r.status === 'accepted') {
+                        if (r.orders?.status ===accepted') {
+                        if (r.orders?.status === 'completed') btn = '<div style="color 'completed') btn = '<div style="color:var(--success);margin-top:8px;">✅:var(--success);margin-top:8px;">✅ Выполнено</div>';
+                        else if (r.orders Выполнено</div>';
+                        else if (r.orders?.awaiting_confirmation) btn = '<div style="color?.awaiting_confirmation) btn = '<div style="color:var(--warning);margin-top:8px;">:var(--warning);margin-top:8px;"> Ожидает подтверждения</div>'; Ожидает подтверждения</div>';
+                        else btn = `<button class="btn btn-success
+                        else btn = `<button class="btn btn-success btn-sm" onclick="completeWork(${r.order_id}) btn-sm" onclick="completeWork(${r.order_id})" style="margin-top:8px;">Выполнено" style="margin-top:8px;">Выполнено</button>`;
+                    }
+                    return `</button>`;
+                    }
+                    return `<div class="response-item"><div style="font-weight:<div class="response-item"><div style="font-weight:600;">Заявка #${r.order_id600;">Заявка #${r.order_id}</div><div style="color:var(--text}</div><div style="color:var(--text-secondary);font-size:14px;">${r-secondary);font-size:14px;">${r.message||''}</div><div style="display.message||''}</div><div style="display:flex;justify-content:space-between;margin-top:8:flex;justify-content:space-between;margin-top:8px;"><span style="font-weight:70px;"><span style="font-weight:700;color:var(--primary);">${r.price}0;color:var(--primary);">${r.price} ₽</span><span style="font-size:13 ₽</span><span style="font-size:13px;color:var(--text-muted);">${status}px;color:var(--text-muted);">${status}</span></div>${btn}</div>`;
+                }).</span></div>${btn}</div>`;
+                }).join('');
+            } else {
+                title.textContentjoin('');
+            } else {
+                title.textContent = 'Отклики на заявки';
+                const = 'Отклики на заявки';
+                const { data: orders } = await supabaseClient.from(' { data: orders } = await supabaseClient.from('orders').select('id,title').eq('userorders').select('id,title').eq('user_id', currentUser.id);
+                if (!orders ||_id', currentUser.id);
+                if (!orders || orders.length === 0) { container.innerHTML = ' orders.length === 0) { container.innerHTML = '<div class="empty-state"><i class="fas fa<div class="empty-state"><i class="fas fa-file"></i><p>Нет заявок-file"></i><p>Нет заявок</p></div>'; return; }
+                const {</p></div>'; return; }
+                const { data } = await supabaseClient.from('responses data } = await supabaseClient.from('responses').select('*').in('order_id', orders.map(o').select('*').in('order_id', orders.map(o=>o.id)).order('created_at',=>o.id)).order('created_at', { ascending: false });
+                if (!data || data { ascending: false });
+                if (!data || data.length === 0) { container.innerHTML = '<div.length === 0) { container.innerHTML = '<div class="empty-state"><i class="fas fa-clock"> class="empty-state"><i class="fas fa-clock"></i><p>Нет откликов</i><p>Нет откликов</p></div>'; return; }
+                
+                container.innerHTML</p></div>'; return; }
+                
+                container.innerHTML = data.map(r => {
+                    const order = orders = data.map(r => {
+                    const order = orders.find(o => o.id === r.order_id);
+.find(o => o.id === r.order_id);
+                    const btn = r.status === 'pending'                    const btn = r.status === 'pending' ? `<button class="btn btn-success btn-sm" onclick ? `<button class="btn btn-success btn-sm" onclick="acceptResponse(${r.id},${r.order_id})="acceptResponse(${r.id},${r.order_id})">Принять</button>` : '';
+                    return">Принять</button>` : '';
+                    return `<div class="response-item"><div style="font `<div class="response-item"><div style="font-size:13px;color:var(--text-muted);-size:13px;color:var(--text-muted);">${order?.title||'#'+r.order_id}">${order?.title||'#'+r.order_id}</div><div style="font-size:14</div><div style="font-size:14px;margin:4px 0;">${r.messagepx;margin:4px 0;">${r.message||''}</div><div style="display:flex;||''}</div><div style="display:flex;justify-content:space-between;margin-top:6justify-content:space-between;margin-top:6px;"><span style="font-weight:700;colorpx;"><span style="font-weight:700;color:var(--primary);">${r.price} ₽</span:var(--primary);">${r.price} ₽</span><span style="font-size:13><span style="font-size:13px;"># ${r.user_id}</span>px;"># ${r.user_id}</span></div>${btn}</div>`;
+                }).</div>${btn}</div>`;
+                }).join('');
             }
         }
 
-        async function completeWork(orderId) {
-    console.log('🔍 Завершение работы по заявке:', orderId);
-
-    // Ищем кнопку по ID, а не через event.target (это надежнее при наличии иконок)
-    const btn = document.getElementById(`complete-btn-${orderId}`);
-    if (!btn) return;
-
-    const originalHTML = btn.innerHTML;
-
-    // Защита от двойного клика
-    if (btn.disabled) return;
-
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Отправка...';
-    btn.disabled = true;
-
-    try {
-        const { error } = await supabaseClient
-            .from('orders')
-            .update({ awaiting_confirmation: true })
-            .eq('id', orderId);
-
-        if (error) throw error;
-
-        alert('✅ Заказчик уведомлен! Ожидайте подтверждения.');
-        
-        // Перезагружаем данные, чтобы кнопка изменилась на статус ожидания
-        await loadOrders();
-        await loadResponses();
-
-    } catch (err) {
-        console.error('❌ Ошибка:', err);
-        alert('❌ Ошибка: ' + err.message);
-        btn.innerHTML = originalHTML;
-        btn.disabled = false;
-    }
-}
-
-
-        async function confirmCompletion(orderId) {
-            console.log('🔍 Подтверждение выполнения заявки:', orderId);
-
-            const btn = event.target;
-            const originalText = btn.textContent;
-
-            if (originalText.includes('Подтвердить')) {
-                btn.textContent = '⚠️ Точно подтвердить?';
-                btn.style.background = '#FF9800';
-
-                setTimeout(() => {
-                    btn.textContent = originalText;
-                    btn.style.background = '';
-                }, 3000);
-
-                return;
-            }
-
-            btn.textContent = '⏳ Подтверждение...';
-            btn.disabled = true;
-
-            try {
-                const { data, error } = await supabaseClient
-                    .from('orders')
-                    .update({
-                        status: 'completed',
-                        completed_at: new Date().toISOString(),
-                        awaiting_confirmation: false
-                    })
-                    .eq('id', orderId)
-                    .select();
-
-                if (error) throw error;
-
-                console.log('✅ Заявка обновлена:', data);
-                alert('✅ Работа подтверждена! Теперь вы можете оставить отзыв.');
-                await loadOrders();
-                await loadResponses();
-
-            } catch (err) {
-                console.error('❌ Ошибка:', err);
-                alert('❌ Ошибка: ' + err.message);
-                btn.textContent = originalText;
-                btn.disabled = false;
+        asyncjoin('');
             }
         }
 
-        async function rejectCompletion(orderId) {
-            console.log('🔍 Отклонение выполнения заявки:', orderId);
+        async function acceptResponse(rid, oid) {
+            function acceptResponse(rid, oid) {
+            const { data } = await supabaseClient.from('responses const { data } = await supabaseClient.from('responses').select('user_id').eq('id', rid).').select('user_id').eq('id', rid).single();
+            await supabaseClient.from('responses').single();
+            await supabaseClient.from('responses').update({ status: 'accepted' }).eq('idupdate({ status: 'accepted' }).eq('id', rid);
+            await supabaseClient.from('', rid);
+            await supabaseClient.from('orders').update({ status: 'in_progress', assignedorders').update({ status: 'in_progress', assigned_master_id: data.user_id }).eq('id', oid_master_id: data.user_id }).eq('id', oid);
+            alert('✅ Принято!'); await);
+            alert('✅ Принято!'); await loadOrders(); await loadResponses();
+        }
 
-            const btn = event.target;
-            const originalText = btn.textContent;
+ loadOrders(); await loadResponses();
+        }
 
-            if (originalText.includes('Отклонить')) {
-                btn.textContent = '⚠️ Точно отклонить?';
-                btn.style.background = '#FF5722';
+        async function completeWork(oid) {        async function completeWork(oid) {
+            const { error } = await supabaseClient.from
+            const { error } = await supabaseClient.from('orders').update({ awaiting_confirmation: true }).eq('('orders').update({ awaiting_confirmation: true }).eq('id', oid);
+            if (error) { alertid', oid);
+            if (error) { alert('Ошибка'); } else { alert('✅('Ошибка'); } else { alert('✅ Заказчик уведомлен!'); await loadOrders Заказчик уведомлен!'); await loadOrders(); await loadResponses(); }
+        }
 
-                setTimeout(() => {
-                    btn.textContent = originalText;
-                    btn.style.background = '';
-                }, 3000);
+        async(); await loadResponses(); }
+        }
 
-                return;
-            }
+        async function confirmCompletion(oid) {
+            await supabase function confirmCompletion(oid) {
+            await supabaseClient.from('orders').update({ status: 'completed',Client.from('orders').update({ status: 'completed', completed_at: new Date().toISOString(), awaiting_confirmation completed_at: new Date().toISOString(), awaiting_confirmation: false }).eq('id', oid);
+            alert: false }).eq('id', oid);
+            alert('✅ Подтверждено!'); await loadOrders(); await('✅ Подтверждено!'); await loadOrders(); await loadResponses();
+        }
 
-            btn.textContent = '⏳ Отклонение...';
-            btn.disabled = true;
+        async function reject loadResponses();
+        }
 
-            try {
-                const { error } = await supabaseClient
-                    .from('orders')
-                    .update({ awaiting_confirmation: false })
-                    .eq('id', orderId);
-
-                if (error) throw error;
-
-                console.log('✅ Выполнение отклонено');
-                alert('⚠️ Выполнение отклонено. Мастер может отметить работу снова.');
-                await loadOrders();
-                await loadResponses();
-
-            } catch (err) {
-                console.error('❌ Ошибка:', err);
-                alert('❌ Ошибка: ' + err.message);
-                btn.textContent = originalText;
-                btn.disabled = false;
-            }
+        async function rejectCompletion(oid) {
+            await supabaseClient.fromCompletion(oid) {
+            await supabaseClient.from('orders').update({ awaiting_confirmation: false }).eq('('orders').update({ awaiting_confirmation: false }).eq('id', oid);
+            alert('⚠️id', oid);
+            alert('⚠️ Отклонено'); await loadOrders(); await loadResponses(); Отклонено'); await loadOrders(); await loadResponses();
         }
 
         async function createOrder() {
-            if (!currentUser) return alert('Подождите загрузку');
 
-            const district = document.getElementById('order-district').value;
-            const categoryId = document.getElementById('order-category').value;
+        }
+
+        async function createOrder() {
+            const district = document.getElementById('order-district').value            const district = document.getElementById('order-district').value;
+            const cat = document.getElementById('order-category').;
+            const cat = document.getElementById('order-category').value;
+            const title = document.getElementById('order-titlevalue;
             const title = document.getElementById('order-title').value.trim();
-            const description = document.getElementById('order-description').value.trim();
+            const desc = document.getElementById').value.trim();
+            const desc = document.getElementById('order-description').value.trim();
+            const budget =('order-description').value.trim();
             const budget = document.getElementById('order-budget').value;
-
-            if (!district) return alert('Выберите район');
-            if (!categoryId || !title) return alert('Заполните категорию и заголовок');
-
-            const btn = document.querySelector('#tab-order .btn');
-            btn.textContent = '⏳ Создание...';
-            btn.disabled = true;
-
-            const { data, error } = await supabaseClient
-                .from('orders')
-                .insert([{
-                    user_id: currentUser.id,
-                    district,
-                    category_id: parseInt(categoryId),
-                    title,
-                    description: description || null,
-                    budget: budget ? parseFloat(budget) : null,
-                    status: 'open',
-                    photos: uploadedPhotos.length > 0 ? uploadedPhotos : null
-                }])
-                .select();
-
-            if (error) {
-                alert('❌ Ошибка: ' + error.message);
-            } else {
-                const newOrder = data[0];
-                postOrderToServer(newOrder);
-                notifyMastersAboutNewOrder(newOrder);
-                alert('✅ Заявка создана! Пост в группу ВК публикуется...');
-
+            
+ document.getElementById('order-budget').value;
+            
+            if (!district || !cat || !title) {            if (!district || !cat || !title) { alert('Заполните все поля'); return; alert('Заполните все поля'); return; }
+            
+            const { data, error } = await }
+            
+            const { data, error } = await supabaseClient.from('orders').insert([{ user_id: supabaseClient.from('orders').insert([{ user_id: currentUser.id, district, category_id: parseInt(cat), currentUser.id, district, category_id: parseInt(cat), title, description: desc||null, budget: title, description: desc||null, budget: budget?parseFloat(budget):null, status: ' budget?parseFloat(budget):null, status: 'open', photos: uploadedPhotos.length>0?uploadedPhotosopen', photos: uploadedPhotos.length>0?uploadedPhotos:null }]).select();
+            
+            if (error:null }]).select();
+            
+            if (error) { alert('Ошибка: '+error.message); } 
+) { alert('Ошибка: '+error.message); } 
+            else {
+                alert('✅ Создано            else {
+                alert('✅ Создано!');
+                document.getElementById('order-title').value =!');
                 document.getElementById('order-title').value = '';
                 document.getElementById('order-description').value = '';
+                document.getElementById('order-description').value = '';
+                document.getElementById('order-budget').value = ''; '';
                 document.getElementById('order-budget').value = '';
                 document.getElementById('order-category').value = '';
+
+                document.getElementById('order-category').value = '';
                 document.getElementById('order-district').value = '';
-                uploadedPhotos = [];
-                renderPhotoPreview();
+                document.getElementById('order-district').value = '';
+                uploadedPhotos = []; renderPhotoPreview();
+                uploadedPhotos = []; renderPhotoPreview();
                 await loadOrders();
+                switchTab('home');                await loadOrders();
                 switchTab('home');
             }
-
-            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Создать заявку';
-            btn.disabled = false;
         }
 
-        async function toggleRole() {
-            const newRole = currentUser.role === 'customer' ? 'master' : 'customer';
-            const { error } = await supabaseClient
-                .from('users')
-                .update({ role: newRole })
-                .eq('id', currentUser.id);
-
-            if (error) {
-                alert('❌ Ошибка: ' + error.message);
-            } else {
-                currentUser.role = newRole;
-
-                if (newRole === 'master') {
-                    await countTodayResponses();
-                } else {
-                    todayResponsesCount = 0;
-                }
-
-                updateProfileUI();
-                await loadOrders();
-                await loadResponses();
-                alert(`✅ Роль изменена на: ${newRole === 'master' ? 'Мастер' : 'Заказчик'}`);
+        function
             }
         }
 
-        function buyPro() {
-            document.getElementById('pro-modal').classList.add('active');
+        function switchTab(name) {
+            document.querySelectorAll('.tab switchTab(name) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+           ').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(`tab-${name('active'));
+            document.getElementById(`tab-${name}`).classList.add('active');
+            const idx =}`).classList.add('active');
+            const idx = ['home','order','responses','chat','profile'].indexOf ['home','order','responses','chat','profile'].indexOf(name);
+            if (idx >= 0) document(name);
+            if (idx >= 0) document.querySelectorAll('.nav-item')[idx].classList.add('active.querySelectorAll('.nav-item')[idx].classList.add('active');
+            if (name === 'responses') loadResponses');
+            if (name === 'responses') loadResponses();
+            if (name === 'chat') loadChat();
+            if (name === 'chat') loadChatOrders();
         }
 
-        function closeProModal() {
-            document.getElementById('pro-modal').classList.remove('active');
+        function buyPro() {Orders();
         }
+
+        function buyPro() { document.getElementById('pro-modal').classList.add('active'); } document.getElementById('pro-modal').classList.add('active'); }
+        function closeProModal() { document.getElementById('pro
+        function closeProModal() { document.getElementById('pro-modal').classList.remove('active'); }
+
+        async function-modal').classList.remove('active'); }
 
         async function connectVKPay() {
-            if (!currentUser) {
-                alert('Подождите загрузку профиля');
-                return;
-            }
-
-            if (currentUser.subscription_type === 'pro') {
-                alert('У вас уже активна Pro-подписка!');
-                return;
-            }
-
-            const btn = event.target;
-            btn.textContent = '⏳ Обработка...';
-            btn.disabled = true;
-
+            if (!currentUser || connectVKPay() {
+            if (!currentUser || currentUser.subscription_type === 'pro') { alert('Ошибка currentUser.subscription_type === 'pro') { alert('Ошибка'); return; }
             try {
-                console.log('💳 Инициация оплаты через VK Pay...');
+'); return; }
+            try {
+                const result = await vkBridge.send('VKWebApp                const result = await vkBridge.send('VKWebAppShowOrderBox', { action: 'pay-to-group',ShowOrderBox', { action: 'pay-to-group', app_id: parseInt(appId), order_id: `order app_id: parseInt(appId), order_id: `order_${currentUser.id}_${Date.now()}`, amount_${currentUser.id}_${Date.now()}`, amount: 29900, description: 'Pro: 29900, description: 'Pro подписка', currency: 'RUB', подписка', currency: 'RUB', test_mode: 1 });
+                if (result.status test_mode: 1 });
+                if (result.status === 'success' || result.status === 'success_new') === 'success' || result.status === 'success_new') {
+                    await supabaseClient.from(' {
+                    await supabaseClient.from('users').update({ subscription_type: 'pro', subscription_exusers').update({ subscription_type: 'pro', subscription_expires_at: new Date(Date.now()+3pires_at: new Date(Date.now()+30*24*60*60*10*24*60*60*1000).toISOString() }).eq('id',000).toISOString() }).eq('id', currentUser.id);
+                    currentUser.subscription_type = 'pro'; currentUser.id);
+                    currentUser.subscription_type = 'pro';
+                    alert('✅ Pro активирован!');
 
-                const orderData = {
-                    action: 'pay-to-group',
-                    app_id: parseInt(appId),
-                    order_id: `order_${currentUser.id}_${Date.now()}`,
-                    amount: 29900,
-                    description: 'Pro-подписка на 1 месяц',
-                    currency: 'RUB',
-                    test_mode: 1
-                };
-
-                console.log('📤 Отправка запроса в VK Pay:', orderData);
-
-                const result = await vkBridge.send('VKWebAppShowOrderBox', orderData);
-
-                console.log('✅ Результат оплаты:', result);
-
-                if (result.status === 'success' || result.status === 'success_new') {
-                    await activateProSubscription(result.order_id);
-                } else {
-                    alert('Оплата отменена или не завершена');
+                    alert('✅ Pro активирован!');
+                    updateProfileUI();
                 }
-
-            } catch (err) {
-                console.error('❌ Ошибка VK Pay:', err);
-                alert('Ошибка оплаты: ' + err.message);
-            }
-
-            btn.textContent = 'Подключить VK Pay';
-            btn.disabled = false;
-        }
-
-        async function activateProSubscription(vkOrderId) {
-            console.log('⭐ Активация Pro-подписки...');
-
-            const proDuration = 30;
-            const expiresAt = new Date();
-            expiresAt.setDate(expiresAt.getDate() + proDuration);
-
-            const { error: userError } = await supabaseClient
-                .from('users')
-                .update({
-                    subscription_type: 'pro',
-                    subscription_expires_at: expiresAt.toISOString()
-                })
-                .eq('id', currentUser.id);
-
-            if (userError) {
-                console.error('❌ Ошибка обновления пользователя:', userError);
-                throw userError;
-            }
-
-            let partnerId = null;
-            let partnerAmount = 0;
-
-            if (currentUser.invited_by_partner_id) {
-                partnerId = currentUser.invited_by_partner_id;
-                partnerAmount = 299 * 0.30;
-
-                console.log(`🤝 Начисление партнеру #${partnerId}: ${partnerAmount} ₽`);
-
-                const { data: partnerData } = await supabaseClient
-                    .from('users')
-                    .select('partner_balance')
-                    .eq('id', partnerId)
-                    .single();
-
-                if (partnerData) {
-                    const newBalance = (partnerData.partner_balance || 0) + partnerAmount;
-
-                    await supabaseClient
-                        .from('users')
-                        .update({ partner_balance: newBalance })
-                        .eq('id', partnerId);
-
-                    console.log('✅ Баланс партнера обновлен:', newBalance);
+                               updateProfileUI();
                 }
-
-                await supabaseClient
-                    .from('partner_earnings')
-                    .insert([{
-                        partner_id: partnerId,
-                        master_id: currentUser.id,
-                        amount: partnerAmount,
-                        source: 'subscription',
-                        description: `Pro-подписка мастера #${currentUser.id}`
-                    }]);
-            }
-
-            await supabaseClient
-                .from('payments')
-                .insert([{
-                    user_id: currentUser.id,
-                    amount: 299,
-                    currency: 'RUB',
-                    status: 'completed',
-                    vk_order_id: vkOrderId,
-                    description: 'Pro-подписка на 1 месяц',
-                    partner_id: partnerId,
-                    partner_amount: partnerAmount,
-                    completed_at: new Date().toISOString()
-                }]);
-
-            currentUser.subscription_type = 'pro';
-            currentUser.subscription_expires_at = expiresAt.toISOString();
-
-            alert(`✅ Pro-подписка активирована!\nДействует до: ${expiresAt.toLocaleDateString('ru-RU')}`);
-
-            updateProfileUI();
-            await loadOrders();
+            } catch (err) { alert('Ошибка оплаты } catch (err) { alert('Ошибка оплаты'); }
+            closeProModal();
         }
 
-        function openPartnerApplicationModal() {
-            document.getElementById('partner-application-modal').classList.add('active');
+'); }
+            closeProModal();
         }
 
-        function closePartnerApplicationModal() {
-            document.getElementById('partner-application-modal').classList.remove('active');
-        }
+        function openPartnerApplicationModal() { document.getElementById('partner        function openPartnerApplicationModal() { document.getElementById('partner-application-modal').classList.add('active'); }
+        function-application-modal').classList.add('active'); }
+        function closePartnerApplicationModal() { document.getElementById('partner-application-modal closePartnerApplicationModal() { document.getElementById('partner-application-modal').classList.remove('active'); }
+
+        async function submit').classList.remove('active'); }
 
         async function submitPartnerApplication() {
+            const vk = document.getElementById('PartnerApplication() {
             const vk = document.getElementById('partner-vk').value.trim();
-            const description = document.getElementById('partner-description').value.trim();
-
-            if (!vk || !description) {
-                alert('Заполните все поля');
-                return;
-            }
-
-            const btn = event.target;
-            btn.textContent = '📤 Отправка...';
-            btn.disabled = true;
-
-            const { error } = await supabaseClient
-                .from('partner_applications')
-                .insert([{
-                    user_id: currentUser.id,
-                    vk_profile: vk,
-                    description: description,
-                    status: 'pending'
-                }]);
-
-            if (error) {
-                alert('❌ Ошибка: ' + error.message);
-                btn.textContent = '📤 Отправить заявку';
-                btn.disabled = false;
-            } else {
-                alert('✅ Заявка отправлена! Мы рассмотрим её в течение 24 часов.');
-                closePartnerApplicationModal();
-                document.getElementById('partner-vk').value = '';
-                document.getElementById('partner-description').value = '';
-            }
+            const desc =partner-vk').value.trim();
+            const desc = document.getElementById('partner-description').value.trim();
+            if document.getElementById('partner-description').value.trim();
+            if (!vk || !desc) { alert('Заполните (!vk || !desc) { alert('Заполните поля'); return; }
+            await supabaseClient.from поля'); return; }
+            await supabaseClient.from('partner_applications').insert([{ user_id: currentUser.id('partner_applications').insert([{ user_id: currentUser.id, vk_profile: vk, description: desc, status, vk_profile: vk, description: desc, status: 'pending' }]);
+            alert('✅ Зая: 'pending' }]);
+            alert('✅ Заявка отправлена!'); closePartnerApplicationModal();
+       вка отправлена!'); closePartnerApplicationModal();
         }
+
+        async function loadPartnerStats() { }
 
         async function loadPartnerStats() {
             if (!currentUser.is_partner) return;
-
-            const { count: invitedCount } = await supabaseClient
-                .from('users')
-                .select('*', { count: 'exact', head: true })
-                .eq('invited_by_partner_id', currentUser.id);
-
-            const { count: proCount } = await supabaseClient
-                .from('users')
-                .select('*', { count: 'exact', head: true })
-                .eq('invited_by_partner_id', currentUser.id)
-                .eq('subscription_type', 'pro');
-
-            const { data: earnings } = await supabaseClient
-                .from('partner_earnings')
-                .select('amount')
-                .eq('partner_id', currentUser.id);
-
-            const totalEarnings = earnings ? earnings.reduce((sum, e) => sum + parseFloat(e.amount), 0) : 0;
-
-            partnerStats = {
-                invited: invitedCount || 0,
-                pro: proCount || 0,
-                earnings: totalEarnings
-            };
-
-            document.getElementById('stat-invited').textContent = partnerStats.invited;
-            document.getElementById('stat-pro').textContent = partnerStats.pro;
-            document.getElementById('stat-earnings').textContent = Math.round(partnerStats.earnings) + ' ₽';
-            document.getElementById('partner-balance').textContent = Math.round(currentUser.partner_balance || 0) + ' ₽';
-
-            const partnerLink = appId ? `https://vk.com/app${appId}?ref=${currentUser.id}` :
-                `https://vk.com/app?ref=${currentUser.id}`;
-            document.getElementById('partner-link').textContent = partnerLink;
-
-            const withdrawBtn = document.getElementById('withdraw-btn');
-            if (currentUser.partner_balance < MIN_WITHDRAW) {
-                withdrawBtn.disabled = true;
-                withdrawBtn.textContent = `💳 Недостаточно средств (мин. ${MIN_WITHDRAW} ₽)`;
-            }
+           
+            if (!currentUser.is_partner) return;
+            const { count: inv } = await sup const { count: inv } = await supabaseClient.from('users').select('*', { count: 'abaseClient.from('users').select('*', { count: 'exact', head: true }).eq('invited_by_partnerexact', head: true }).eq('invited_by_partner_id', currentUser.id);
+            const { count: pro_id', currentUser.id);
+            const { count: pro } = await supabaseClient.from('users').select } = await supabaseClient.from('users').select('*', { count: 'exact', head: true }).eq('*', { count: 'exact', head: true }).eq('invited_by_partner_id', currentUser.id).('invited_by_partner_id', currentUser.id).eq('subscription_type', 'pro');
+            const {eq('subscription_type', 'pro');
+            const { data: earn } = await supabaseClient.from(' data: earn } = await supabaseClient.from('partner_earnings').select('amount').eq('partnerpartner_earnings').select('amount').eq('partner_id', currentUser.id);
+            const total = earn_id', currentUser.id);
+            const total = earn ? earn.reduce((s,e)=>s+ ? earn.reduce((s,e)=>s+parseFloat(e.amount),0) : 0;
+            
+parseFloat(e.amount),0) : 0;
+            
+            document.getElementById('stat-invited').textContent = inv            document.getElementById('stat-invited').textContent = inv||0;
+            document.getElementById('stat||0;
+            document.getElementById('stat-pro').textContent = pro||0;
+           -pro').textContent = pro||0;
+            document.getElementById('stat-earnings').textContent = Math.round document.getElementById('stat-earnings').textContent = Math.round(total)+' ₽';
+            document.getElementById('partner(total)+' ₽';
+            document.getElementById('partner-balance').textContent = Math.round(currentUser.partner_balance||0-balance').textContent = Math.round(currentUser.partner_balance||0)+' ₽';
+            document.getElementById('partner-link)+' ₽';
+            document.getElementById('partner-link').textContent = `https://vk.com/app${appId}?').textContent = `https://vk.com/app${appId}?ref=${currentUser.id}`;
         }
 
-        function copyPartnerLink() {
-            const link = document.getElementById('partner-link').textContent;
-            navigator.clipboard.writeText(link).then(() => {
-                alert('✅ Ссылка скопирована!');
-            }).catch(() => {
-                alert('Не удалось скопировать');
-            });
+ref=${currentUser.id}`;
         }
 
-        async function sharePartnerLink() {
-            const link = document.getElementById('partner-link').textContent;
-            try {
-                await vkBridge.send('VKWebAppShare', { link: link });
-            } catch (err) {
-                alert('Не удалось поделиться');
-            }
-        }
+        function copyPartnerLink() { navigator.clipboard.write        function copyPartnerLink() { navigator.clipboard.writeText(document.getElementById('partner-link').textContent).Text(document.getElementById('partner-link').textContent).then(()=>alert('✅ Скопировано')); }
+then(()=>alert('✅ Скопировано')); }
+        async function sharePartnerLink() { try { await vk        async function sharePartnerLink() { try { await vkBridge.send('VKWebAppShare', { link: documentBridge.send('VKWebAppShare', { link: document.getElementById('partner-link').textContent }); } catch(e.getElementById('partner-link').textContent }); } catch(e){} }
+        function openWithdrawModal){} }
+        function openWithdrawModal() { if (currentUser.partner_balance < MIN() { if (currentUser.partner_balance < MIN_WITHDRAW) { alert('Мин:_WITHDRAW) { alert('Мин: 1000 ₽'); return; } document 1000 ₽'); return; } document.getElementById('withdraw-modal').classList.add('active'); }.getElementById('withdraw-modal').classList.add('active'); }
+        function closeWithdrawModal() { document
+        function closeWithdrawModal() { document.getElementById('withdraw-modal').classList.remove('active'); }
 
-        function openWithdrawModal() {
-            if (currentUser.partner_balance < MIN_WITHDRAW) {
-                alert(`Минимальная сумма вывода: ${MIN_WITHDRAW} ₽`);
-                return;
-            }
-            document.getElementById('withdraw-modal').classList.add('active');
-        }
-
-        function closeWithdrawModal() {
-            document.getElementById('withdraw-modal').classList.remove('active');
-        }
+.getElementById('withdraw-modal').classList.remove('active'); }
 
         async function submitWithdrawal() {
-            const amount = parseFloat(document.getElementById('withdraw-amount').value);
+            const amount        async function submitWithdrawal() {
+            const amount = parseFloat(document.getElementById('withdraw-amount').value); = parseFloat(document.getElementById('withdraw-amount').value);
+            const method = document.getElementById('withdraw-method').value
             const method = document.getElementById('withdraw-method').value;
+            const details = document.getElementById('withdraw-details').;
             const details = document.getElementById('withdraw-details').value.trim();
-
-            if (!amount || amount < MIN_WITHDRAW) {
-                alert(`Минимальная сумма: ${MIN_WITHDRAW} ₽`);
-                return;
-            }
-            if (!method || !details) {
-                alert('Заполните все поля');
-                return;
-            }
-            if (amount > currentUser.partner_balance) {
-                alert('Недостаточно средств');
-                return;
-            }
-
-            const btn = event.target;
-            btn.textContent = '📤 Отправка...';
-            btn.disabled = true;
-
-            const { error } = await supabaseClient
-                .from('partner_withdrawals')
-                .insert([{
-                    partner_id: currentUser.id,
-                    amount: amount,
-                    payment_method: method,
-                    payment_details: details,
-                    status: 'pending'
-                }]);
-
-            if (error) {
-                alert('❌ Ошибка: ' + error.message);
-                btn.textContent = '✅ Запросить вывод';
-                btn.disabled = false;
-            } else {
-                alert('✅ Заявка на вывод отправлена! Обработка 1-3 рабочих дня.');
-                closeWithdrawModal();
-                document.getElementById('withdraw-amount').value = '';
-                document.getElementById('withdraw-method').value = '';
-                document.getElementById('withdraw-details').value = '';
-            }
+            if (!amount || amount value.trim();
+            if (!amount || amount < MIN_WITHDRAW || !method || !details) { alert< MIN_WITHDRAW || !method || !details) { alert('Заполните поля'); return; }('Заполните поля'); return; }
+            await supabaseClient.from('partner_withdrawals
+            await supabaseClient.from('partner_withdrawals').insert([{ partner_id: currentUser.id, amount').insert([{ partner_id: currentUser.id, amount, payment_method: method, payment_details: details, payment_method: method, payment_details: details, status: 'pending' }]);
+            alert, status: 'pending' }]);
+            alert('✅ Заявка отправлена!'); closeWithdrawModal('✅ Заявка отправлена!'); closeWithdrawModal();
         }
 
-        function openReviewModal(orderId, masterId) {
-            currentReviewOrderId = orderId;
-            currentReviewMasterId = masterId;
-            selectedRating = 0;
-            document.getElementById('review-comment').value = '';
-            updateRatingStars();
-            document.getElementById('review-modal').classList.add('active');
+        function openReviewModal(();
         }
 
-        function closeReviewModal() {
-            document.getElementById('review-modal').classList.remove('active');
-            currentReviewOrderId = null;
-            currentReviewMasterId = null;
-            selectedRating = 0;
-        }
+        function openReviewModal(oid, mid) { currentReviewOrderId = oidoid, mid) { currentReviewOrderId = oid; currentReviewMasterId = mid; selectedRating =; currentReviewMasterId = mid; selectedRating = 0; document.getElementById('review-comment').value = ''; 0; document.getElementById('review-comment').value = ''; updateRatingStars(); document.getElementById('review-modal').classList.add updateRatingStars(); document.getElementById('review-modal').classList.add('active'); }
+        function closeReviewModal() {('active'); }
+        function closeReviewModal() { document.getElementById('review-modal').classList.remove('active'); } document.getElementById('review-modal').classList.remove('active'); }
+        function setRating(r) { selectedRating =
+        function setRating(r) { selectedRating = r; updateRatingStars(); }
+        function update r; updateRatingStars(); }
+        function updateRatingStars() { document.querySelectorAll('#rating-stars .star').RatingStars() { document.querySelectorAll('#rating-stars .star').forEach((s,i) => s.classList.toggleforEach((s,i) => s.classList.toggle('active', i < selectedRating)); }
 
-        function setRating(rating) {
-            selectedRating = rating;
-            updateRatingStars();
-        }
-
-        function updateRatingStars() {
-            const stars = document.querySelectorAll('#rating-stars .star');
-            stars.forEach((star, idx) => {
-                if (idx < selectedRating) {
-                    star.classList.add('active');
-                } else {
-                    star.classList.remove('active');
-                }
-            });
-        }
+       ('active', i < selectedRating)); }
 
         async function submitReview() {
-            if (selectedRating === 0) {
-                alert('Пожалуйста, выберите рейтинг');
-                return;
-            }
-
+            if (selectedRating async function submitReview() {
+            if (selectedRating === 0) { alert('Выберите рейтинг === 0) { alert('Выберите рейтинг'); return; }
+            const comment = document'); return; }
             const comment = document.getElementById('review-comment').value.trim();
-            const btn = event.target;
-            btn.textContent = '📤 Отправка...';
-            btn.disabled = true;
-
-            try {
-                const { error } = await supabaseClient
-                    .from('reviews')
-                    .insert([{
-                        order_id: currentReviewOrderId,
-                        reviewer_id: currentUser.id,
-                        master_id: currentReviewMasterId,
-                        rating: selectedRating,
-                        comment: comment || null
-                    }]);
-
-                if (error) throw error;
-
-                const { data: reviews } = await supabaseClient
-                    .from('reviews')
-                    .select('rating')
-                    .eq('master_id', currentReviewMasterId);
-
-                if (reviews && reviews.length > 0) {
-                    const avgRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
-                    await supabaseClient
-                        .from('users')
-                        .update({ average_rating: avgRating })
-                        .eq('id', currentReviewMasterId);
-                }
-
-                alert('✅ Отзыв отправлен!');
-                ordersWithReviews.add(currentReviewOrderId);
-                closeReviewModal();
-                await loadOrders();
-                await loadResponses();
-
-            } catch (err) {
-                alert('❌ Ошибка: ' + err.message);
-                btn.textContent = '✅ Отправить отзыв';
-                btn.disabled = false;
+            await sup.getElementById('review-comment').value.trim();
+            await supabaseClient.from('reviews').insert([{ order_id:abaseClient.from('reviews').insert([{ order_id: currentReviewOrderId, reviewer_id: currentUser.id, master_id currentReviewOrderId, reviewer_id: currentUser.id, master_id: currentReviewMasterId, rating: selectedRating, comment: currentReviewMasterId, rating: selectedRating, comment: comment||null }]);
+            const { data: comment||null }]);
+            const { data } = await supabaseClient.from('reviews').select(' } = await supabaseClient.from('reviews').select('rating').eq('master_id', currentReviewMasterIdrating').eq('master_id', currentReviewMasterId);
+            if (data && data.length > );
+            if (data && data.length > 0) {
+                const avg = data0) {
+                const avg = data.reduce((s,r)=>s+r.rating,.reduce((s,r)=>s+r.rating,0)/data.length;
+                await supabaseClient.from0)/data.length;
+                await supabaseClient.from('users').update({ average_rating: avg }).eq('('users').update({ average_rating: avg }).eq('id', currentReviewMasterId);
             }
+           id', currentReviewMasterId);
+            }
+            ordersWithReviews.add(currentReviewOrderId);
+            alert(' ordersWithReviews.add(currentReviewOrderId);
+            alert('✅ Отзыв отправлен!'); closeReviewModal(); await✅ Отзыв отправлен!'); closeReviewModal(); await loadOrders();
         }
 
-        async function loadMasterReviews(masterId) {
-            console.log('🔍 Загрузка отзывов для мастера:', masterId);
+        async function load loadOrders();
+        }
 
+        async function loadMasterReviews(mid) {
+            const {MasterReviews(mid) {
+            const { data } = await supabaseClient.from('reviews data } = await supabaseClient.from('reviews').select('*').eq('master_id', mid).').select('*').eq('master_id', mid).order('created_at', { ascending: falseorder('created_at', { ascending: false });
+            const container = document.getElementById('reviews-list });
             const container = document.getElementById('reviews-list');
+            if (!data || data.length === 0');
+            if (!data || data.length === 0) { container.innerHTML = '<div style="text) { container.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding-align:center;color:var(--text-muted);padding:20px;">Нет отзывов</div>';:20px;">Нет отзывов</div>'; return; }
+            const ids = [... return; }
+            const ids = [...new Set(data.map(r=>r.reviewer_idnew Set(data.map(r=>r.reviewer_id))];
+            const { data: users } = await))];
+            const { data: users } = await supabaseClient.from('users').select('id,name supabaseClient.from('users').select('id,name').in('id', ids);
+            const').in('id', ids);
+            const map = {}; if (users) users.forEach(u => map = {}; if (users) users.forEach(u => map[u.id]=u.name);
+            container.innerHTML map[u.id]=u.name);
+            container.innerHTML = data.map(r => `<div class="review-item"> = data.map(r => `<div class="review-item"><div style="display:flex;justify-content:space-between;font<div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text-secondary-size:13px;color:var(--text-secondary);"><span>${map[r.reviewer_id]);"><span>${map[r.reviewer_id]||'Аноним'}</span><span>${new||'Аноним'}</span><span>${new Date(r.created_at).toLocaleDateString('ru-R Date(r.created_at).toLocaleDateString('ru-RU')}</span></div><div style="colorU')}</span></div><div style="color:#F59E0B;margin:4:#F59E0B;margin:4px 0;">${'⭐'.repeatpx 0;">${'⭐'.repeat(r.rating)}</div><div style="font-size:(r.rating)}</div><div style="font-size:14px;color:var(--text-secondary);">${14px;color:var(--text-secondary);">${r.comment||''}</div></div>`).joinr.comment||''}</div></div>`).join('');
+        }
 
-            const { data: reviews, error } = await supabaseClient
-                .from('reviews')
-                .select('*')
-                .eq('master_id', masterId)
-                .order('created_at', { ascending: false });
-
-            console.log('📊 Отзывы:', { reviews, error });
-
-            if (error) {
-                console.error('❌ Ошибка загрузки отзывов:', error);
-                container.innerHTML =
-                    '<div style="color:var(--text-muted); text-align:center; padding:20px;">Ошибка загрузки отзывов</div>';
-                return;
-            }
-
-            if (!reviews || reviews.length === 0) {
-                container.innerHTML =
-                    '<div style="color:var(--text-muted); text-align:center; padding:20px;">Пока нет отзывов</div>';
-                return;
-            }
-
-            const reviewerIds = [...new Set(reviews.map(r => r.reviewer_id))];
-            const { data: users } = await supabaseClient
-                .from('users')
-                .select('id, name')
-                .in('id', reviewerIds);
-
-            const usersMap = {};
-            if (users) {
-                users.forEach(u => { usersMap[u.id] = u.name; });
-            }
-
-            container.innerHTML = reviews.map(r => {
-                const date = new Date(r.created_at).toLocaleDateString('ru-RU');
-                const stars = '⭐'.repeat(r.rating);
-                const authorName = usersMap[r.reviewer_id] || 'Аноним';
-
-                return `
-                    <div class="review-item">
-                        <div class="review-header">
-                            <span>${authorName}</span>
-                            <span>${date}</span>
-                        </div>
-                        <div class="review-stars">${stars}</div>
-                        <div style="font-size:14px; color:var(--text-secondary);">${r.comment || 'Без комментария'}</div>
-                    </div>
-                `;
-            }).join('');
+        function updateProfileUI()('');
         }
 
         function updateProfileUI() {
             if (!currentUser) return;
-            const firstLetter = currentUser.name.charAt(0).toUpperCase();
-            const roleText = currentUser.role === 'customer' ? '👤 Заказчик' : '👷 Мастер';
-            const switchText = currentUser.role === 'customer' ? 'Стать мастером' : 'Стать заказчиком';
-
-            let subscriptionBlock = '';
+            const {
+            if (!currentUser) return;
+            const letter = currentUser.name.charAt(0).toUpperCase();
+ letter = currentUser.name.charAt(0).toUpperCase();
+            const role = currentUser.role === 'customer' ? '            const role = currentUser.role === 'customer' ? '👤 Заказчик' : '👷👤 Заказчик' : '👷 Мастер';
+            const switchText = currentUser Мастер';
+            const switchText = currentUser.role === 'customer' ? 'Стать мастером'.role === 'customer' ? 'Стать мастером' : 'Стать заказчиком';
+            
+ : 'Стать заказчиком';
+            
+            let sub = '';
+            if (currentUser.role ===            let sub = '';
             if (currentUser.role === 'master') {
-                const isPro = currentUser.subscription_type === 'pro';
-                if (isPro) {
-                    subscriptionBlock = `
-                        <div class="subscription-info">
-                            <div style="font-size:13px; color:var(--text-muted);">Текущий тариф</div>
-                            <div style="font-weight:700; color:#F59E0B; font-size:18px;">⭐ PRO-мастер</div>
-                        </div>
-                    `;
+                if (currentUser.subscription_type === 'master') {
+                if (currentUser.subscription_type === 'pro') {
+                    sub = '<div class=" 'pro') {
+                    sub = '<div class="subscription-info"><div style="font-size:13pxsubscription-info"><div style="font-size:13px;color:var(--text-muted);">Тариф;color:var(--text-muted);">Тариф</div><div style="font-weight:700;color</div><div style="font-weight:700;color:#F59E0B;">⭐ PRO:#F59E0B;">⭐ PRO</div></div>';
                 } else {
-                    subscriptionBlock = `
-                        <div class="subscription-info free">
-                            <div style="font-size:13px; color:var(--text-muted);">Текущий тариф</div>
-                            <div style="font-weight:700; font-size:18px;">Free-мастер</div>
-                            <div style="font-size:12px; color:var(--text-muted);">Откликов: ${todayResponsesCount}/${DAILY_RESPONSE_LIMIT}</div>
-                        </div>
-                        <button class="btn btn-pro" onclick="buyPro()">⭐ Оформить Pro за 299 ₽/мес</button>
-                    `;
+                    sub</div></div>';
+                } else {
+                    sub = `<div class="subscription-info free"><div style=" = `<div class="subscription-info free"><div style="font-size:13px;color:var(--textfont-size:13px;color:var(--text-muted);">Тариф</div><div style-muted);">Тариф</div><div style="font-weight:700;">Free</div>="font-weight:700;">Free</div><div style="font-size:12px;"><div style="font-size:12px;">Откликов: ${todayResponsesCount}/${DAILYОткликов: ${todayResponsesCount}/${DAILY_RESPONSE_LIMIT}</div></div><button class="btn_RESPONSE_LIMIT}</div></div><button class="btn btn-pro" onclick="buyPro()">Pro btn-pro" onclick="buyPro()">Pro за 299 ₽</button>` за 299 ₽</button>`;
                 }
             }
-
-            let ratingBlock = '';
+            
+            let rating;
+                }
+            }
+            
+            let rating = '';
+            if (currentUser.role === 'master = '';
             if (currentUser.role === 'master') {
-                const avgRating = currentUser.average_rating || 0;
-                const stars = avgRating > 0 ? '⭐'.repeat(Math.round(avgRating)) : 'Нет оценок';
-                ratingBlock = `
-                    <div style="background:var(--bg); padding:12px; border-radius:var(--radius-sm); margin-top:8px;">
-                        <div style="color:var(--text-muted); font-size:13px;">Рейтинг</div>
-                        <div style="font-size:18px; margin-top:4px;">${stars}</div>
-                    </div>
-                `;
+                const avg = currentUser.average_rating ||') {
+                const avg = currentUser.average_rating || 0;
+                rating = `<div style="background 0;
+                rating = `<div style="background:var(--bg);padding:12px;border:var(--bg);padding:12px;border-radius:var(--radius-sm);margin-top:8-radius:var(--radius-sm);margin-top:8px;"><div style="color:var(--text-muted);px;"><div style="color:var(--text-muted);font-size:13px;">Рейтинг</divfont-size:13px;">Рейтинг</div><div style="font-size:18px;">><div style="font-size:18px;">${avg>0?'⭐'.repeat(Math.round(avg${avg>0?'⭐'.repeat(Math.round(avg)):'Нет оценок'}</div>)):'Нет оценок'}</div></div>`;
             }
-
-            document.getElementById('profile-info').innerHTML = `
-                <div class="profile-avatar ${currentUser.subscription_type === 'pro' ? 'pro' : ''} ${currentUser.is_partner ? 'partner' : ''}">
-                    ${firstLetter}${currentUser.subscription_type === 'pro' ? '⭐' : ''}
-                </div>
-                <div class="profile-name">${currentUser.name}</div>
-                <div class="profile-role">${roleText}</div>
-                ${ratingBlock}
-                ${subscriptionBlock}
-                <div style="background:var(--bg); padding:12px; border-radius:var(--radius-sm); margin:8px 0;">
-                    <div style="color:var(--text-muted); font-size:13px;">VK ID</div>
-                    <div style="font-weight:600;">${currentUser.vk_id}</div>
-                </div>
-                <button class="btn btn-warning" onclick="toggleRole()"><i class="fas fa-exchange-alt"></i> ${switchText}</button>
-            `;
-
-            if (currentUser.is_partner) {
-                document.getElementById('partner-section').style.display = 'block';
-                document.getElementById('become-partner-section').style.display = 'none';
-            } else {
-                document.getElementById('partner-section').style.display = 'none';
-                document.getElementById('become-partner-section').style.display = 'block';
+            
+            document.getElementById('</div>`;
             }
-
-            if (currentUser.role === 'master') {
-                document.getElementById('reviews-section').style.display = 'block';
-                loadMasterReviews(currentUser.id);
-            } else {
-                document.getElementById('reviews-section').style.display = 'none';
-            }
+            
+            document.getElementById('profile-info').innerHTML = `<div class="profile-avatar ${profile-info').innerHTML = `<div class="profile-avatar ${currentUser.subscription_type==='pro'?'pro':''currentUser.subscription_type==='pro'?'pro':''} ${currentUser.is_partner?'partner':''}">${} ${currentUser.is_partner?'partner':''}">${letter}${currentUser.subscription_type==='pro'?'⭐':''letter}${currentUser.subscription_type==='pro'?'⭐':''}</div><div class="profile-name">${}</div><div class="profile-name">${currentUser.name}</div><div class="profile-role">${currentUser.name}</div><div class="profile-role">${role}</div>${rating}${sub}<div style="backgroundrole}</div>${rating}${sub}<div style="background:var(--bg);padding:12px;border:var(--bg);padding:12px;border-radius:var(--radius-sm);margin:8px -radius:var(--radius-sm);margin:8px 0;"><div style="color:var(--text-muted);0;"><div style="color:var(--text-muted);font-size:13px;">VK ID</divfont-size:13px;">VK ID</div><div style="font-weight:600;">><div style="font-weight:600;">${currentUser.vk_id}</div></div>${currentUser.vk_id}</div></div><button class="btn btn-warning" onclick="toggleRole()<button class="btn btn-warning" onclick="toggleRole()">${switchText}</button>`;
+            
+           ">${switchText}</button>`;
+            
+            document.getElementById('partner-section').style.display = currentUser.is_partner document.getElementById('partner-section').style.display = currentUser.is_partner ? 'block' : 'none';
+            document.getElementById ? 'block' : 'none';
+            document.getElementById('become-partner-section').style.display = currentUser('become-partner-section').style.display = currentUser.is_partner ? 'none' : 'block';
+           .is_partner ? 'none' : 'block';
+            document.getElementById('reviews-section').style.display = currentUser.role document.getElementById('reviews-section').style.display = currentUser.role === 'master' ? 'block' : 'none'; === 'master' ? 'block' : 'none';
+            if (currentUser.role === 'master') loadMaster
+            if (currentUser.role === 'master') loadMasterReviews(currentUser.id);
         }
 
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(`tab-${tabName}`).classList.add('active');
-
-            const navItems = document.querySelectorAll('.nav-item');
-            const tabs = ['home', 'order', 'responses', 'chat', 'profile'];
-            const idx = tabs.indexOf(tabName);
-            if (idx >= 0) navItems[idx].classList.add('active');
-
-            if (tabName === 'responses') loadResponses();
-            if (tabName === 'chat') loadChatOrders();
+        async function toggleReviews(currentUser.id);
         }
 
-        async function postOrderToServer(order) {
-            const SERVER_URL = 'https://moymaster-server.vercel.app';
-
-            try {
-                console.log('📢 Отправка заявки на сервер:', order);
-
-                const response = await fetch(`${SERVER_URL}/api/new-order`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        id: order.id,
-                        title: order.title,
-                        description: order.description,
-                        budget: order.budget,
-                        district: order.district,
-                        category_id: order.category_id,
-                        user_id: order.user_id
-                    })
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    console.log('✅ Пост опубликован в группе ВК! ID поста:', result.post_id);
-                } else {
-                    console.error('❌ Ошибка публикации:', result.error);
-                }
-            } catch (err) {
-                console.error('❌ Ошибка соединения с сервером:', err);
-            }
+        async function toggleRole() {
+            const newRole = currentUser.role ===Role() {
+            const newRole = currentUser.role === 'customer' ? 'master' : 'customer';
+ 'customer' ? 'master' : 'customer';
+            await supabaseClient.from('users').update({            await supabaseClient.from('users').update({ role: newRole }).eq('id', currentUser.id); role: newRole }).eq('id', currentUser.id);
+            currentUser.role = newRole;
+            if (
+            currentUser.role = newRole;
+            if (newRole === 'master') await countTodayResponses(); elsenewRole === 'master') await countTodayResponses(); else todayResponsesCount = 0;
+            updateProfileUI todayResponsesCount = 0;
+            updateProfileUI(); await loadOrders(); await loadResponses();
+            alert(); await loadOrders(); await loadResponses();
+            alert(`✅ Теперь вы: ${newRole==='master(`✅ Теперь вы: ${newRole==='master'?'Мастер':'Заказчик'}`'?'Мастер':'Заказчик'}`);
         }
 
-        async function notifyMastersAboutNewOrder(order) {
-            console.log('📢 Отправка уведомлений мастерам о новой заявке...');
-
-            try {
-                const { data: masters } = await supabaseClient
-                    .from('users')
-                    .select('vk_id')
-                    .eq('role', 'master');
-
-                if (!masters || masters.length === 0) {
-                    console.log('Нет мастеров для уведомления');
-                    return;
-                }
-
-                console.log(`Найдено ${masters.length} мастеров для уведомления`);
-
-                const SERVER_URL = 'https://moymaster-server.vercel.app';
-
-                const response = await fetch(`${SERVER_URL}/api/send-notification`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        user_ids: masters.map(m => m.vk_id),
-                        message: `🔨 Новая заявка в районе ${order.district}!\n\n${order.title}\n💰 Бюджет: ${order.budget || 'Договорная'}\n\nОткликнуться в приложении: https://vk.com/app${appId}`
-                    })
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    console.log('✅ Уведомления отправлены!');
-                } else {
-                    console.error('❌ Ошибка:', result.error);
-                }
-
-            } catch (err) {
-                console.error('❌ Ошибка отправки уведомлений:', err);
-            }
+        async function loadChatOrders());
         }
 
         async function loadChatOrders() {
-            console.log('🔍 Загрузка списка заявок для чата...');
-
-            if (!currentUser) {
-                console.log('❌ Пользователь не авторизован');
-                return;
-            }
-
+            if (!currentUser) return;
+            const {
+            if (!currentUser) return;
+            const { data } = await supabaseClient.from(' { data } = await supabaseClient.from('orders').select('*').or(`user_id.eq.${currentUserorders').select('*').or(`user_id.eq.${currentUser.id},assigned_master_id.eq.${currentUser.id}`).in.id},assigned_master_id.eq.${currentUser.id}`).in('status',['in_progress','completed']).order('status',['in_progress','completed']).order('created_at',{ascending:false});
+           ('created_at',{ascending:false});
             const container = document.getElementById('chat-orders-container');
-
-            const { data: orders } = await supabaseClient
-                .from('orders')
-                .select('*')
-                .or(`user_id.eq.${currentUser.id},assigned_master_id.eq.${currentUser.id}`)
-                .in('status', ['in_progress', 'completed'])
-                .order('created_at', { ascending: false });
-
-            if (!orders || orders.length === 0) {
-                container.innerHTML =
-                    '<div class="empty-state"><i class="fas fa-comments"></i><p>Нет активных заявок</p></div>';
-                return;
-            }
-
-            const ordersWithPartners = await Promise.all(orders.map(async order => {
-                const partnerId = order.user_id === currentUser.id ?
-                    order.assigned_master_id :
-                    order.user_id;
-
-                if (!partnerId) {
-                    return { ...order, partnerName: 'Нет собеседника', hasMessages: false };
-                }
-
-                const { data: partner } = await supabaseClient
-                    .from('users')
-                    .select('name')
-                    .eq('id', partnerId)
-                    .single();
-
-                const { data: messages } = await supabaseClient
-                    .from('messages')
-                    .select('id', { count: 'exact', head: true })
-                    .eq('order_id', order.id);
-
-                return {
-                    ...order,
-                    partnerName: partner?.name || 'Пользователь',
-                    hasMessages: messages && messages.length > 0
-                };
+            const container = document.getElementById('chat-orders-container');
+            if (!data || data.length === 0) { container if (!data || data.length === 0) { container.innerHTML = '<div class="empty-state"><i class=".innerHTML = '<div class="empty-state"><i class="fas fa-comments"></i><p>Нет чfas fa-comments"></i><p>Нет чатов</p></div>'; return; }
+атов</p></div>'; return; }
+            
+            const orders = await Promise.all(data.map            
+            const orders = await Promise.all(data.map(async o => {
+                const pid = o.user(async o => {
+                const pid = o.user_id === currentUser.id ? o.assigned_master_id : o_id === currentUser.id ? o.assigned_master_id : o.user_id;
+                if (!pid) return { ....user_id;
+                if (!pid) return { ...o, name: '?', hasMsg:o, name: '?', hasMsg: false };
+                const { data: p } = await false };
+                const { data: p } = await supabaseClient.from('users').select('name').eq supabaseClient.from('users').select('name').eq('id', pid).single();
+                const {('id', pid).single();
+                const { data: msgs } = await supabaseClient.from(' data: msgs } = await supabaseClient.from('messages').select('id',{count:'exact',head:truemessages').select('id',{count:'exact',head:true}).eq('order_id',o.id);
+}).eq('order_id',o.id);
+                return { ...o, name: p                return { ...o, name: p?.name||'?', hasMsg: msgs &&?.name||'?', hasMsg: msgs && msgs.length > 0 };
             }));
-
-            container.innerHTML = ordersWithPartners.map(order => `
-                <div class="order-card" onclick="openChat(${order.id})" style="cursor:pointer;">
-                    <div style="font-weight:600;">${order.title}</div>
-                    <div style="font-size:13px; color:var(--text-muted);">
-                        <i class="fas fa-user"></i> ${order.partnerName}
-                        ${order.hasMessages ? ' <i class="fas fa-circle" style="color:var(--primary); font-size:8px;"></i>' : ''}
-                    </div>
-                </div>
-            `).join('');
+ msgs.length > 0 };
+            }));
+            
+            container.innerHTML = orders.map(o => `<div class            
+            container.innerHTML = orders.map(o => `<div class="order-card" onclick="openChat(${o="order-card" onclick="openChat(${o.id})" style="cursor:pointer;"><div style.id})" style="cursor:pointer;"><div style="font-weight:600;">${o.title="font-weight:600;">${o.title}</div><div style="font-size:13}</div><div style="font-size:13px;color:var(--text-muted);"><i classpx;color:var(--text-muted);"><i class="fas fa-user"></i> ${o.name="fas fa-user"></i> ${o.name}${o.hasMsg?' <i class="fas}${o.hasMsg?' <i class="fas fa-circle" style="color:var(--primary);font fa-circle" style="color:var(--primary);font-size:8px;"></i>':''}</div></div-size:8px;"></i>':''}</div></div>`).join('');
         }
 
-        async function openChat(orderId) {
-            currentChatOrderId = orderId;
+        async function>`).join('');
+        }
 
-            const { data: order } = await supabaseClient
-                .from('orders')
-                .select('user_id, assigned_master_id, title')
-                .eq('id', orderId)
-                .single();
-
-            currentChatPartnerId = order.user_id === currentUser.id ?
-                order.assigned_master_id :
-                order.user_id;
-
-            const { data: partner } = await supabaseClient
-                .from('users')
-                .select('name')
-                .eq('id', currentChatPartnerId)
-                .single();
-
-            document.getElementById('chat-partner-name').textContent =
-                `С: ${partner?.name || 'Пользователь'} | ${order.title}`;
-
+        async function openChat(oid) {
+            currentChatOrderId = openChat(oid) {
+            currentChatOrderId = oid;
+            const { data: o } = await oid;
+            const { data: o } = await supabaseClient.from('orders').select('user_id, supabaseClient.from('orders').select('user_id,assigned_master_id,title').eq('id',oidassigned_master_id,title').eq('id',oid).single();
+            currentChatPartnerId = o).single();
+            currentChatPartnerId = o.user_id === currentUser.id ? o.assigned_master_id :.user_id === currentUser.id ? o.assigned_master_id : o.user_id;
+            const { data: p } o.user_id;
+            const { data: p } = await supabaseClient.from('users').select('name = await supabaseClient.from('users').select('name').eq('id',currentChatPartnerId).single();').eq('id',currentChatPartnerId).single();
+            document.getElementById('chat-partner-name').textContent
+            document.getElementById('chat-partner-name').textContent = `С: ${p?.name||'? = `С: ${p?.name||'?'} | ${o.title}`;
+            await loadMessages'} | ${o.title}`;
             await loadMessages();
-
+            if (messagesInterval) clearInterval(messagesInterval();
             if (messagesInterval) clearInterval(messagesInterval);
+            messagesInterval = setInterval(loadMessages, 3);
             messagesInterval = setInterval(loadMessages, 3000);
         }
 
+        async function load000);
+        }
+
         async function loadMessages() {
+            if (!currentChatOrderId) returnMessages() {
             if (!currentChatOrderId) return;
-
+            const { data } = await sup;
+            const { data } = await supabaseClient.from('messages').select('*').eq('orderabaseClient.from('messages').select('*').eq('order_id',currentChatOrderId).order('created_at',{_id',currentChatOrderId).order('created_at',{ascending:true});
+            const container = document.getElementByIdascending:true});
             const container = document.getElementById('messages-container');
-
-            const { data: messages } = await supabaseClient
-                .from('messages')
-                .select('*')
-                .eq('order_id', currentChatOrderId)
-                .order('created_at', { ascending: true });
-
-            if (!messages || messages.length === 0) {
-                container.innerHTML =
-                    `<div class="empty-state"><i class="fas fa-comment-dots"></i><p>Нет сообщений</p></div>`;
-                return;
-            }
-
-            container.innerHTML = messages.map(msg => {
-                const isMe = msg.sender_id === currentUser.id;
-                const time = new Date(msg.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit',
-                    minute: '2-digit' });
-
-                return `
-                    <div class="chat-message ${isMe ? 'me' : 'other'}">
-                        <div class="bubble">
-                            ${msg.message}
-                            <span class="time">${time}</span>
-                        </div>
-                    </div>
-                `;
+            if (!data ||('messages-container');
+            if (!data || data.length === 0) { container.innerHTML = ' data.length === 0) { container.innerHTML = '<div class="empty-state"><i class="fas fa-comment<div class="empty-state"><i class="fas fa-comment"></i><p>Нет сообщений"></i><p>Нет сообщений</p></div>'; return; }
+            container.innerHTML =</p></div>'; return; }
+            container.innerHTML = data.map(m => {
+                const me data.map(m => {
+                const me = m.sender_id === currentUser.id;
+                const = m.sender_id === currentUser.id;
+                const time = new Date(m.created_at).toLocaleTimeString('ru time = new Date(m.created_at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-RU',{hour:'2-digit',minute:'2-digit'});
+                return `<div class-digit'});
+                return `<div class="chat-message ${me?'me':'other="chat-message ${me?'me':'other'}"><div class="bubble">${m.message}<span'}"><div class="bubble">${m.message}<span class="time">${time}</span></div class="time">${time}</span></div></div>`;
             }).join('');
+></div>`;
+            }).join('');
+            container.scrollTop = container.scrollHeight;
+        }
 
             container.scrollTop = container.scrollHeight;
         }
 
         async function sendMessage() {
+            const input = document        async function sendMessage() {
             const input = document.getElementById('message-input');
-            const message = input.value.trim();
-
-            if (!message || !currentChatOrderId || !currentChatPartnerId) {
-                alert('Введите сообщение');
-                return;
-            }
-
-            const { error } = await supabaseClient
-                .from('messages')
-                .insert([{
-                    order_id: currentChatOrderId,
-                    sender_id: currentUser.id,
-                    receiver_id: currentChatPartnerId,
-                    message: message
-                }]);
-
-            if (error) {
-                alert('❌ Ошибка отправки: ' + error.message);
-            } else {
-                input.value = '';
-                await loadMessages();
-            }
+            const msg = input.value.getElementById('message-input');
+            const msg = input.value.trim();
+            if (!msg || !currentChatOrderId.trim();
+            if (!msg || !currentChatOrderId || !currentChatPartnerId) { alert('В || !currentChatPartnerId) { alert('Введите сообщение'); return; }
+            await supabaseClientведите сообщение'); return; }
+            await supabaseClient.from('messages').insert([{ order_id: currentChatOrderId.from('messages').insert([{ order_id: currentChatOrderId, sender_id: currentUser.id, receiver_id: currentChat, sender_id: currentUser.id, receiver_id: currentChatPartnerId, message: msg }]);
+            input.valuePartnerId, message: msg }]);
+            input.value = ''; await loadMessages();
         }
-// Принудительный запуск приложения
-console.log('🔧 Подготовка к запуску...');
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        console.log(' DOM загружен, запускаем initApp...');
-        initApp();
-    });
-} else {
-    console.log('📄 Страница уже загружена, запускаем initApp...');
-    initApp();
-}
+ = ''; await loadMessages();
+        }
 
-window.addEventListener('load', () => {
-    console.log('🎉 Всё загружено!');
-});
-       // <!-- ДИАГНОСТИКА -->
-<script>
-console.log(' ДИАГНОСТИКА:');
-console.log('1. HTML загружен:', document.readyState);
-console.log('2. initApp существует:', typeof initApp);
-console.log('3. vkBridge существует:', typeof vkBridge);
-console.log('4. supabaseClient существует:', typeof supabaseClient);
-
-// Принудительно вызываем initApp через 2 секунды
-setTimeout(() => {
-    console.log('⏰ Принудительный вызов initApp...');
-    if (typeof initApp === 'function') {
-        initApp();
-    } else {
-        console.error('❌ initApp не найдена!');
-    }
-}, 2000);
-
-        initApp();
+        // Запуск
+        if (document.readyState ===        // Запуск
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init 'loading') {
+            document.addEventListener('DOMContentLoaded', initApp);
+        } else {
+            setTimeout(initAppApp);
+        } else {
+            setTimeout(initApp, 100);
+        }
+   , 100);
+        }
     </script>
-
+</body>
+</html>
+ </script>
 </body>
 </html>
