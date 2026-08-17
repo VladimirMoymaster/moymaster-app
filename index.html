@@ -2859,6 +2859,23 @@ if (document.readyState === 'loading') {
 window.addEventListener('load', () => {
     console.log('🎉 Всё загружено!');
 });
+        <!-- ДИАГНОСТИКА -->
+<script>
+console.log(' ДИАГНОСТИКА:');
+console.log('1. HTML загружен:', document.readyState);
+console.log('2. initApp существует:', typeof initApp);
+console.log('3. vkBridge существует:', typeof vkBridge);
+console.log('4. supabaseClient существует:', typeof supabaseClient);
+
+// Принудительно вызываем initApp через 2 секунды
+setTimeout(() => {
+    console.log('⏰ Принудительный вызов initApp...');
+    if (typeof initApp === 'function') {
+        initApp();
+    } else {
+        console.error('❌ initApp не найдена!');
+    }
+}, 2000);
 
         initApp();
     </script>
