@@ -2473,24 +2473,51 @@ async function loadModerationOrders() {
 }
 
 async function approveOrder(orderId) {
-    if (!confirm('Одобрить эту заявку?')) return;
+    console.log('🔍 Начало одобрения заявки ID:', orderId);
+    console.log('👤 Текущий пользователь:', currentUser);
+
+    if (!confirm('Одобрить эту заявку?')) {
+        console.log('❌ Действие отменено пользователем');
+        return;
+    }
+
+    console.log('📤 Отправка запроса на обновление в Supabase...');
     
-    const { error } = await supabaseClient.from('orders').update({ 
+    const { data, error } = await supabaseClient.from('orders').update({ 
         status: 'open',
         moderated_by: currentUser.id,
         moderated_at: new Date().toISOString()
-    }).eq('id', orderId);
+    }).eq('id', orderId).select();
 
-    if (error) { alert('❌ Ошибка: ' + error.message); return; }
+    if (error) {
+        console.error('❌ ОШИБКА SUPABASE:', error);
+        alert('❌ Ошибка базы данных: ' + error.message + '\n\nПроверь, выполнил ли ты SQL-скрипт для добавления колонок moderated_by и moderated_at!');
+        return;
+    }
 
-    const { data: order } = await supabaseClient.from('orders').select('user_id, title').eq('id', orderId).single();
-    await createNotification(order.user_id, '✅ Заявка одобрена!', `Ваша заявка "${order.title}" прошла модерацию и теперь видна мастерам.`, 'success', orderId);
+    console.log('✅ Заявка успешно обновлена в БД:', data);
+
+    try {
+        console.log('📤 Создание уведомления для пользователя...');
+        const { data: order } = await supabaseClient.from('orders').select('user_id, title').eq('id', orderId).single();
+        
+        await createNotification(
+            order.user_id, 
+            '✅ Заявка одобрена!', 
+            `Ваша заявка "${order.title}" прошла модерацию и теперь видна мастерам.`, 
+            'success', 
+            orderId
+        );
+        console.log('✅ Уведомление успешно создано');
+    } catch (notifError) {
+        console.error('⚠️ Ошибка при создании уведомления (не критично, заявка всё равно одобрена):', notifError);
+    }
 
     alert('✅ Заявка одобрена!');
     await loadModerationOrders();
     await loadOrders();
 }
-
+        
 function openRejectModal(orderId) {
     currentRejectOrderId = orderId;
     document.getElementById('reject-reason').value = '';
