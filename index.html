@@ -2473,17 +2473,16 @@ async function loadModerationOrders() {
 }
 
 async function approveOrder(orderId) {
-    console.log('🔍 Пытаемся одобрить заявку ID:', orderId);
-    console.log('👤 Текущий пользователь:', currentUser);
+    alert('🔍 Начинаем одобрение заявки #' + orderId);
     
     if (!confirm('Одобрить эту заявку?')) {
-        console.log('❌ Отменено пользователем');
+        alert('❌ Отменено');
         return;
     }
 
-    console.log('📤 Обновляем статус заявки...');
-    
-    // Упрощённая версия - только статус, без дополнительных полей
+    alert('📤 Отправляем запрос в базу данных...');
+
+    // Сначала просто меняем статус
     const { data, error } = await supabaseClient
         .from('orders')
         .update({ status: 'open' })
@@ -2491,31 +2490,43 @@ async function approveOrder(orderId) {
         .select();
 
     if (error) {
-        console.error('❌ ОШИБКА SUPABASE:', error);
-        alert(' Ошибка: ' + error.message);
+        alert('❌ ОШИБКА БАЗЫ ДАННЫХ:\n\n' + error.message + '\n\nКод: ' + error.code);
         return;
     }
 
-    console.log('✅ Заявка обновлена:', data);
+    alert('✅ Заявка обновлена! Пробуем создать уведомление...');
 
-    // Пробуем создать уведомление (если таблица есть)
+    // Пробуем создать уведомление
     try {
-        const { data: order } = await supabaseClient.from('orders').select('user_id, title').eq('id', orderId).single();
-        await supabaseClient.from('notifications').insert([{
-            user_id: order.user_id,
-            title: '✅ Заявка одобрена!',
-            message: `Ваша заявка "${order.title}" прошла модерацию.`,
-            type: 'success',
-            order_id: orderId
-        }]);
-        console.log('✅ Уведомление создано');
-    } catch (notifErr) {
-        console.warn('⚠️ Уведомление не создано (не критично):', notifErr);
+        const { data: order } = await supabaseClient
+            .from('orders')
+            .select('user_id, title')
+            .eq('id', orderId)
+            .single();
+        
+        const { error: notifError } = await supabaseClient
+            .from('notifications')
+            .insert([{
+                user_id: order.user_id,
+                title: '✅ Заявка одобрена!',
+                message: 'Ваша заявка "' + order.title + '" прошла модерацию.',
+                type: 'success',
+                order_id: orderId
+            }]);
+        
+        if (notifError) {
+            alert('⚠️ Уведомление не создано: ' + notifError.message);
+        } else {
+            alert('✅ Уведомление создано!');
+        }
+    } catch (e) {
+        alert('⚠️ Ошибка уведомления: ' + e.message);
     }
 
-    alert('✅ Заявка одобрена!');
+    alert('🎉 Всё готово! Обновляем списки...');
     await loadModerationOrders();
     await loadOrders();
+    alert('✅ Готово! Заявка одобрена.');
 }
         
 function openRejectModal(orderId) {
