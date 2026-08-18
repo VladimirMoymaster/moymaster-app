@@ -1547,14 +1547,14 @@
             renderPhotoPreview();
         }
 
-        async function loadOrCreateUser(vkId, name) {
+         async function loadOrCreateUser(vkId, name) {
             try {
                 let { data: users } = await supabaseClient.from('users').select('*').eq('vk_id', vkId).single();
 
                 if (!users) {
                     const { data: newUser } = await supabaseClient.from('users').insert([{
                         vk_id: vkId, name: name, role: 'customer', subscription_type: 'free',
-                        average_rating: 0, is_partner: false, partner_balance: 0
+                        average_rating: 0, is_partner: false, partner_balance: 0, is_admin: false
                     }]).select().single();
                     currentUser = newUser;
                 } else {
@@ -1574,11 +1574,17 @@
                 await loadOrders();
                 await loadResponses();
 
+                // ИСПРАВЛЕННЫЙ БЛОК:
                 if (currentUser.is_partner) {
                     await loadPartnerStats();
-                if (currentUser.is_admin) showAdminTab();
-                    await loadUnreadNotificationsCount();
                 }
+                
+                // Эти функции теперь вне условия is_partner и сработают для всех
+                if (currentUser.is_admin) {
+                    showAdminTab();
+                }
+                await loadUnreadNotificationsCount();
+
             } catch (err) {
                 console.error('❌ Ошибка:', err);
                 document.getElementById('profile-info').innerHTML = `<div class="error">Ошибка: ${err.message}</div>`;
