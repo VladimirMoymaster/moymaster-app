@@ -6,12 +6,10 @@
     <title>Мой Мастер</title>
     
     <!-- VK Bridge -->
-    <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js">
-    </script>
+    <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
     
     <!-- Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -925,33 +923,15 @@
         }
 
         /* ===== UTILITY ===== */
-        .text-center {
-            text-align: center;
-        }
-        .mt-8 {
-            margin-top: 8px;
-        }
-        .mt-12 {
-            margin-top: 12px;
-        }
-        .gap-8 {
-            gap: 8px;
-        }
-        .flex {
-            display: flex;
-        }
-        .flex-col {
-            flex-direction: column;
-        }
-        .items-center {
-            align-items: center;
-        }
-        .justify-between {
-            justify-content: space-between;
-        }
-        .w-full {
-            width: 100%;
-        }
+        .text-center { text-align: center; }
+        .mt-8 { margin-top: 8px; }
+        .mt-12 { margin-top: 12px; }
+        .gap-8 { gap: 8px; }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .w-full { width: 100%; }
 
         .limit-warning {
             background: #FEF3C7;
@@ -1016,19 +996,10 @@
 
         /* ===== RESPONSIVE TWEAKS ===== */
         @media (max-width: 400px) {
-            .app-logo {
-                font-size: 17px;
-            }
-            .card {
-                padding: 14px 12px;
-            }
-            .partner-stats {
-                grid-template-columns: 1fr 1fr;
-            }
-            .order-photos img {
-                width: 56px;
-                height: 56px;
-            }
+            .app-logo { font-size: 17px; }
+            .card { padding: 14px 12px; }
+            .partner-stats { grid-template-columns: 1fr 1fr; }
+            .order-photos img { width: 56px; height: 56px; }
         }
     </style>
 </head>
@@ -1107,6 +1078,18 @@
                 <div class="form-group">
                     <label>Бюджет (руб)</label>
                     <input type="number" id="order-budget" class="form-control" placeholder="Например: 1500">
+                </div>
+
+                <!-- НОВОЕ: Выбор количества человек -->
+                <div class="form-group">
+                    <label>Сколько человек нужно</label>
+                    <select id="order-workers" class="form-control">
+                        <option value="1">1 человек</option>
+                        <option value="2">2 человека</option>
+                        <option value="3">3 человека</option>
+                        <option value="4">4 человека</option>
+                        <option value="5">5 человек</option>
+                    </select>
                 </div>
 
                 <div class="form-group">
@@ -1242,7 +1225,6 @@
     </nav>
 
     <!-- ===== MODALS ===== -->
-
     <!-- PRO Modal -->
     <div class="modal-overlay" id="pro-modal">
         <div class="modal-content">
@@ -1330,6 +1312,16 @@
 
     <!-- ===== SCRIPTS ===== -->
     <script>
+        // ===== ФИЛЬТР НЕПРИЕМЛЕМОГО КОНТЕНТА =====
+        const BAD_WORDS = ['хуй','хуя','хую','хуе','хуи','хуйло','хуйня','пизд','ебат','ебан','ебал','ебл','ебуч','ебло','бля','сука','суки','сучар','мудак','мудил','гандон','гондон','пидор','пидр','пидар','педик','шлюх','мразь','говн','дроч','залуп','заеб','уеб','долбоеб','долба','жопа','жоп','сран'];
+        
+        function containsBadWords(text) {
+            if (!text) return false;
+            // Убираем регистр, ё→е и все символы (чтобы нельзя было обойти как "х.у.й" или "Х#УЙ")
+            const normalized = text.toLowerCase().replace(/ё/g, 'е').replace(/[^а-яa-z0-9]/g, '');
+            return BAD_WORDS.some(word => normalized.includes(word));
+        }
+
         // ===== FALLBACK ДЛЯ VK BRIDGE (ПК) =====
         (function() {
             if (typeof vkBridge === 'undefined') {
@@ -1341,32 +1333,20 @@
                         switch(method) {
                             case 'VKWebAppInit':
                                 return { status: 'success' };
-                                
                             case 'VKWebAppGetUserInfo':
-                                return { 
-                                    id: 999999, 
-                                    first_name: 'Тестовый', 
-                                    last_name: 'Пользователь' 
-                                };
-                                
+                                return { id: 999999, first_name: 'Тестовый', last_name: 'Пользователь' };
                             case 'VKWebAppGetLaunchParams':
                                 return { app_id: 'test_app' };
-                                
                             case 'VKWebAppShare':
                                 alert('📤 Поделиться: ' + params.link);
                                 return { status: 'success' };
-                                
                             case 'VKWebAppShowOrderBox':
                                 console.log('💳 Тестовый режим оплаты:', params);
                                 if (params.test_mode === 1) {
                                     alert('💳 Тестовый режим: оплата прошла успешно!');
-                                    return { 
-                                        status: 'success', 
-                                        order_id: `test_order_${Date.now()}` 
-                                    };
+                                    return { status: 'success', order_id: `test_order_${Date.now()}` };
                                 }
                                 throw new Error('VK Pay недоступен на ПК');
-                                
                             default:
                                 throw new Error(`Метод ${method} не поддерживается на ПК`);
                         }
@@ -1381,7 +1361,6 @@
         // ===== КОНСТАНТЫ =====
         const SUPABASE_URL = 'https://kmjuddmhvlccrbyyfcce.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttanVkZG1odmxjY3JieXlmY2NlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2Mjc5ODcsImV4cCI6MjEwMjIwMzk4N30.PhJxMFSRlF9tmUuvOLH-JC9Tn-9kAgQ11XEg69eJZ6c';
-
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         const BARNAUL_DISTRICTS = ['Центральный', 'Железнодорожный', 'Октябрьский', 'Индустриальный', 'Ленинский'];
@@ -1419,7 +1398,6 @@
             try {
                 console.log('📱 Инициализация VK Bridge...');
                 
-                // Пробуем инициализировать с таймаутом
                 const initPromise = vkBridge.send('VKWebAppInit');
                 const timeoutPromise = new Promise((_, reject) => 
                     setTimeout(() => reject(new Error('Таймаут VK Bridge')), 3000)
@@ -1428,7 +1406,6 @@
                 await Promise.race([initPromise, timeoutPromise]);
                 console.log('✅ VK Bridge инициализирован');
                 
-                // Получаем параметры запуска
                 try {
                     const launchParams = await vkBridge.send('VKWebAppGetLaunchParams');
                     if (launchParams?.app_id) {
@@ -1439,22 +1416,17 @@
                     console.warn('⚠️ Не удалось получить app_id:', err.message);
                 }
                 
-                // Получаем данные пользователя
                 console.log('👤 Получение данных пользователя...');
                 const userData = await vkBridge.send('VKWebAppGetUserInfo');
                 console.log('✅ Пользователь:', userData);
                 
-                await loadOrCreateUser(
-                    userData.id, 
-                    `${userData.first_name} ${userData.last_name}`.trim()
-                );
+                await loadOrCreateUser(userData.id, `${userData.first_name} ${userData.last_name}`.trim());
                 
             } catch (err) {
                 console.error('❌ Ошибка инициализации:', err);
                 console.log('⚠️ Переход в тестовый режим...');
                 await loadOrCreateUser(999999, 'Тестовый Пользователь');
             } finally {
-                // Скрываем экран загрузки
                 if (loadingScreen) {
                     loadingScreen.classList.add('hidden');
                     setTimeout(() => {
@@ -1465,10 +1437,8 @@
             }
         }
 
-        // ===== ОСТАЛЬНЫЕ ФУНКЦИИ =====
         async function uploadPhotos() {
             console.log('📸 Попытка загрузки фото...');
-
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = 'image/*';
@@ -1478,15 +1448,12 @@
             input.onchange = async () => {
                 if (input.files && input.files.length > 0) {
                     console.log(`Выбрано файлов: ${input.files.length}`);
-
                     for (let i = 0; i < input.files.length; i++) {
                         const file = input.files[i];
-
                         if (file.size > 5 * 1024 * 1024) {
                             alert(`Файл "${file.name}" слишком большой (макс. 5MB)`);
                             continue;
                         }
-
                         try {
                             const base64 = await fileToBase64(file);
                             uploadedPhotos.push(base64);
@@ -1496,14 +1463,11 @@
                             alert('Не удалось обработать фото');
                         }
                     }
-
                     renderPhotoPreview();
                 }
             };
-
             document.body.appendChild(input);
             input.click();
-
             setTimeout(() => {
                 if (input.parentNode) {
                     input.parentNode.removeChild(input);
@@ -1538,26 +1502,13 @@
 
         async function loadOrCreateUser(vkId, name) {
             try {
-                let { data: users } = await supabaseClient
-                    .from('users')
-                    .select('*')
-                    .eq('vk_id', vkId)
-                    .single();
+                let { data: users } = await supabaseClient.from('users').select('*').eq('vk_id', vkId).single();
 
                 if (!users) {
-                    const { data: newUser } = await supabaseClient
-                        .from('users')
-                        .insert([{
-                            vk_id: vkId,
-                            name: name,
-                            role: 'customer',
-                            subscription_type: 'free',
-                            average_rating: 0,
-                            is_partner: false,
-                            partner_balance: 0
-                        }])
-                        .select()
-                        .single();
+                    const { data: newUser } = await supabaseClient.from('users').insert([{
+                        vk_id: vkId, name: name, role: 'customer', subscription_type: 'free',
+                        average_rating: 0, is_partner: false, partner_balance: 0
+                    }]).select().single();
                     currentUser = newUser;
                 } else {
                     currentUser = users;
@@ -1570,7 +1521,6 @@
                 }
 
                 await checkAutoComplete();
-
                 updateProfileUI();
                 renderDistrictFilters();
                 await loadCategories();
@@ -1582,75 +1532,55 @@
                 }
             } catch (err) {
                 console.error('❌ Ошибка:', err);
-                document.getElementById('profile-info').innerHTML =
-                    `<div class="error">Ошибка: ${err.message}</div>`;
+                document.getElementById('profile-info').innerHTML = `<div class="error">Ошибка: ${err.message}</div>`;
             }
         }
 
         async function checkAutoComplete() {
             if (!currentUser) return;
-
             const threeDaysAgo = new Date();
             threeDaysAgo.setDate(threeDaysAgo.getDate() - AUTO_COMPLETE_DAYS);
             const threeDaysAgoISO = threeDaysAgo.toISOString();
 
             const { data: oldOrders, error } = await supabaseClient
-                .from('orders')
-                .select('id, awaiting_confirmation, completed_at')
-                .eq('user_id', currentUser.id)
-                .eq('awaiting_confirmation', true)
-                .lt('created_at', threeDaysAgoISO)
-                .is('completed_at', null);
+                .from('orders').select('id, awaiting_confirmation, completed_at')
+                .eq('user_id', currentUser.id).eq('awaiting_confirmation', true)
+                .lt('created_at', threeDaysAgoISO).is('completed_at', null);
 
             if (error || !oldOrders || oldOrders.length === 0) return;
 
             console.log(`⏰ Автозавершение ${oldOrders.length} заявок`);
-
             for (const order of oldOrders) {
-                await supabaseClient
-                    .from('orders')
-                    .update({
-                        status: 'completed',
-                        completed_at: new Date().toISOString(),
-                        awaiting_confirmation: false
-                    })
-                    .eq('id', order.id);
+                await supabaseClient.from('orders').update({
+                    status: 'completed', completed_at: new Date().toISOString(), awaiting_confirmation: false
+                }).eq('id', order.id);
             }
         }
 
         async function countTodayResponses() {
             if (!currentUser || currentUser.role !== 'master') return;
-
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             const todayISO = today.toISOString();
 
             const { count, error } = await supabaseClient
-                .from('responses')
-                .select('*', { count: 'exact', head: true })
-                .eq('user_id', currentUser.id)
-                .gte('created_at', todayISO);
+                .from('responses').select('*', { count: 'exact', head: true })
+                .eq('user_id', currentUser.id).gte('created_at', todayISO);
 
-            if (error) {
-                todayResponsesCount = 0;
-            } else {
-                todayResponsesCount = count || 0;
-            }
+            if (error) { todayResponsesCount = 0; } 
+            else { todayResponsesCount = count || 0; }
         }
 
         function renderDistrictFilters() {
             const container = document.getElementById('district-filter');
             const select = document.getElementById('order-district');
 
-            let html =
-                `<div class="district-chip active" onclick="filterByDistrict('all', this)"><i class="fas fa-globe"></i> Все</div>`;
+            let html = `<div class="district-chip active" onclick="filterByDistrict('all', this)"><i class="fas fa-globe"></i> Все</div>`;
             BARNAUL_DISTRICTS.forEach(d => {
                 html += `<div class="district-chip" onclick="filterByDistrict('${d}', this)">${d}</div>`;
             });
             container.innerHTML = html;
-
-            select.innerHTML = '<option value="">Выберите район</option>' +
-                BARNAUL_DISTRICTS.map(d => `<option value="${d}">${d}</option>`).join('');
+            select.innerHTML = '<option value="">Выберите район</option>' + BARNAUL_DISTRICTS.map(d => `<option value="${d}">${d}</option>`).join('');
         }
 
         function filterByDistrict(district, element) {
@@ -1668,11 +1598,7 @@
         }
 
         async function loadCategories() {
-            const { data, error } = await supabaseClient
-                .from('categories')
-                .select('*')
-                .order('sort_order', { ascending: true });
-
+            const { data, error } = await supabaseClient.from('categories').select('*').order('sort_order', { ascending: true });
             const container = document.getElementById('categories-list');
             const select = document.getElementById('order-category');
 
@@ -1682,29 +1608,20 @@
             }
 
             categoriesCache = data;
-
             let html = `<span class="chip active" onclick="filterByCategory('all', this)">Все</span>`;
             data.forEach(c => {
                 html += `<span class="chip" onclick="filterByCategory(${c.id}, this)">${c.name}</span>`;
             });
             container.innerHTML = html;
-
-            select.innerHTML = '<option value="">Выберите категорию</option>' +
-                data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            select.innerHTML = '<option value="">Выберите категорию</option>' + data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
         }
 
         async function loadOrders() {
-            const { data, error } = await supabaseClient
-                .from('orders')
-                .select('*')
-                .order('created_at', { ascending: false })
-                .limit(50);
-
+            const { data, error } = await supabaseClient.from('orders').select('*').order('created_at', { ascending: false }).limit(50);
             if (error || !data) {
                 document.getElementById('orders-list').innerHTML = '<div class="error">Ошибка загрузки</div>';
                 return;
             }
-
             allOrders = data;
             await loadReviewStatus();
             renderOrders();
@@ -1712,50 +1629,35 @@
 
         async function loadReviewStatus() {
             if (!currentUser) return;
-
-            const userOrderIds = allOrders
-                .filter(o => o.user_id === currentUser.id && o.status === 'completed')
-                .map(o => o.id);
-
+            const userOrderIds = allOrders.filter(o => o.user_id === currentUser.id && o.status === 'completed').map(o => o.id);
             if (userOrderIds.length === 0) {
                 ordersWithReviews = new Set();
                 return;
             }
-
-            const { data: reviews } = await supabaseClient
-                .from('reviews')
-                .select('order_id')
-                .in('order_id', userOrderIds)
-                .eq('reviewer_id', currentUser.id);
-
+            const { data: reviews } = await supabaseClient.from('reviews').select('order_id').in('order_id', userOrderIds).eq('reviewer_id', currentUser.id);
             ordersWithReviews = new Set(reviews?.map(r => r.order_id) || []);
         }
 
         function renderOrders() {
             const container = document.getElementById('orders-list');
-
             let filteredOrders = allOrders;
 
             if (currentDistrictFilter !== 'all') {
                 filteredOrders = filteredOrders.filter(o => o.district === currentDistrictFilter);
             }
-
             if (currentCategoryFilter !== 'all') {
                 filteredOrders = filteredOrders.filter(o => o.category_id === currentCategoryFilter);
             }
 
             if (filteredOrders.length === 0) {
-                container.innerHTML =
-                    `<div class="empty-state"><i class="fas fa-inbox"></i><p>Заявок пока нет</p></div>`;
+                container.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>Заявок пока нет</p></div>`;
                 return;
             }
 
             container.innerHTML = filteredOrders.map(order => {
                 const cat = categoriesCache.find(c => c.id === order.category_id);
-                const statusClass = order.status === 'open' ? 'open' :
-                    order.status === 'in_progress' ? 'in_progress' : 'completed';
-                const statusText = order.status === 'open' ? 'Открыта' :
-                    order.status === 'in_progress' ? 'В работе' : 'Завершена';
+                const statusClass = order.status === 'open' ? 'open' : order.status === 'in_progress' ? 'in_progress' : 'completed';
+                const statusText = order.status === 'open' ? 'Открыта' : order.status === 'in_progress' ? 'В работе' : 'Завершена';
                 const isOwnOrder = currentUser && order.user_id === currentUser.id;
                 let responseBtn = '';
 
@@ -1763,45 +1665,72 @@
                     const isPro = currentUser.subscription_type === 'pro';
                     const limitReached = !isPro && todayResponsesCount >= DAILY_RESPONSE_LIMIT;
                     if (limitReached) {
-                        responseBtn =
-                            `<div class="limit-warning"><i class="fas fa-exclamation-triangle"></i> Лимит исчерпан</div><button class="btn btn-pro" onclick="buyPro()">⭐ Оформить Pro</button>`;
+                        responseBtn = `<div class="limit-warning"><i class="fas fa-exclamation-triangle"></i> Лимит исчерпан</div><button class="btn btn-pro" onclick="buyPro()">⭐ Оформить Pro</button>`;
                     } else {
-                        responseBtn =
-                            `<button class="btn btn-success" onclick="showResponseForm(${order.id})"><i class="fas fa-hand-paper"></i> Откликнуться</button>`;
+                        responseBtn = `<button class="btn btn-success" onclick="showResponseForm(${order.id})"><i class="fas fa-hand-paper"></i> Откликнуться</button>`;
                     }
                 } else if (isOwnOrder) {
                     if (order.awaiting_confirmation) {
                         const createdAt = new Date(order.created_at);
-                        const daysLeft = Math.ceil((new Date(createdAt.getTime() + AUTO_COMPLETE_DAYS * 24 * 60 * 60 *
-                            1000) - new Date()) / (1000 * 60 * 60 * 24));
-                        responseBtn =
-                            `<div class="confirmation-banner"><i class="fas fa-info-circle"></i> Мастер отметил работу выполненной</div><div class="auto-complete-timer">⏰ Автоподтверждение через ${daysLeft} дн.</div><div style="display:flex; gap:8px; margin-top:8px;"><button class="btn btn-success btn-sm" onclick="confirmCompletion(${order.id})" id="confirm-btn-${order.id}"><i class="fas fa-check"></i> Подтвердить</button><button class="btn btn-danger btn-sm" onclick="rejectCompletion(${order.id})" id="reject-btn-${order.id}"><i class="fas fa-times"></i> Отклонить</button></div>`;
+                        const daysLeft = Math.ceil((new Date(createdAt.getTime() + AUTO_COMPLETE_DAYS * 24 * 60 * 60 * 1000) - new Date()) / (1000 * 60 * 60 * 24));
+                        responseBtn = `<div class="confirmation-banner"><i class="fas fa-info-circle"></i> Мастер отметил работу выполненной</div><div class="auto-complete-timer">⏰ Автоподтверждение через ${daysLeft} дн.</div><div style="display:flex; gap:8px; margin-top:8px;"><button class="btn btn-success btn-sm" onclick="confirmCompletion(${order.id})" id="confirm-btn-${order.id}"><i class="fas fa-check"></i> Подтвердить</button><button class="btn btn-danger btn-sm" onclick="rejectCompletion(${order.id})" id="reject-btn-${order.id}"><i class="fas fa-times"></i> Отклонить</button></div>`;
                     } else if (order.status === 'completed' && !ordersWithReviews.has(order.id)) {
-                        responseBtn =
-                            `<button class="btn btn-warning" onclick="openReviewModal(${order.id}, ${order.assigned_master_id})"><i class="fas fa-star"></i> Оставить отзыв</button>`;
+                        responseBtn = `<button class="btn btn-warning" onclick="openReviewModal(${order.id}, ${order.assigned_master_id})"><i class="fas fa-star"></i> Оставить отзыв</button>`;
                     } else if (order.status === 'completed' && ordersWithReviews.has(order.id)) {
-                        responseBtn =
-                            `<div style="font-size:13px; color:var(--success); font-weight:600; margin-top:10px;"><i class="fas fa-check-circle"></i> Отзыв оставлен</div>`;
+                        responseBtn = `<div style="font-size:13px; color:var(--success); font-weight:600; margin-top:10px;"><i class="fas fa-check-circle"></i> Отзыв оставлен</div>`;
                     } else {
-                        responseBtn =
-                            `<div style="font-size:13px; color:var(--text-muted);"><i class="fas fa-tag"></i> Ваша заявка</div>`;
+                        responseBtn = `<div style="font-size:13px; color:var(--text-muted);"><i class="fas fa-tag"></i> Ваша заявка</div>`;
                     }
                 }
 
                 let photosHtml = '';
                 if (order.photos && Array.isArray(order.photos) && order.photos.length > 0) {
-                    photosHtml =
-                        `<div class="order-photos">${order.photos.map(p => `<img src="${p}" onclick="window.open('${p}')">`).join('')}</div>`;
+                    photosHtml = `<div class="order-photos">${order.photos.map(p => `<img src="${p}" onclick="window.open('${p}')">`).join('')}</div>`;
                 }
 
-                return `<div class="order-card"><div class="order-top"><span class="badge">${cat?.name || 'Без категории'}</span>${order.district ? `<span class="badge badge-district"><i class="fas fa-map-pin"></i> ${order.district}</span>` : ''}<span class="status-badge ${statusClass}">${statusText}</span></div><div class="order-title">${order.title}</div>${order.description ? `<div class="order-desc">${order.description}</div>` : ''}${photosHtml}<div class="order-footer"><span class="order-price">${order.budget ? order.budget + ' ₽' : 'Договорная'}</span><span class="order-id">ID: ${order.id}</span></div><div id="response-form-${order.id}"></div>${responseBtn}</div>`;
+                // НОВОЕ: Отображение количества мест
+                const workersBadge = order.workers_needed > 1 ? `<span class="badge badge-district">👥 ${order.workers_taken || 0}/${order.workers_needed} мест</span>` : '';
+
+                return `<div class="order-card">
+                    <div class="order-top">
+                        <span class="badge">${cat?.name || 'Без категории'}</span>
+                        ${order.district ? `<span class="badge badge-district"><i class="fas fa-map-pin"></i> ${order.district}</span>` : ''}
+                        ${workersBadge}
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </div>
+                    <div class="order-title">${order.title}</div>
+                    ${order.description ? `<div class="order-desc">${order.description}</div>` : ''}
+                    ${photosHtml}
+                    <div class="order-footer">
+                        <span class="order-price">${order.budget ? order.budget + ' ₽' : 'Договорная'}</span>
+                        <span class="order-id">ID: ${order.id}</span>
+                    </div>
+                    <div id="response-form-${order.id}"></div>
+                    ${responseBtn}
+                </div>`;
             }).join('');
         }
 
         function showResponseForm(orderId) {
+            const order = allOrders.find(o => o.id === orderId);
+            const needed = order.workers_needed || 1;
+            const taken = order.workers_taken || 0;
+            const available = Math.max(1, needed - taken);
+
+            let workersOptions = '';
+            for (let i = 1; i <= available; i++) {
+                const word = i === 1 ? 'человек' : (i < 5 ? 'человека' : 'человек');
+                workersOptions += `<option value="${i}">${i} ${word}</option>`;
+            }
+
             const formContainer = document.getElementById(`response-form-${orderId}`);
             formContainer.innerHTML = `
                 <div style="background:var(--bg); padding:14px; border-radius:var(--radius-sm); margin-top:10px;">
+                    <div style="font-size:13px; color:var(--text-muted); margin-bottom:8px;">Свободно мест: <b>${available}</b> из ${needed}</div>
+                    <div class="form-group" style="margin-bottom:8px;">
+                        <label>Сколько человек берёте</label>
+                        <select id="response-workers-${orderId}" class="form-control">${workersOptions}</select>
+                    </div>
                     <div class="form-group" style="margin-bottom:8px;">
                         <input type="number" id="response-price-${orderId}" class="form-control" placeholder="Ваша цена (руб)">
                     </div>
@@ -1824,22 +1753,23 @@
         async function submitResponse(orderId) {
             const price = document.getElementById(`response-price-${orderId}`).value.trim();
             const message = document.getElementById(`response-message-${orderId}`).value.trim();
+            const workersCount = parseInt(document.getElementById(`response-workers-${orderId}`).value) || 1;
 
             if (!price) { alert('Укажите цену'); return; }
+            if (containsBadWords(message)) { alert('❌ Сообщение содержит недопустимые выражения'); return; }
 
             const btn = event.target;
             btn.textContent = '⏳ Отправка...';
             btn.disabled = true;
 
-            const { error } = await supabaseClient
-                .from('responses')
-                .insert([{
-                    order_id: orderId,
-                    user_id: currentUser.id,
-                    price: parseFloat(price),
-                    message: message || null,
-                    status: 'pending'
-                }]);
+            const { error } = await supabaseClient.from('responses').insert([{
+                order_id: orderId,
+                user_id: currentUser.id,
+                price: parseFloat(price),
+                message: message || null,
+                status: 'pending',
+                workers_count: workersCount
+            }]);
 
             if (error) {
                 alert('❌ Ошибка: ' + error.message);
@@ -1857,29 +1787,22 @@
 
         async function loadResponses() {
             if (!currentUser) return;
-
             const container = document.getElementById('responses-list');
             const title = document.getElementById('responses-title');
 
             if (currentUser.role === 'master') {
                 title.textContent = 'Мои отклики';
-
                 const { data, error } = await supabaseClient
-                    .from('responses')
-                    .select('*, orders(status, awaiting_confirmation)')
-                    .eq('user_id', currentUser.id)
-                    .order('created_at', { ascending: false });
+                    .from('responses').select('*, orders(status, awaiting_confirmation)')
+                    .eq('user_id', currentUser.id).order('created_at', { ascending: false });
 
                 if (error || !data || data.length === 0) {
-                    container.innerHTML =
-                        `<div class="empty-state"><i class="fas fa-inbox"></i><p>Вы пока не откликались</p></div>`;
+                    container.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>Вы пока не откликались</p></div>`;
                     return;
                 }
 
                 container.innerHTML = data.map(r => {
-                    const statusText = r.status === 'pending' ? '⏳ Ожидает' :
-                        r.status === 'accepted' ? '✅ Принят' : '❌ Отклонен';
-
+                    const statusText = r.status === 'pending' ? '⏳ Ожидает' : r.status === 'accepted' ? '✅ Принят' : '❌ Отклонен';
                     let completeBtn = '';
 
                     if (r.status === 'accepted') {
@@ -1887,14 +1810,11 @@
                         const isAwaiting = r.orders?.awaiting_confirmation;
 
                         if (orderStatus === 'completed') {
-                            completeBtn =
-                                `<div style="margin-top:8px; font-size:13px; color:var(--success); font-weight:600;"><i class="fas fa-check-circle"></i> Работа подтверждена</div>`;
+                            completeBtn = `<div style="margin-top:8px; font-size:13px; color:var(--success); font-weight:600;"><i class="fas fa-check-circle"></i> Работа подтверждена</div>`;
                         } else if (isAwaiting) {
-                            completeBtn =
-                                `<div style="margin-top:8px; font-size:13px; color:var(--warning); font-weight:600;"><i class="fas fa-clock"></i> Ожидает подтверждения</div>`;
+                            completeBtn = `<div style="margin-top:8px; font-size:13px; color:var(--warning); font-weight:600;"><i class="fas fa-clock"></i> Ожидает подтверждения</div>`;
                         } else {
-                            completeBtn =
-                                `<button class="btn btn-success btn-sm" onclick="completeWork(${r.order_id})" style="margin-top:8px;" id="complete-btn-${r.order_id}"><i class="fas fa-check-circle"></i> Работа выполнена</button>`;
+                            completeBtn = `<button class="btn btn-success btn-sm" onclick="completeWork(${r.order_id})" style="margin-top:8px;" id="complete-btn-${r.order_id}"><i class="fas fa-check-circle"></i> Работа выполнена</button>`;
                         }
                     }
 
@@ -1913,36 +1833,24 @@
 
             } else {
                 title.textContent = 'Отклики на мои заявки';
-
-                const { data: myOrders } = await supabaseClient
-                    .from('orders')
-                    .select('id, title')
-                    .eq('user_id', currentUser.id);
+                const { data: myOrders } = await supabaseClient.from('orders').select('id, title').eq('user_id', currentUser.id);
 
                 if (!myOrders || myOrders.length === 0) {
-                    container.innerHTML =
-                        `<div class="empty-state"><i class="fas fa-file-alt"></i><p>Нет заявок</p></div>`;
+                    container.innerHTML = `<div class="empty-state"><i class="fas fa-file-alt"></i><p>Нет заявок</p></div>`;
                     return;
                 }
 
                 const orderIds = myOrders.map(o => o.id);
-                const { data: responses } = await supabaseClient
-                    .from('responses')
-                    .select('*')
-                    .in('order_id', orderIds)
-                    .order('created_at', { ascending: false });
+                const { data: responses } = await supabaseClient.from('responses').select('*').in('order_id', orderIds).order('created_at', { ascending: false });
 
                 if (!responses || responses.length === 0) {
-                    container.innerHTML =
-                        `<div class="empty-state"><i class="fas fa-clock"></i><p>Нет откликов</p></div>`;
+                    container.innerHTML = `<div class="empty-state"><i class="fas fa-clock"></i><p>Нет откликов</p></div>`;
                     return;
                 }
 
                 container.innerHTML = responses.map(r => {
                     const order = myOrders.find(o => o.id === r.order_id);
-                    const acceptBtn = r.status === 'pending' ?
-                        `<button class="btn btn-success btn-sm" onclick="acceptResponse(${r.id}, ${r.order_id})"><i class="fas fa-check"></i> Принять</button>` :
-                        '';
+                    const acceptBtn = r.status === 'pending' ? `<button class="btn btn-success btn-sm" onclick="acceptResponse(${r.id}, ${r.order_id})"><i class="fas fa-check"></i> Принять</button>` : '';
                     return `
                         <div class="response-item">
                             <div style="font-size:13px; color:var(--text-muted);">На: ${order?.title || '#' + r.order_id}</div>
@@ -1964,9 +1872,7 @@
 
             if (originalText.includes('Принять')) {
                 btn.textContent = '⚠️ Точно принять?';
-                setTimeout(() => {
-                    btn.textContent = originalText;
-                }, 3000);
+                setTimeout(() => { btn.textContent = originalText; }, 3000);
                 return;
             }
 
@@ -1974,19 +1880,27 @@
             btn.disabled = true;
 
             try {
-                const { data: responseData } = await supabaseClient
-                    .from('responses')
-                    .select('user_id')
-                    .eq('id', responseId)
-                    .single();
+                // 1. Получаем данные отклика (сколько человек берет мастер)
+                const { data: responseData, error: respError } = await supabaseClient.from('responses').select('user_id, workers_count').eq('id', responseId).single();
+                if (respError) throw respError;
+                const workersCount = responseData.workers_count || 1;
 
+                // 2. Получаем текущие данные заявки
+                const { data: orderData, error: orderError } = await supabaseClient.from('orders').select('workers_taken, workers_needed').eq('id', orderId).single();
+                if (orderError) throw orderError;
+
+                const currentTaken = orderData.workers_taken || 0;
+                const newWorkersTaken = currentTaken + workersCount;
+
+                // 3. Обновляем отклик и заявку
                 await supabaseClient.from('responses').update({ status: 'accepted' }).eq('id', responseId);
                 await supabaseClient.from('orders').update({
                     status: 'in_progress',
-                    assigned_master_id: responseData.user_id
+                    assigned_master_id: responseData.user_id,
+                    workers_taken: newWorkersTaken
                 }).eq('id', orderId);
 
-                alert('✅ Мастер принят!');
+                alert(`✅ Мастер принят! Занято ${newWorkersTaken} из ${orderData.workers_needed || 1} мест.`);
                 await loadOrders();
                 await loadResponses();
 
@@ -1999,29 +1913,20 @@
 
         async function completeWork(orderId) {
             console.log('🔍 Завершение работы по заявке:', orderId);
-
             const btn = document.getElementById(`complete-btn-${orderId}`);
             if (!btn) return;
-
             const originalHTML = btn.innerHTML;
-
             if (btn.disabled) return;
 
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Отправка...';
             btn.disabled = true;
 
             try {
-                const { error } = await supabaseClient
-                    .from('orders')
-                    .update({ awaiting_confirmation: true })
-                    .eq('id', orderId);
-
+                const { error } = await supabaseClient.from('orders').update({ awaiting_confirmation: true }).eq('id', orderId);
                 if (error) throw error;
-
                 alert('✅ Заказчик уведомлен! Ожидайте подтверждения.');
                 await loadOrders();
                 await loadResponses();
-
             } catch (err) {
                 console.error('❌ Ошибка:', err);
                 alert('❌ Ошибка: ' + err.message);
@@ -2032,19 +1937,13 @@
 
         async function confirmCompletion(orderId) {
             console.log('🔍 Подтверждение выполнения заявки:', orderId);
-
             const btn = event.target;
             const originalText = btn.textContent;
 
             if (originalText.includes('Подтвердить')) {
                 btn.textContent = '⚠️ Точно подтвердить?';
                 btn.style.background = '#FF9800';
-
-                setTimeout(() => {
-                    btn.textContent = originalText;
-                    btn.style.background = '';
-                }, 3000);
-
+                setTimeout(() => { btn.textContent = originalText; btn.style.background = ''; }, 3000);
                 return;
             }
 
@@ -2052,23 +1951,15 @@
             btn.disabled = true;
 
             try {
-                const { data, error } = await supabaseClient
-                    .from('orders')
-                    .update({
-                        status: 'completed',
-                        completed_at: new Date().toISOString(),
-                        awaiting_confirmation: false
-                    })
-                    .eq('id', orderId)
-                    .select();
+                const { data, error } = await supabaseClient.from('orders').update({
+                    status: 'completed', completed_at: new Date().toISOString(), awaiting_confirmation: false
+                }).eq('id', orderId).select();
 
                 if (error) throw error;
-
                 console.log('✅ Заявка обновлена:', data);
                 alert('✅ Работа подтверждена! Теперь вы можете оставить отзыв.');
                 await loadOrders();
                 await loadResponses();
-
             } catch (err) {
                 console.error('❌ Ошибка:', err);
                 alert('❌ Ошибка: ' + err.message);
@@ -2079,19 +1970,13 @@
 
         async function rejectCompletion(orderId) {
             console.log('🔍 Отклонение выполнения заявки:', orderId);
-
             const btn = event.target;
             const originalText = btn.textContent;
 
             if (originalText.includes('Отклонить')) {
                 btn.textContent = '⚠️ Точно отклонить?';
                 btn.style.background = '#FF5722';
-
-                setTimeout(() => {
-                    btn.textContent = originalText;
-                    btn.style.background = '';
-                }, 3000);
-
+                setTimeout(() => { btn.textContent = originalText; btn.style.background = ''; }, 3000);
                 return;
             }
 
@@ -2099,18 +1984,12 @@
             btn.disabled = true;
 
             try {
-                const { error } = await supabaseClient
-                    .from('orders')
-                    .update({ awaiting_confirmation: false })
-                    .eq('id', orderId);
-
+                const { error } = await supabaseClient.from('orders').update({ awaiting_confirmation: false }).eq('id', orderId);
                 if (error) throw error;
-
                 console.log('✅ Выполнение отклонено');
                 alert('⚠️ Выполнение отклонено. Мастер может отметить работу снова.');
                 await loadOrders();
                 await loadResponses();
-
             } catch (err) {
                 console.error('❌ Ошибка:', err);
                 alert('❌ Ошибка: ' + err.message);
@@ -2127,27 +2006,33 @@
             const title = document.getElementById('order-title').value.trim();
             const description = document.getElementById('order-description').value.trim();
             const budget = document.getElementById('order-budget').value;
+            const workers = parseInt(document.getElementById('order-workers').value) || 1;
 
             if (!district) return alert('Выберите район');
             if (!categoryId || !title) return alert('Заполните категорию и заголовок');
+            
+            // НОВОЕ: Проверка на мат
+            if (containsBadWords(title) || containsBadWords(description)) {
+                alert('❌ Заявка содержит недопустимые выражения. Пожалуйста, опишите задачу корректно.');
+                return;
+            }
 
             const btn = document.querySelector('#tab-order .btn');
             btn.textContent = '⏳ Создание...';
             btn.disabled = true;
 
-            const { data, error } = await supabaseClient
-                .from('orders')
-                .insert([{
-                    user_id: currentUser.id,
-                    district,
-                    category_id: parseInt(categoryId),
-                    title,
-                    description: description || null,
-                    budget: budget ? parseFloat(budget) : null,
-                    status: 'open',
-                    photos: uploadedPhotos.length > 0 ? uploadedPhotos : null
-                }])
-                .select();
+            const { data, error } = await supabaseClient.from('orders').insert([{
+                user_id: currentUser.id,
+                district,
+                category_id: parseInt(categoryId),
+                title,
+                description: description || null,
+                budget: budget ? parseFloat(budget) : null,
+                status: 'open',
+                photos: uploadedPhotos.length > 0 ? uploadedPhotos : null,
+                workers_needed: workers,
+                workers_taken: 0
+            }]).select();
 
             if (error) {
                 alert('❌ Ошибка: ' + error.message);
@@ -2162,6 +2047,7 @@
                 document.getElementById('order-budget').value = '';
                 document.getElementById('order-category').value = '';
                 document.getElementById('order-district').value = '';
+                document.getElementById('order-workers').value = '1'; // Сброс выбора
                 uploadedPhotos = [];
                 renderPhotoPreview();
                 await loadOrders();
@@ -2174,21 +2060,14 @@
 
         async function toggleRole() {
             const newRole = currentUser.role === 'customer' ? 'master' : 'customer';
-            const { error } = await supabaseClient
-                .from('users')
-                .update({ role: newRole })
-                .eq('id', currentUser.id);
+            const { error } = await supabaseClient.from('users').update({ role: newRole }).eq('id', currentUser.id);
 
             if (error) {
                 alert('❌ Ошибка: ' + error.message);
             } else {
                 currentUser.role = newRole;
-
-                if (newRole === 'master') {
-                    await countTodayResponses();
-                } else {
-                    todayResponsesCount = 0;
-                }
+                if (newRole === 'master') { await countTodayResponses(); } 
+                else { todayResponsesCount = 0; }
 
                 updateProfileUI();
                 await loadOrders();
@@ -2197,24 +2076,12 @@
             }
         }
 
-        function buyPro() {
-            document.getElementById('pro-modal').classList.add('active');
-        }
-
-        function closeProModal() {
-            document.getElementById('pro-modal').classList.remove('active');
-        }
+        function buyPro() { document.getElementById('pro-modal').classList.add('active'); }
+        function closeProModal() { document.getElementById('pro-modal').classList.remove('active'); }
 
         async function connectVKPay() {
-            if (!currentUser) {
-                alert('Подождите загрузку профиля');
-                return;
-            }
-
-            if (currentUser.subscription_type === 'pro') {
-                alert('У вас уже активна Pro-подписка!');
-                return;
-            }
+            if (!currentUser) { alert('Подождите загрузку профиля'); return; }
+            if (currentUser.subscription_type === 'pro') { alert('У вас уже активна Pro-подписка!'); return; }
 
             const btn = event.target;
             btn.textContent = '⏳ Обработка...';
@@ -2222,7 +2089,6 @@
 
             try {
                 console.log('💳 Инициация оплаты через VK Pay...');
-
                 const orderData = {
                     action: 'pay-to-group',
                     app_id: parseInt(appId) || 0,
@@ -2234,9 +2100,7 @@
                 };
 
                 console.log('📤 Отправка запроса в VK Pay:', orderData);
-
                 const result = await vkBridge.send('VKWebAppShowOrderBox', orderData);
-
                 console.log('✅ Результат оплаты:', result);
 
                 if (result.status === 'success' || result.status === 'success_new') {
@@ -2244,7 +2108,6 @@
                 } else {
                     alert('Оплата отменена или не завершена');
                 }
-
             } catch (err) {
                 console.error('❌ Ошибка VK Pay:', err);
                 alert('Ошибка оплаты: ' + err.message);
@@ -2256,18 +2119,14 @@
 
         async function activateProSubscription(vkOrderId) {
             console.log('⭐ Активация Pro-подписки...');
-
             const proDuration = 30;
             const expiresAt = new Date();
             expiresAt.setDate(expiresAt.getDate() + proDuration);
 
-            const { error: userError } = await supabaseClient
-                .from('users')
-                .update({
-                    subscription_type: 'pro',
-                    subscription_expires_at: expiresAt.toISOString()
-                })
-                .eq('id', currentUser.id);
+            const { error: userError } = await supabaseClient.from('users').update({
+                subscription_type: 'pro',
+                subscription_expires_at: expiresAt.toISOString()
+            }).eq('id', currentUser.id);
 
             if (userError) {
                 console.error('❌ Ошибка обновления пользователя:', userError);
@@ -2280,89 +2139,51 @@
             if (currentUser.invited_by_partner_id) {
                 partnerId = currentUser.invited_by_partner_id;
                 partnerAmount = 299 * 0.30;
-
                 console.log(`🤝 Начисление партнеру #${partnerId}: ${partnerAmount} ₽`);
 
-                const { data: partnerData } = await supabaseClient
-                    .from('users')
-                    .select('partner_balance')
-                    .eq('id', partnerId)
-                    .single();
-
+                const { data: partnerData } = await supabaseClient.from('users').select('partner_balance').eq('id', partnerId).single();
                 if (partnerData) {
                     const newBalance = (partnerData.partner_balance || 0) + partnerAmount;
-
-                    await supabaseClient
-                        .from('users')
-                        .update({ partner_balance: newBalance })
-                        .eq('id', partnerId);
-
+                    await supabaseClient.from('users').update({ partner_balance: newBalance }).eq('id', partnerId);
                     console.log('✅ Баланс партнера обновлен:', newBalance);
                 }
 
-                await supabaseClient
-                    .from('partner_earnings')
-                    .insert([{
-                        partner_id: partnerId,
-                        master_id: currentUser.id,
-                        amount: partnerAmount,
-                        source: 'subscription',
-                        description: `Pro-подписка мастера #${currentUser.id}`
-                    }]);
+                await supabaseClient.from('partner_earnings').insert([{
+                    partner_id: partnerId, master_id: currentUser.id, amount: partnerAmount,
+                    source: 'subscription', description: `Pro-подписка мастера #${currentUser.id}`
+                }]);
             }
 
-            await supabaseClient
-                .from('payments')
-                .insert([{
-                    user_id: currentUser.id,
-                    amount: 299,
-                    currency: 'RUB',
-                    status: 'completed',
-                    vk_order_id: vkOrderId,
-                    description: 'Pro-подписка на 1 месяц',
-                    partner_id: partnerId,
-                    partner_amount: partnerAmount,
-                    completed_at: new Date().toISOString()
-                }]);
+            await supabaseClient.from('payments').insert([{
+                user_id: currentUser.id, amount: 299, currency: 'RUB', status: 'completed',
+                vk_order_id: vkOrderId, description: 'Pro-подписка на 1 месяц',
+                partner_id: partnerId, partner_amount: partnerAmount, completed_at: new Date().toISOString()
+            }]);
 
             currentUser.subscription_type = 'pro';
             currentUser.subscription_expires_at = expiresAt.toISOString();
-
             alert(`✅ Pro-подписка активирована!\nДействует до: ${expiresAt.toLocaleDateString('ru-RU')}`);
-
             updateProfileUI();
             await loadOrders();
         }
 
-        function openPartnerApplicationModal() {
-            document.getElementById('partner-application-modal').classList.add('active');
-        }
-
-        function closePartnerApplicationModal() {
-            document.getElementById('partner-application-modal').classList.remove('active');
-        }
+        function openPartnerApplicationModal() { document.getElementById('partner-application-modal').classList.add('active'); }
+        function closePartnerApplicationModal() { document.getElementById('partner-application-modal').classList.remove('active'); }
 
         async function submitPartnerApplication() {
             const vk = document.getElementById('partner-vk').value.trim();
             const description = document.getElementById('partner-description').value.trim();
 
-            if (!vk || !description) {
-                alert('Заполните все поля');
-                return;
-            }
+            if (!vk || !description) { alert('Заполните все поля'); return; }
+            if (containsBadWords(vk) || containsBadWords(description)) { alert('❌ Содержит недопустимые выражения'); return; }
 
             const btn = event.target;
             btn.textContent = '📤 Отправка...';
             btn.disabled = true;
 
-            const { error } = await supabaseClient
-                .from('partner_applications')
-                .insert([{
-                    user_id: currentUser.id,
-                    vk_profile: vk,
-                    description: description,
-                    status: 'pending'
-                }]);
+            const { error } = await supabaseClient.from('partner_applications').insert([{
+                user_id: currentUser.id, vk_profile: vk, description: description, status: 'pending'
+            }]);
 
             if (error) {
                 alert('❌ Ошибка: ' + error.message);
@@ -2379,37 +2200,19 @@
         async function loadPartnerStats() {
             if (!currentUser.is_partner) return;
 
-            const { count: invitedCount } = await supabaseClient
-                .from('users')
-                .select('*', { count: 'exact', head: true })
-                .eq('invited_by_partner_id', currentUser.id);
-
-            const { count: proCount } = await supabaseClient
-                .from('users')
-                .select('*', { count: 'exact', head: true })
-                .eq('invited_by_partner_id', currentUser.id)
-                .eq('subscription_type', 'pro');
-
-            const { data: earnings } = await supabaseClient
-                .from('partner_earnings')
-                .select('amount')
-                .eq('partner_id', currentUser.id);
+            const { count: invitedCount } = await supabaseClient.from('users').select('*', { count: 'exact', head: true }).eq('invited_by_partner_id', currentUser.id);
+            const { count: proCount } = await supabaseClient.from('users').select('*', { count: 'exact', head: true }).eq('invited_by_partner_id', currentUser.id).eq('subscription_type', 'pro');
+            const { data: earnings } = await supabaseClient.from('partner_earnings').select('amount').eq('partner_id', currentUser.id);
 
             const totalEarnings = earnings ? earnings.reduce((sum, e) => sum + parseFloat(e.amount), 0) : 0;
-
-            partnerStats = {
-                invited: invitedCount || 0,
-                pro: proCount || 0,
-                earnings: totalEarnings
-            };
+            partnerStats = { invited: invitedCount || 0, pro: proCount || 0, earnings: totalEarnings };
 
             document.getElementById('stat-invited').textContent = partnerStats.invited;
             document.getElementById('stat-pro').textContent = partnerStats.pro;
             document.getElementById('stat-earnings').textContent = Math.round(partnerStats.earnings) + ' ₽';
             document.getElementById('partner-balance').textContent = Math.round(currentUser.partner_balance || 0) + ' ₽';
 
-            const partnerLink = appId ? `https://vk.com/app${appId}?ref=${currentUser.id}` :
-                `https://vk.com/app?ref=${currentUser.id}`;
+            const partnerLink = appId ? `https://vk.com/app${appId}?ref=${currentUser.id}` : `https://vk.com/app?ref=${currentUser.id}`;
             document.getElementById('partner-link').textContent = partnerLink;
 
             const withdrawBtn = document.getElementById('withdraw-btn');
@@ -2421,65 +2224,36 @@
 
         function copyPartnerLink() {
             const link = document.getElementById('partner-link').textContent;
-            navigator.clipboard.writeText(link).then(() => {
-                alert('✅ Ссылка скопирована!');
-            }).catch(() => {
-                alert('Не удалось скопировать');
-            });
+            navigator.clipboard.writeText(link).then(() => { alert('✅ Ссылка скопирована!'); }).catch(() => { alert('Не удалось скопировать'); });
         }
 
         async function sharePartnerLink() {
             const link = document.getElementById('partner-link').textContent;
-            try {
-                await vkBridge.send('VKWebAppShare', { link: link });
-            } catch (err) {
-                alert('Не удалось поделиться');
-            }
+            try { await vkBridge.send('VKWebAppShare', { link: link }); } catch (err) { alert('Не удалось поделиться'); }
         }
 
         function openWithdrawModal() {
-            if (currentUser.partner_balance < MIN_WITHDRAW) {
-                alert(`Минимальная сумма вывода: ${MIN_WITHDRAW} ₽`);
-                return;
-            }
+            if (currentUser.partner_balance < MIN_WITHDRAW) { alert(`Минимальная сумма вывода: ${MIN_WITHDRAW} ₽`); return; }
             document.getElementById('withdraw-modal').classList.add('active');
         }
-
-        function closeWithdrawModal() {
-            document.getElementById('withdraw-modal').classList.remove('active');
-        }
+        function closeWithdrawModal() { document.getElementById('withdraw-modal').classList.remove('active'); }
 
         async function submitWithdrawal() {
             const amount = parseFloat(document.getElementById('withdraw-amount').value);
             const method = document.getElementById('withdraw-method').value;
             const details = document.getElementById('withdraw-details').value.trim();
 
-            if (!amount || amount < MIN_WITHDRAW) {
-                alert(`Минимальная сумма: ${MIN_WITHDRAW} ₽`);
-                return;
-            }
-            if (!method || !details) {
-                alert('Заполните все поля');
-                return;
-            }
-            if (amount > currentUser.partner_balance) {
-                alert('Недостаточно средств');
-                return;
-            }
+            if (!amount || amount < MIN_WITHDRAW) { alert(`Минимальная сумма: ${MIN_WITHDRAW} ₽`); return; }
+            if (!method || !details) { alert('Заполните все поля'); return; }
+            if (amount > currentUser.partner_balance) { alert('Недостаточно средств'); return; }
 
             const btn = event.target;
             btn.textContent = '📤 Отправка...';
             btn.disabled = true;
 
-            const { error } = await supabaseClient
-                .from('partner_withdrawals')
-                .insert([{
-                    partner_id: currentUser.id,
-                    amount: amount,
-                    payment_method: method,
-                    payment_details: details,
-                    status: 'pending'
-                }]);
+            const { error } = await supabaseClient.from('partner_withdrawals').insert([{
+                partner_id: currentUser.id, amount: amount, payment_method: method, payment_details: details, status: 'pending'
+            }]);
 
             if (error) {
                 alert('❌ Ошибка: ' + error.message);
@@ -2502,65 +2276,42 @@
             updateRatingStars();
             document.getElementById('review-modal').classList.add('active');
         }
-
         function closeReviewModal() {
             document.getElementById('review-modal').classList.remove('active');
             currentReviewOrderId = null;
             currentReviewMasterId = null;
             selectedRating = 0;
         }
-
-        function setRating(rating) {
-            selectedRating = rating;
-            updateRatingStars();
-        }
-
+        function setRating(rating) { selectedRating = rating; updateRatingStars(); }
         function updateRatingStars() {
             const stars = document.querySelectorAll('#rating-stars .star');
             stars.forEach((star, idx) => {
-                if (idx < selectedRating) {
-                    star.classList.add('active');
-                } else {
-                    star.classList.remove('active');
-                }
+                if (idx < selectedRating) { star.classList.add('active'); } 
+                else { star.classList.remove('active'); }
             });
         }
 
         async function submitReview() {
-            if (selectedRating === 0) {
-                alert('Пожалуйста, выберите рейтинг');
-                return;
-            }
-
+            if (selectedRating === 0) { alert('Пожалуйста, выберите рейтинг'); return; }
             const comment = document.getElementById('review-comment').value.trim();
+            
+            if (containsBadWords(comment)) { alert('❌ Отзыв содержит недопустимые выражения'); return; }
+
             const btn = event.target;
             btn.textContent = '📤 Отправка...';
             btn.disabled = true;
 
             try {
-                const { error } = await supabaseClient
-                    .from('reviews')
-                    .insert([{
-                        order_id: currentReviewOrderId,
-                        reviewer_id: currentUser.id,
-                        master_id: currentReviewMasterId,
-                        rating: selectedRating,
-                        comment: comment || null
-                    }]);
-
+                const { error } = await supabaseClient.from('reviews').insert([{
+                    order_id: currentReviewOrderId, reviewer_id: currentUser.id, master_id: currentReviewMasterId,
+                    rating: selectedRating, comment: comment || null
+                }]);
                 if (error) throw error;
 
-                const { data: reviews } = await supabaseClient
-                    .from('reviews')
-                    .select('rating')
-                    .eq('master_id', currentReviewMasterId);
-
+                const { data: reviews } = await supabaseClient.from('reviews').select('rating').eq('master_id', currentReviewMasterId);
                 if (reviews && reviews.length > 0) {
                     const avgRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
-                    await supabaseClient
-                        .from('users')
-                        .update({ average_rating: avgRating })
-                        .eq('id', currentReviewMasterId);
+                    await supabaseClient.from('users').update({ average_rating: avgRating }).eq('id', currentReviewMasterId);
                 }
 
                 alert('✅ Отзыв отправлен!');
@@ -2568,7 +2319,6 @@
                 closeReviewModal();
                 await loadOrders();
                 await loadResponses();
-
             } catch (err) {
                 alert('❌ Ошибка: ' + err.message);
                 btn.textContent = '✅ Отправить отзыв';
@@ -2578,52 +2328,32 @@
 
         async function loadMasterReviews(masterId) {
             console.log('🔍 Загрузка отзывов для мастера:', masterId);
-
             const container = document.getElementById('reviews-list');
-
-            const { data: reviews, error } = await supabaseClient
-                .from('reviews')
-                .select('*')
-                .eq('master_id', masterId)
-                .order('created_at', { ascending: false });
-
+            const { data: reviews, error } = await supabaseClient.from('reviews').select('*').eq('master_id', masterId).order('created_at', { ascending: false });
             console.log('📊 Отзывы:', { reviews, error });
 
             if (error) {
                 console.error('❌ Ошибка загрузки отзывов:', error);
-                container.innerHTML =
-                    '<div style="color:var(--text-muted); text-align:center; padding:20px;">Ошибка загрузки отзывов</div>';
+                container.innerHTML = '<div style="color:var(--text-muted); text-align:center; padding:20px;">Ошибка загрузки отзывов</div>';
                 return;
             }
-
             if (!reviews || reviews.length === 0) {
-                container.innerHTML =
-                    '<div style="color:var(--text-muted); text-align:center; padding:20px;">Пока нет отзывов</div>';
+                container.innerHTML = '<div style="color:var(--text-muted); text-align:center; padding:20px;">Пока нет отзывов</div>';
                 return;
             }
 
             const reviewerIds = [...new Set(reviews.map(r => r.reviewer_id))];
-            const { data: users } = await supabaseClient
-                .from('users')
-                .select('id, name')
-                .in('id', reviewerIds);
-
+            const { data: users } = await supabaseClient.from('users').select('id, name').in('id', reviewerIds);
             const usersMap = {};
-            if (users) {
-                users.forEach(u => { usersMap[u.id] = u.name; });
-            }
+            if (users) { users.forEach(u => { usersMap[u.id] = u.name; }); }
 
             container.innerHTML = reviews.map(r => {
                 const date = new Date(r.created_at).toLocaleDateString('ru-RU');
                 const stars = '⭐'.repeat(r.rating);
                 const authorName = usersMap[r.reviewer_id] || 'Аноним';
-
                 return `
                     <div class="review-item">
-                        <div class="review-header">
-                            <span>${authorName}</span>
-                            <span>${date}</span>
-                        </div>
+                        <div class="review-header"><span>${authorName}</span><span>${date}</span></div>
                         <div class="review-stars">${stars}</div>
                         <div style="font-size:14px; color:var(--text-secondary);">${r.comment || 'Без комментария'}</div>
                     </div>
@@ -2641,21 +2371,9 @@
             if (currentUser.role === 'master') {
                 const isPro = currentUser.subscription_type === 'pro';
                 if (isPro) {
-                    subscriptionBlock = `
-                        <div class="subscription-info">
-                            <div style="font-size:13px; color:var(--text-muted);">Текущий тариф</div>
-                            <div style="font-weight:700; color:#F59E0B; font-size:18px;">⭐ PRO-мастер</div>
-                        </div>
-                    `;
+                    subscriptionBlock = `<div class="subscription-info"><div style="font-size:13px; color:var(--text-muted);">Текущий тариф</div><div style="font-weight:700; color:#F59E0B; font-size:18px;">⭐ PRO-мастер</div></div>`;
                 } else {
-                    subscriptionBlock = `
-                        <div class="subscription-info free">
-                            <div style="font-size:13px; color:var(--text-muted);">Текущий тариф</div>
-                            <div style="font-weight:700; font-size:18px;">Free-мастер</div>
-                            <div style="font-size:12px; color:var(--text-muted);">Откликов: ${todayResponsesCount}/${DAILY_RESPONSE_LIMIT}</div>
-                        </div>
-                        <button class="btn btn-pro" onclick="buyPro()">⭐ Оформить Pro за 299 ₽/мес</button>
-                    `;
+                    subscriptionBlock = `<div class="subscription-info free"><div style="font-size:13px; color:var(--text-muted);">Текущий тариф</div><div style="font-weight:700; font-size:18px;">Free-мастер</div><div style="font-size:12px; color:var(--text-muted);">Откликов: ${todayResponsesCount}/${DAILY_RESPONSE_LIMIT}</div></div><button class="btn btn-pro" onclick="buyPro()">⭐ Оформить Pro за 299 ₽/мес</button>`;
                 }
             }
 
@@ -2663,12 +2381,7 @@
             if (currentUser.role === 'master') {
                 const avgRating = currentUser.average_rating || 0;
                 const stars = avgRating > 0 ? '⭐'.repeat(Math.round(avgRating)) : 'Нет оценок';
-                ratingBlock = `
-                    <div style="background:var(--bg); padding:12px; border-radius:var(--radius-sm); margin-top:8px;">
-                        <div style="color:var(--text-muted); font-size:13px;">Рейтинг</div>
-                        <div style="font-size:18px; margin-top:4px;">${stars}</div>
-                    </div>
-                `;
+                ratingBlock = `<div style="background:var(--bg); padding:12px; border-radius:var(--radius-sm); margin-top:8px;"><div style="color:var(--text-muted); font-size:13px;">Рейтинг</div><div style="font-size:18px; margin-top:4px;">${stars}</div></div>`;
             }
 
             document.getElementById('profile-info').innerHTML = `
@@ -2718,56 +2431,30 @@
 
         async function postOrderToServer(order) {
             const SERVER_URL = 'https://moymaster-server.vercel.app';
-
             try {
                 console.log('📢 Отправка заявки на сервер:', order);
-
                 const response = await fetch(`${SERVER_URL}/api/new-order`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        id: order.id,
-                        title: order.title,
-                        description: order.description,
-                        budget: order.budget,
-                        district: order.district,
-                        category_id: order.category_id,
-                        user_id: order.user_id
+                        id: order.id, title: order.title, description: order.description,
+                        budget: order.budget, district: order.district, category_id: order.category_id, user_id: order.user_id
                     })
                 });
-
                 const result = await response.json();
-
-                if (result.success) {
-                    console.log('✅ Пост опубликован в группе ВК! ID поста:', result.post_id);
-                } else {
-                    console.error('❌ Ошибка публикации:', result.error);
-                }
-            } catch (err) {
-                console.error('❌ Ошибка соединения с сервером:', err);
-            }
+                if (result.success) { console.log('✅ Пост опубликован в группе ВК! ID поста:', result.post_id); } 
+                else { console.error('❌ Ошибка публикации:', result.error); }
+            } catch (err) { console.error('❌ Ошибка соединения с сервером:', err); }
         }
 
         async function notifyMastersAboutNewOrder(order) {
             console.log('📢 Отправка уведомлений мастерам о новой заявке...');
-
             try {
-                const { data: masters } = await supabaseClient
-                    .from('users')
-                    .select('vk_id')
-                    .eq('role', 'master');
-
-                if (!masters || masters.length === 0) {
-                    console.log('Нет мастеров для уведомления');
-                    return;
-                }
-
+                const { data: masters } = await supabaseClient.from('users').select('vk_id').eq('role', 'master');
+                if (!masters || masters.length === 0) { console.log('Нет мастеров для уведомления'); return; }
                 console.log(`Найдено ${masters.length} мастеров для уведомления`);
 
                 const SERVER_URL = 'https://moymaster-server.vercel.app';
-
                 const response = await fetch(`${SERVER_URL}/api/send-notification`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -2776,68 +2463,34 @@
                         message: `🔨 Новая заявка в районе ${order.district}!\n\n${order.title}\n💰 Бюджет: ${order.budget || 'Договорная'}\n\nОткликнуться в приложении: https://vk.com/app${appId}`
                     })
                 });
-
                 const result = await response.json();
-
-                if (result.success) {
-                    console.log('✅ Уведомления отправлены!');
-                } else {
-                    console.error('❌ Ошибка:', result.error);
-                }
-
-            } catch (err) {
-                console.error('❌ Ошибка отправки уведомлений:', err);
-            }
+                if (result.success) { console.log('✅ Уведомления отправлены!'); } 
+                else { console.error('❌ Ошибка:', result.error); }
+            } catch (err) { console.error('❌ Ошибка отправки уведомлений:', err); }
         }
 
         async function loadChatOrders() {
             console.log('🔍 Загрузка списка заявок для чата...');
-
-            if (!currentUser) {
-                console.log('❌ Пользователь не авторизован');
-                return;
-            }
+            if (!currentUser) { console.log('❌ Пользователь не авторизован'); return; }
 
             const container = document.getElementById('chat-orders-container');
-
-            const { data: orders } = await supabaseClient
-                .from('orders')
-                .select('*')
+            const { data: orders } = await supabaseClient.from('orders').select('*')
                 .or(`user_id.eq.${currentUser.id},assigned_master_id.eq.${currentUser.id}`)
-                .in('status', ['in_progress', 'completed'])
-                .order('created_at', { ascending: false });
+                .in('status', ['in_progress', 'completed']).order('created_at', { ascending: false });
 
             if (!orders || orders.length === 0) {
-                container.innerHTML =
-                    '<div class="empty-state"><i class="fas fa-comments"></i><p>Нет активных заявок</p></div>';
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-comments"></i><p>Нет активных заявок</p></div>';
                 return;
             }
 
             const ordersWithPartners = await Promise.all(orders.map(async order => {
-                const partnerId = order.user_id === currentUser.id ?
-                    order.assigned_master_id :
-                    order.user_id;
+                const partnerId = order.user_id === currentUser.id ? order.assigned_master_id : order.user_id;
+                if (!partnerId) { return { ...order, partnerName: 'Нет собеседника', hasMessages: false }; }
 
-                if (!partnerId) {
-                    return { ...order, partnerName: 'Нет собеседника', hasMessages: false };
-                }
+                const { data: partner } = await supabaseClient.from('users').select('name').eq('id', partnerId).single();
+                const { data: messages } = await supabaseClient.from('messages').select('id', { count: 'exact', head: true }).eq('order_id', order.id);
 
-                const { data: partner } = await supabaseClient
-                    .from('users')
-                    .select('name')
-                    .eq('id', partnerId)
-                    .single();
-
-                const { data: messages } = await supabaseClient
-                    .from('messages')
-                    .select('id', { count: 'exact', head: true })
-                    .eq('order_id', order.id);
-
-                return {
-                    ...order,
-                    partnerName: partner?.name || 'Пользователь',
-                    hasMessages: messages && messages.length > 0
-                };
+                return { ...order, partnerName: partner?.name || 'Пользователь', hasMessages: messages && messages.length > 0 };
             }));
 
             container.innerHTML = ordersWithPartners.map(order => `
@@ -2853,64 +2506,35 @@
 
         async function openChat(orderId) {
             currentChatOrderId = orderId;
-
-            const { data: order } = await supabaseClient
-                .from('orders')
-                .select('user_id, assigned_master_id, title')
-                .eq('id', orderId)
-                .single();
-
-            currentChatPartnerId = order.user_id === currentUser.id ?
-                order.assigned_master_id :
-                order.user_id;
-
-            const { data: partner } = await supabaseClient
-                .from('users')
-                .select('name')
-                .eq('id', currentChatPartnerId)
-                .single();
-
-            document.getElementById('chat-partner-name').textContent =
-                `С: ${partner?.name || 'Пользователь'} | ${order.title}`;
-
+            const { data: order } = await supabaseClient.from('orders').select('user_id, assigned_master_id, title').eq('id', orderId).single();
+            currentChatPartnerId = order.user_id === currentUser.id ? order.assigned_master_id : order.user_id;
+            const { data: partner } = await supabaseClient.from('users').select('name').eq('id', currentChatPartnerId).single();
+            
+            document.getElementById('chat-partner-name').textContent = `С: ${partner?.name || 'Пользователь'} | ${order.title}`;
             await loadMessages();
-
             if (messagesInterval) clearInterval(messagesInterval);
             messagesInterval = setInterval(loadMessages, 3000);
         }
 
         async function loadMessages() {
             if (!currentChatOrderId) return;
-
             const container = document.getElementById('messages-container');
-
-            const { data: messages } = await supabaseClient
-                .from('messages')
-                .select('*')
-                .eq('order_id', currentChatOrderId)
-                .order('created_at', { ascending: true });
+            const { data: messages } = await supabaseClient.from('messages').select('*').eq('order_id', currentChatOrderId).order('created_at', { ascending: true });
 
             if (!messages || messages.length === 0) {
-                container.innerHTML =
-                    `<div class="empty-state"><i class="fas fa-comment-dots"></i><p>Нет сообщений</p></div>`;
+                container.innerHTML = `<div class="empty-state"><i class="fas fa-comment-dots"></i><p>Нет сообщений</p></div>`;
                 return;
             }
 
             container.innerHTML = messages.map(msg => {
                 const isMe = msg.sender_id === currentUser.id;
-                const time = new Date(msg.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit',
-                    minute: '2-digit' });
-
+                const time = new Date(msg.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
                 return `
                     <div class="chat-message ${isMe ? 'me' : 'other'}">
-                        <div class="bubble">
-                            ${msg.message}
-                            <span class="time">${time}</span>
-                        </div>
+                        <div class="bubble">${msg.message}<span class="time">${time}</span></div>
                     </div>
                 `;
             }).join('');
-
             container.scrollTop = container.scrollHeight;
         }
 
@@ -2918,31 +2542,19 @@
             const input = document.getElementById('message-input');
             const message = input.value.trim();
 
-            if (!message || !currentChatOrderId || !currentChatPartnerId) {
-                alert('Введите сообщение');
-                return;
-            }
+            if (!message || !currentChatOrderId || !currentChatPartnerId) { alert('Введите сообщение'); return; }
+            if (containsBadWords(message)) { alert('❌ Сообщение содержит недопустимые выражения'); return; }
 
-            const { error } = await supabaseClient
-                .from('messages')
-                .insert([{
-                    order_id: currentChatOrderId,
-                    sender_id: currentUser.id,
-                    receiver_id: currentChatPartnerId,
-                    message: message
-                }]);
+            const { error } = await supabaseClient.from('messages').insert([{
+                order_id: currentChatOrderId, sender_id: currentUser.id, receiver_id: currentChatPartnerId, message: message
+            }]);
 
-            if (error) {
-                alert('❌ Ошибка отправки: ' + error.message);
-            } else {
-                input.value = '';
-                await loadMessages();
-            }
+            if (error) { alert('❌ Ошибка отправки: ' + error.message); } 
+            else { input.value = ''; await loadMessages(); }
         }
 
         // ===== ЗАПУСК ПРИЛОЖЕНИЯ =====
         console.log('🔧 Подготовка к запуску...');
-
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
                 console.log('📄 DOM загружен, запускаем приложение...');
@@ -2952,11 +2564,7 @@
             console.log('📄 Страница уже загружена, запускаем приложение...');
             initApp();
         }
-
-        window.addEventListener('load', () => {
-            console.log('🎉 Всё загружено!');
-        });
+        window.addEventListener('load', () => { console.log('🎉 Всё загружено!'); });
     </script>
-
 </body>
 </html>
