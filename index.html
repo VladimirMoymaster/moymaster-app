@@ -1233,7 +1233,7 @@
 </div>
 
     <!-- ===== BOTTOM NAVIGATION ===== -->
-    <nav class="bottom-nav">
+    <nav class="bottom-nav" id="bottom-nav">
         <button class="nav-item active" onclick="switchTab('home')">
             <i class="fas fa-home"></i>
             <span>Главная</span>
@@ -2415,6 +2415,13 @@
         // ===== АДМИН-ПАНЕЛЬ И МОДЕРАЦИЯ =====
 function showAdminTab() {
     const nav = document.getElementById('bottom-nav');
+    
+    // Проверка: существует ли навигация
+    if (!nav) {
+        console.error('❌ Навигация не найдена!');
+        return;
+    }
+    
     // Проверяем, нет ли уже кнопки модерации
     if (document.getElementById('nav-moderation')) return;
     
