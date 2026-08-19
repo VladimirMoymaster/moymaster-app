@@ -2414,16 +2414,18 @@
 
         // ===== АДМИН-ПАНЕЛЬ И МОДЕРАЦИЯ =====
 function showAdminTab() {
-    const nav = document.getElementById('bottom-nav');
+    alert('🔍 showAdminTab вызвана! Пользователь: ' + currentUser.name);
     
-    // Проверка: существует ли навигация
+    const nav = document.getElementById('bottom-nav');
     if (!nav) {
-        console.error('❌ Навигация не найдена!');
+        alert('❌ Навигация не найдена!');
         return;
     }
     
-    // Проверяем, нет ли уже кнопки модерации
-    if (document.getElementById('nav-moderation')) return;
+    if (document.getElementById('nav-moderation')) {
+        alert('ℹ️ Кнопка модерации уже есть');
+        return;
+    }
     
     const modBtn = document.createElement('button');
     modBtn.id = 'nav-moderation';
@@ -2431,6 +2433,8 @@ function showAdminTab() {
     modBtn.onclick = () => switchTab('moderation');
     modBtn.innerHTML = '<i class="fas fa-shield-alt"></i><span>Модерация</span>';
     nav.insertBefore(modBtn, nav.lastElementChild);
+    
+    alert('✅ Кнопка модерации добавлена!');
 }
 
 async function loadModerationOrders() {
