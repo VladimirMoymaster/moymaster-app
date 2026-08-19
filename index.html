@@ -2477,20 +2477,64 @@ async function loadModerationOrders() {
 }
 
 async function approveOrder(orderId) {
-    alert('✅ Функция вызвана! ID заявки: ' + orderId);
+    alert('🔍 Начинаем одобрение заявки #' + orderId);
     
-    const result = await supabaseClient
+    if (!confirm('Одобрить эту заявку?')) {
+        alert('❌ Отменено');
+        return;
+    }
+
+    alert('📤 Отправляем запрос в базу данных...');
+
+    const { data, error } = await supabaseClient
         .from('orders')
         .update({ status: 'open' })
-        .eq('id', orderId);
-    
-    if (result.error) {
-        alert('❌ Ошибка: ' + result.error.message);
-    } else {
-        alert('✅ Успех! Заявка одобрена.');
-        await loadModerationOrders();
-        await loadOrders();
+        .eq('id', orderId)
+        .select();
+
+    if (error) {
+        alert('❌ ОШИБКА БАЗЫ ДАННЫХ:\n\n' + error.message + '\n\nКод: ' + error.code);
+        return;
     }
+
+    alert('✅ Заявка обновлена! Публикуем в группе ВК...');
+
+    // НОВОЕ: Автопостинг после одобрения
+    const approvedOrder = data[0];
+    await postOrderToServer(approvedOrder);
+    await notifyMastersAboutNewOrder(approvedOrder);
+
+    // Пробуем создать уведомление
+    try {
+        const { data: order } = await supabaseClient
+            .from('orders')
+            .select('user_id, title')
+            .eq('id', orderId)
+            .single();
+        
+        const { error: notifError } = await supabaseClient
+            .from('notifications')
+            .insert([{
+                user_id: order.user_id,
+                title: '✅ Заявка одобрена!',
+                message: 'Ваша заявка "' + order.title + '" прошла модерацию.',
+                type: 'success',
+                order_id: orderId
+            }]);
+        
+        if (notifError) {
+            alert('⚠️ Уведомление не создано: ' + notifError.message);
+        } else {
+            alert('✅ Уведомление создано!');
+        }
+    } catch (e) {
+        alert('⚠️ Ошибка уведомления: ' + e.message);
+    }
+
+    alert('🎉 Всё готово! Обновляем списки...');
+    await loadModerationOrders();
+    await loadOrders();
+    alert('✅ Готово! Заявка одобрена и опубликована.');
 }
         
 function openRejectModal(orderId) {
