@@ -2477,56 +2477,78 @@ async function loadModerationOrders() {
 }
 
 async function approveOrder(orderId) {
-    if (!confirm('Одобрить эту заявку?')) return;
-
-    // 1. Сначала одобряем заявку в базе (это главное!)
-    const { data, error } = await supabaseClient
-        .from('orders')
-        .update({ status: 'open' })
-        .eq('id', orderId)
-        .select();
-
-    if (error) {
-        alert('❌ Ошибка базы данных: ' + error.message);
-        return;
+    console.log('approveOrder вызван, ID:', orderId);
+    
+    // Визуальная обратная связь через кнопку
+    const btn = event.target.closest('button');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Одобрение...';
     }
 
-    alert('✅ Заявка одобрена в базе!');
-
-    // 2. Пытаемся опубликовать пост (но если не получится — не страшно)
     try {
-        const approvedOrder = data[0];
-        await postOrderToServer(approvedOrder);
-        await notifyMastersAboutNewOrder(approvedOrder);
-        console.log('✅ Пост опубликован в группе ВК');
-    } catch (serverError) {
-        console.warn('️ Не удалось опубликовать пост (сервер недоступен):', serverError);
-        // НЕ прерываем выполнение!
-    }
-
-    // 3. Создаём уведомление пользователю
-    try {
-        const { data: order } = await supabaseClient
+        // 1. Одобряем заявку
+        const { data, error } = await supabaseClient
             .from('orders')
-            .select('user_id, title')
+            .update({ status: 'open' })
             .eq('id', orderId)
-            .single();
-        
-        await supabaseClient.from('notifications').insert([{
-            user_id: order.user_id,
-            title: '✅ Заявка одобрена!',
-            message: 'Ваша заявка "' + order.title + '" прошла модерацию.',
-            type: 'success',
-            order_id: orderId
-        }]);
-    } catch (notifError) {
-        console.warn('⚠️ Уведомление не создано:', notifError);
-    }
+            .select();
 
-    // 4. Обновляем списки
-    await loadModerationOrders();
-    await loadOrders();
-    alert('✅ Готово! Заявка одобрена.');
+        if (error) {
+            console.error('Ошибка базы:', error);
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-check"></i> Одобрить';
+            }
+            return;
+        }
+
+        console.log('Заявка одобрена:', data);
+
+        // 2. Публикация в ВК (не критично)
+        try {
+            if (data && data[0]) {
+                await postOrderToServer(data[0]);
+                await notifyMastersAboutNewOrder(data[0]);
+            }
+        } catch (e) {
+            console.warn('Сервер недоступен:', e);
+        }
+
+        // 3. Уведомление пользователю
+        try {
+            const { data: order } = await supabaseClient
+                .from('orders')
+                .select('user_id, title')
+                .eq('id', orderId)
+                .single();
+            
+            if (order) {
+                await supabaseClient.from('notifications').insert([{
+                    user_id: order.user_id,
+                    title: 'Заявка одобрена',
+                    message: 'Ваша заявка "' + order.title + '" прошла модерацию.',
+                    type: 'success',
+                    order_id: orderId
+                }]);
+            }
+        } catch (e) {
+            console.warn('Уведомление не создано:', e);
+        }
+
+        // 4. Обновляем списки
+        await loadModerationOrders();
+        await loadOrders();
+        
+        console.log('Готово!');
+        
+    } catch (err) {
+        console.error('Критическая ошибка:', err);
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-check"></i> Одобрить';
+        }
+    }
 }
         
 function openRejectModal(orderId) {
